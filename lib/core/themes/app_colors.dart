@@ -10,4 +10,5 @@ class AppColors {
   static const Color defaultTextColor = Color(0xFFACACAC);
   static const Color pureWhite = Color(0xFFFFFFFF);
   static const Color borderSecondary = Color(0xFF1C2D07);
+  static const Color text = Color(0xFF1F1F1F);
 }

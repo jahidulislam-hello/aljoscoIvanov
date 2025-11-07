@@ -205,7 +205,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         color: widget.dropdownHintTextColor ?? widget.hintTextColor ??AppColors.defaultTextColor,
       ),
       filled: widget.filledstatus ?? true,
-      fillColor: widget.filledColor ?? (widget.isEnabled ? AppColors.background : AppColors.buttonColor),
+      fillColor: widget.filledColor ?? (widget.isEnabled ? AppColors.pureWhite : AppColors.buttonColor),
       contentPadding: EdgeInsets.symmetric(
         vertical: widget.boxHeight?.toDouble() ?? 18.h,
         horizontal: 20.w,
@@ -220,7 +220,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: AppColors.background, width: 1.5),
+        borderSide: BorderSide(color: AppColors.buttonColor, width: 1.5),
       ),
       prefixIcon: _buildPrefixIcon(context),
       suffixIcon: _isPasswordField && !widget.readOnly // Don't show password toggle for readOnly fields

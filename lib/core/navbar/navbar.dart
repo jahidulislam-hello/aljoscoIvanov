@@ -105,8 +105,10 @@
 //       child: Row(
 //         mainAxisAlignment: MainAxisAlignment.spaceAround,
 //         children: [
-//           _buildNavItem(Icons.fitness_center, 0, true),
+//           _buildNavItem('assets/navbar/', 0, true),
 //           _buildNavItem(Icons.restaurant, 1, true),
+//           _buildNavItem(Icons.show_chart, 2,true),
+//           _buildNavItem(Icons.show_chart, 2,true),
 //           _buildNavItem(Icons.show_chart, 2,true),
 //         ],
 //       ),
