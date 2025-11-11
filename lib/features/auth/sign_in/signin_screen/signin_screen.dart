@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:freshbite/core/navbar/navbar/navbar_screen.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/core/widgets/custom_text_field.dart';
@@ -60,12 +61,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: const [
                   Text(
                     "Log In",
-                    style: TextStyle(fontSize: 24, color: Colors.white),
+                    style: TextStyle(fontSize: 24, color: Colors.black, fontWeight: FontWeight.w500),
                   ),
                   SizedBox(height: 10),
                   Text(
                     "Enter your email and password to continue",
-                    style: TextStyle(fontSize: 16, color: Colors.white70),
+                    style: TextStyle(fontSize: 16, color: Color(0xFF4A4A4A)),
                   ),
                 ],
               ),
@@ -102,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Theme(
                       data: Theme.of(context).copyWith(
-                        unselectedWidgetColor: Colors.white,
+                        unselectedWidgetColor: Colors.black,
                       ),
                       child: Checkbox(
                         value: rememberMe,
@@ -118,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     const Text(
                       "Remember Me",
-                      style: TextStyle(color: Colors.white70),
+                      style: TextStyle(color: Color(0xFF6E6E6E)),
                     ),
                   ],
                 ),
@@ -127,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () {  },
                   child:  Text(
                     'Forgot Password?',
-                    style: TextStyle(color: AppColors.defaultTextColor),
+                    style: TextStyle(color: Colors.black),
                   ),
                 ),
               ],
@@ -138,7 +139,9 @@ class _LoginScreenState extends State<LoginScreen> {
             CustomTextButton(
               text: "Log In",
               onTap: (
-              ){},
+              ){
+                Get.offAll(() => BottomNavbar());
+              },
 
             ),
             const SizedBox(height: 20),
@@ -149,7 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const Text(
                   "Don’t have an account? ",
-                  style: TextStyle(color: Colors.white70),
+                  style: TextStyle(color: Colors.blueGrey),
                 ),
                 GestureDetector(
                   onTap: () {
@@ -158,7 +161,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Text(
                     "Sign Up",
                     style: TextStyle(
-                      color: AppColors.defaultTextColor,
+                      color: AppColors.mainTextColor,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

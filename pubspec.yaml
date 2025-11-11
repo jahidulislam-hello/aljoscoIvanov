@@ -73,3 +73,10 @@ flutter:
     - assets/audio/
     - assets/video/
     - assets/navbar/
+
+
+  fonts:
+    - family: Baste B
+      fonts:
+        - asset: assets/fonts/BasteB-Black.otf
+          weight: 900

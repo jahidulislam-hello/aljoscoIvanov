@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:freshbite/core/navbar/controller/navbar_controller.dart';
 import 'package:freshbite/features/home/favourites/favourites_screen/favourite_screen.dart';
+import 'package:freshbite/features/home/filter/filter_screen/filter_screen.dart';
 import 'package:freshbite/features/home/home_new/screen/cooking_screen.dart';
 import 'package:freshbite/features/home/home_new/screen/recipe_screen.dart';
 import 'package:freshbite/features/home/home_recipes/home_recepies_screen/home_recepies_screen.dart';
@@ -17,13 +18,11 @@ class BottomNavbar extends StatefulWidget {
 }
 
 class _BottomNavbarState extends State<BottomNavbar> {
-  // Initialize controller with the initial index directly
   late final BottomNavbarController controller;
 
   @override
   void initState() {
     super.initState();
-    // Create controller with initial index - no setState needed
     controller = Get.put(BottomNavbarController(widget.initialIndex));
   }
 
@@ -32,7 +31,7 @@ class _BottomNavbarState extends State<BottomNavbar> {
     CookingSkillsScreen(),
     RecipeDetailScreen(),
     FavoritesScreen(),
-    RecipeDetailScreen(),
+    FilterScreen(),
   ];
 
   @override
