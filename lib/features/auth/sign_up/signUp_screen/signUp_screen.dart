@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:freshbite/core/navbar/navbar/navbar_screen.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/core/widgets/custom_text_field.dart';
@@ -68,12 +69,6 @@ class SignUpScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
 
-                  /// Location
-                  CustomTextField(
-                    controller: controller.addressController,
-                    hintText: "Location",
-                  ),
-                  const SizedBox(height: 16),
 
                   /// Password
                   Obx(
@@ -108,7 +103,7 @@ class SignUpScreen extends StatelessWidget {
                   /// Terms checkbox
                   Theme(
                     data: Theme.of(context).copyWith(
-                      unselectedWidgetColor: Colors.white, // border visible on black bg
+                      unselectedWidgetColor: Colors.black, // border visible on black bg
                     ),
                     child: Obx(
                           () => CheckboxListTile(
@@ -143,7 +138,7 @@ class SignUpScreen extends StatelessWidget {
                   CustomTextButton(
                     text: "Sign Up",
                     onTap: () {
-                      // your navigation or action here
+                      Get.offAll(() => BottomNavbar());
 
                     },
                   ),
@@ -166,7 +161,7 @@ class SignUpScreen extends StatelessWidget {
                           "Login",
                           style: TextStyle(
                             fontSize: 16,
-                            color: AppColors.pureWhite,
+                            color: AppColors.buttonColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

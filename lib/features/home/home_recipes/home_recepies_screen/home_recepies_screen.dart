@@ -1,11 +1,12 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
 import 'package:freshbite/features/home/home_recipes/home_recepies_controller/home_recepies_controller.dart';
+import 'package:freshbite/features/home/recipe_search/recipe_search_screen/receipe_search_screen.dart';
 import 'package:get/get.dart';
-
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -16,7 +17,6 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      // bottomNavigationBar: const CustomBottomNavBar(currentIndex: 0),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
@@ -58,73 +58,115 @@ class HomeScreen extends StatelessWidget {
               SizedBox(height: 16.h),
 
               // Search bar
-              Container(
-                height: 45.h,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30.r),
-                  color: AppColors.pureWhite,
-                ),
-                child: Row(
-                  children: [
-                    SizedBox(width: 12.w),
-                    Icon(Icons.search, color: AppColors.mainTextColor),
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: "Search recipes",
-                          border: InputBorder.none,
-                          contentPadding:
-                          EdgeInsets.symmetric(horizontal: 10.w),
-                        ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 45.h,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30.r),
+                        color: AppColors.pureWhite,
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(width: 12.w),
+                          Image.asset(
+                            AppImages.search, // your PNG asset path
+                            width: 24.w,          // adjust size as needed
+                            height: 24.h,
+                            color: AppColors.mainTextColor, // optional: if you want to tint the PNG
+                          ),
+                          Expanded(
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: "Search recipes",
+                                border: InputBorder.none,
+                                contentPadding:
+                                EdgeInsets.symmetric(horizontal: 10.w),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Icon(Icons.tune, color: AppColors.background),
-                    SizedBox(width: 12.w),
-                  ],
-                ),
+                  ),
+                  SizedBox(width: 10.w),
+                  Container(
+                    width: 36.w,
+                    height: 36.h,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(5.r),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.tune,
+                        color: AppColors.pureWhite,
+                        size: 24.sp,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-
               SizedBox(height: 20.h),
 
               // Featured recipe card
               Obx(() {
-                if (controller.recipes.isEmpty) return SizedBox.shrink();
+                if (controller.recipes.isEmpty) return const SizedBox.shrink();
                 final item = controller.recipes.first;
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16.r),
-                    color: AppColors.pureWhite,
-                  ),
-                  padding: EdgeInsets.all(12.w),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(item.category,
-                                style: AppTextStyles.bioText.copyWith(
-                                    color: AppColors.defaultTextColor)),
-                            SizedBox(height: 4.h),
-                            Text(item.title,
-                                style: AppTextStyles.H4_Regular
-                                    .copyWith(color: AppColors.background)),
-                            SizedBox(height: 4.h),
-                            Text(item.description,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppTextStyles.bioText),
-                          ],
+                return Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16.r),
+                        color: AppColors.pureWhite,
+                      ),
+                      padding: EdgeInsets.all(12.w),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(item.category,
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                        color: AppColors.mainTextColor)),
+                                SizedBox(height: 4.h),
+                                Text(item.title,
+                                    style: AppTextStyles.HeadBold.copyWith(
+                                        color: AppColors.mainTextColor)),
+                                SizedBox(height: 6.h),
+                                Text(item.description,
+                                    softWrap: true,
+                                    overflow: TextOverflow.visible,
+                                    style: AppTextStyles.bodySmall.copyWith(
+                                        color: AppColors.mainTextColor,
+                                        height: 1.4)),
+                              ],
+                            ),
+                          ),
+                          SizedBox(width: 10.w),
+                          SizedBox(width: 100.w),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      right: 2.w,
+                      bottom: -20.h,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12.r),
+                        child: Image.asset(
+                          item.image,
+                          width: 140.w,
+                          height: 150.h,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      SizedBox(width: 10.w),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12.r),
-                        child: Image.asset(item.image,
-                            width: 90.w, height: 80.h, fit: BoxFit.cover),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 );
               }),
 
@@ -134,14 +176,23 @@ class HomeScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Let`s cook!",
-                      style: AppTextStyles.H3_Regular
-                          .copyWith(fontWeight: FontWeight.w700)),
-                  Text("See all",
-                      style: AppTextStyles.bioText
-                          .copyWith(color: AppColors.mainTextColor)),
+                  Text(
+                    "Let's cook!",
+                    style: AppTextStyles.heading1.copyWith(fontWeight: FontWeight.w500),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      // Navigate to RecipeSearchScreen
+                      Get.to(() => RecipeSearchScreen());
+                    },
+                    child: Text(
+                      "See all",
+                      style: AppTextStyles.bioText.copyWith(color: AppColors.buttonColor),
+                    ),
+                  ),
                 ],
               ),
+
               SizedBox(height: 10.h),
 
               Obx(() => SingleChildScrollView(
@@ -153,16 +204,50 @@ class HomeScreen extends StatelessWidget {
                     padding: EdgeInsets.only(right: 10.w),
                     child: Column(
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(12.r),
-                          child: Image.asset(recipe.image,
-                              width: 100.w,
-                              height: 100.h,
-                              fit: BoxFit.cover),
+                        Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius:
+                              BorderRadius.circular(12.r),
+                              child: Image.asset(
+                                recipe.image,
+                                width: 110.w,
+                                height: 145.h,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                height: 32.h,
+                                decoration: BoxDecoration(
+                                  color: Colors.black
+                                      .withOpacity(0.4),
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft:
+                                    Radius.circular(12.r),
+                                    bottomRight:
+                                    Radius.circular(12.r),
+                                  ),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  recipe.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTextStyles
+                                      .buttonRegular
+                                      .copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 6.h),
-                        Text(recipe.title,
-                            style: AppTextStyles.bioText),
                       ],
                     ),
                   ))
@@ -172,29 +257,173 @@ class HomeScreen extends StatelessWidget {
 
               SizedBox(height: 20.h),
 
-              // Next planned prep list
-              Text("Next planned Prep List:",
-                  style: AppTextStyles.H4_Regular
-                      .copyWith(fontWeight: FontWeight.w600)),
-              SizedBox(height: 4.h),
-              Text("Regular meal plan",
-                  style: AppTextStyles.H4_Regular
-                      .copyWith(fontWeight: FontWeight.w500)),
-              SizedBox(height: 6.h),
+              // Next Planned Prep List Section
               Text(
-                  "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
-                  style: AppTextStyles.body),
-
+                "Next planned Prep List:",
+                style: AppTextStyles.heading2.copyWith(
+                    fontWeight: FontWeight.w600, color: AppColors.black),
+              ),
               SizedBox(height: 20.h),
+              Obx(
+                    () {
+                  if (controller.prepList.isEmpty) {
+                    // Show placeholder card when no prep data
+                    return Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(16.w),
+                      decoration: BoxDecoration(
+                        color: AppColors.pureWhite,
+                        borderRadius: BorderRadius.circular(16.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        "You don’t have a meal plan yet. Go to the meal planning section to create one.",
+                        style: AppTextStyles.body.copyWith(
+                          color: AppColors.mainTextColor.withOpacity(0.7),
+                          height: 1.4,
+                        ),
+                      ),
+                    );
+                  }
 
-              // Next planned shopping
-              Text("Next planned Shopping:",
-                  style: AppTextStyles.H4_Regular
-                      .copyWith(fontWeight: FontWeight.w600)),
-              SizedBox(height: 6.h),
+                  // Show normal PrepList UI when data exists
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: controller.prepList.map((prep) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            prep.title,
+                            style: AppTextStyles.H6_Regular.copyWith(
+                                fontWeight: FontWeight.w600, color: AppColors.black),
+                          ),
+                          SizedBox(height: 8.h),
+                          Text(
+                            prep.description,
+                            style: AppTextStyles.body.copyWith(
+                                color: AppColors.black, fontWeight: FontWeight.w400),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            controller.assignedText,
+                            style: AppTextStyles.bioText.copyWith(
+                                color: AppColors.mainTextColor.withOpacity(0.7)),
+                          ),
+                          SizedBox(height: 16.h),
+                        ],
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+
+              SizedBox(height: 30.h),
+
+// Next Planned Shopping Section
               Text(
-                  "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
-                  style: AppTextStyles.body),
+                "Next Planned Shopping:",
+                style: AppTextStyles.heading2.copyWith(
+                    fontWeight: FontWeight.w600, color: AppColors.black),
+              ),
+              SizedBox(height: 20.h),
+              Obx(
+                    () {
+                  if (controller.shoppingList.isEmpty) {
+                    // Show placeholder card when no shopping data
+                    return Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(16.w),
+                      decoration: BoxDecoration(
+                        color: AppColors.pureWhite,
+                        borderRadius: BorderRadius.circular(16.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        "You don’t have a meal plan yet. Go to the meal planning section to create one.",
+                        style: AppTextStyles.body.copyWith(
+                          color: AppColors.mainTextColor.withOpacity(0.7),
+                          height: 1.4,
+                        ),
+                      ),
+                    );
+                  }
+
+                  // Show normal ShoppingList UI when data exists
+                  return Column(
+                    children: controller.shoppingList.map((shop) {
+                      return Container(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 70.w,
+                              height: 70.h,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.r),
+                                border: Border.all(color: AppColors.buttonColor),
+                                image: DecorationImage(
+                                  image: AssetImage(shop.image),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 12.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    shop.title,
+                                    style: AppTextStyles.H6_Regular.copyWith(
+                                        fontWeight: FontWeight.w600, color: AppColors.black),
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Text(
+                                    shop.description,
+                                    style: AppTextStyles.body.copyWith(
+                                        color: AppColors.black, fontWeight: FontWeight.w400),
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  Text(
+                                    controller.assignedText,
+                                    style: AppTextStyles.bioText.copyWith(
+                                        color: AppColors.mainTextColor.withOpacity(0.7)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: 60.w,
+                              height: 60.h,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image: AssetImage(AppImages.appLogo),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+
             ],
           ),
         ),

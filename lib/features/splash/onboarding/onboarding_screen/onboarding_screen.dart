@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:freshbite/features/auth/sign_in/signin_screen/signin_screen.dart';
+import 'package:freshbite/features/auth/sign_up/signUp_screen/signUp_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
@@ -18,25 +20,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<Map<String, String>> onboardingData = [
     {
-      "title": "Wellcome to FreshBite !".tr,
+      "title": "Welcome to freshbite!".tr,
       "description": "Log in to start cooking!".tr,
       "onboardImage": "assets/images/onboard.png",
     },
   ];
 
   final _localizationController = Get.find<LocalizationController>();
-
-
+  String selectedLang = 'EN'; // Default
 
   @override
   void initState() {
     super.initState();
-    _pageController.addListener(() {
-      final newPage = _pageController.page?.round() ?? 0;
-      if (newPage != currentPage) {
-        setState(() => currentPage = newPage);
-      }
-    });
+    selectedLang = _localizationController.locale.languageCode == 'de' ? 'DE' : 'EN';
   }
 
   @override
@@ -59,31 +55,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: sizeW * .12),
               child: Column(
-                // mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Image.asset(
                     onboardingData[0]['onboardImage']!,
                     height: 400.h,
-                    width: 393.w,
+                    width: 593.w,
                   ),
-                  SizedBox(height: 30.h),
+                  SizedBox(height: 10.h),
                   Text(
                     onboardingData[0]['title']!,
                     textAlign: TextAlign.center,
                     style: TextStyle(
+                      fontFamily: 'Baste B', // your custom font
+                      fontWeight: FontWeight.w900, // 900 = Black weight
+                      fontStyle: FontStyle.normal, // since 'Black' is weight, style stays normal
                       fontSize: 40.sp,
-                      fontWeight: FontWeight.w900,
-
-                      color: Color(0xFF1C2D07),
+                      height: 46 / 40, // line height ratio → 46px line-height for 40px font-size
+                      letterSpacing: 0,
+                      color: const Color(0xFF1C2D07),
                     ),
                   ),
+
                   SizedBox(height: 10.h),
                   Text(
                     onboardingData[0]['description']!,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 14.sp,
-                      color: Colors.black54,
+                      fontSize: 20.sp,
+                      color: Color(0xFF677259),
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   SizedBox(height: 80.h),
@@ -91,59 +91,54 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
 
-            /// SIGN UP Button
+            /// LOGIN Button (Filled)
             Positioned(
-              bottom: 120.h,
-              left: sizeW * 0.12,
-              right: sizeW * 0.12,
-              child: CustomTextButton(
-                text: 'SIGN UP'.tr,
-                onTap: () {
-                  // context.pushNamed(RouteNames.signUpScreen);
-                },
-              ),
-            ),
-            SizedBox(height: 20.h),
-
-            /// LOGIN Button
-            Positioned(
-              bottom: 70.h,
+              bottom: 150.h,
               left: sizeW * 0.12,
               right: sizeW * 0.12,
               child: CustomTextButton(
                 text: 'LOGIN'.tr,
+                filled: true,
                 onTap: () {
-                  // context.pushNamed(RouteNames.loginScreen);
+                  Get.offAll(() => LoginScreen());
                 },
               ),
             ),
 
-            /// "Continue as Guest" section
+            /// SIGN UP Button (Outlined)
             Positioned(
-              bottom: 30.h,
+              bottom: 90.h,
+              left: sizeW * 0.12,
+              right: sizeW * 0.12,
+              child: CustomTextButton(
+                text: 'SIGN UP'.tr,
+                filled: false,
+                color: Color(0xFF1C2D07), // border & text color
+                onTap: () {
+                  Get.offAll(() => SignUpScreen());
+                },
+              ),
+            ),
+
+
+            /// "Continue as Guest"
+            Positioned(
+              bottom: 50.h,
               left: sizeW * 0.12,
               right: sizeW * 0.12,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "or",
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: Colors.black54,
-                    ),
-                  ),
+                  Text("or", style: TextStyle(fontSize: 14.sp, color: Colors.black54)),
                   SizedBox(width: 8.w),
                   InkWell(
-                    onTap: () {
-                      // context.pushNamed(RouteNames.signInScreen);
-                    },
+                    onTap: () {},
                     child: Text(
                       "Continue as Guest",
                       style: TextStyle(
                         fontSize: 14.sp,
-                        color: AppColors.background,
-                        fontWeight: FontWeight.w500,
+                        color: AppColors.buttonColor,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
@@ -151,65 +146,50 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
 
-            /// Language toggle at top-right
+            /// Language dropdown (top-right)
             Positioned(
               top: sizeH * 0.05,
               right: sizeW * 0.05,
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            _localizationController.setLanguage(
-                                const Locale('de', "DE"));
-                          },
-                          child: Text(
-                            'DE',
-                            style: TextStyle(
-                              color: _localizationController.locale.languageCode == 'de' ? AppColors.buttonColor : Colors.grey,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: selectedLang,
+                    icon: Icon(Icons.keyboard_arrow_down, color: AppColors.mainTextColor),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'EN',
+                        child: Row(
+                          children: [
+                            Image.asset('assets/icons/us.png', width: 24.w, height: 24.h),
+                            SizedBox(width: 8.w),
+                            Text('EN', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ],
                         ),
-                        Switch(
-                          value: _localizationController.locale.languageCode == 'en',
-                          onChanged: (value) {
-                            setState(() {
-                              value
-                                  ? _localizationController.setLanguage(
-                                  const Locale('en', "US"))
-                                  : _localizationController.setLanguage(
-                                  const Locale('de', "DE"));
-                            });
-                          },
-                          activeThumbColor: AppColors.background,
-                          inactiveThumbColor: Colors.grey[300],
-                          inactiveTrackColor: Colors.grey,
+                      ),
+                      DropdownMenuItem(
+                        value: 'DE',
+                        child: Row(
+                          children: [
+                            Image.asset('assets/icons/ger.png', width: 24.w, height: 24.h),
+                            SizedBox(width: 8.w),
+                            Text('DE', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ],
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            _localizationController.setLanguage(
-                                const Locale('en', "US"));
-                          },
-                          child: Text(
-                            'EN',
-                            style: TextStyle(
-                              color: _localizationController.locale.languageCode == 'en' ? AppColors.buttonColor : Colors.grey,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => selectedLang = value);
+                        if (value == 'EN') {
+                          _localizationController.setLanguage(const Locale('en', "US"));
+                        } else {
+                          _localizationController.setLanguage(const Locale('de', "DE"));
+                        }
+                      }
+                    },
                   ),
-                ],
+                ),
               ),
             ),
           ],

@@ -7,8 +7,6 @@ class BottomNavbarController extends GetxController {
     currentIndex.value = initialIndex;
   }
 
-
-
   void changeIndex(int index) {
     currentIndex.value = index;
   }

@@ -20,6 +20,14 @@ class AppImages {
   static String emergency = "$baseUrlImage/emergency.png";
   static String everyday = "$baseUrlImage/everyday.jpg";
   static String meal = "$baseUrlImage/meal.png";
+  static const String profilePlaceholder = 'assets/images/profile_placeholder.png';
+  static const String recipeImage1 = 'assets/images/red_velvet_cupcake.png';
+  static const String cameraIcon = 'assets/icons/camera.png';
+  static const String crownIcon = 'assets/icons/crown.png';
+  static String arrowBack =  "$baseUrlImage/arrow-back-fill.png";
+  static String search =  "$baseUrlImage/search.png";
+  static String imageIcon =  "$baseUrlImage/image_icon.png";
+  static String filter =  "$baseUrlImage/filter.png";
 
 
 
@@ -27,7 +35,7 @@ class AppImages {
 
   // Here All are SVG icons (using PNG placeholders since SVG directory is empty)
 
-  static String userLine = "$baseUrlImage/image.png"; // Using existing image as placeholder
+  static String searchIcon = "$baseUrlLogo/icons_search.svg"; // Using existing image as placeholder
   static String weuiArrowFilled = "$baseUrlImage/image.png"; // Using existing image as placeholder
   static String ArrowLeft = "$baseUrlImage/image.png"; // Using existing image as placeholder
   static String BookmarkSimple1 = "$baseUrlImage/image.png"; // Using existing image as placeholder
