@@ -17,19 +17,19 @@ class RecipeSearchController extends GetxController {
     recipes.assignAll([
       RecipeModel(
         title: "Pancake",
-        image: AppImages.pancake,
+        image: AppImages.soup,
         duration: 45,
         category: "Everyday",
       ),
       RecipeModel(
         title: "Red Velvet",
-        image: AppImages.redVelvet,
+        image: AppImages.pancake,
         duration: 45,
         category: "Everyday",
       ),
       RecipeModel(
         title: "Burrito",
-        image: AppImages.burrito,
+        image: AppImages.soup,
         duration: 45,
         category: "Meal Prep",
       ),

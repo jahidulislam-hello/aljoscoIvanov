@@ -1,6 +1,8 @@
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/features/profile/profile/model/profile_recipe_model.dart';
 import 'package:freshbite/features/profile/profile/model/user_model.dart';
+import 'package:freshbite/features/profile/profile_settings/profile_settings_screen/profile_settings_screen.dart';
+import 'package:freshbite/features/profile/settings/settings_screen/settings_screen.dart';
 import 'package:get/get.dart';
 
 class ProfileController extends GetxController {
@@ -62,7 +64,9 @@ class ProfileController extends GetxController {
 
   void openSettings() {
     // Navigate to settings screen
-    Get.toNamed('/settings');
+    // Get.toNamed('/settings');
+    Get.to(()=>SettingsScreen());
+
   }
 
   void viewRecipe(String recipeId) {
