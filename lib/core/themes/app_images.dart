@@ -45,5 +45,16 @@ class AppImages {
   static String ChatConversationCircle1 = "$baseUrlImage/image.png"; // Using existing image as placeholder
   static String ChatConversationCircle = "$baseUrlImage/image.png"; // Using existing image as placeholder
   static String ChevronDown1 = "$baseUrlImage/image.png"; // Using existing image as placeholder
+  static String pancake = "$baseUrlLogo/pancake.svg"; // Using existing image as placeholder
+  static String soup = "$baseUrlLogo/soup.svg"; // Using existing image as placeholder
+  static String profile = "$baseUrlLogo/profil.svg"; // Using existing image as placeholder
+  static String language = "$baseUrlLogo/translate.svg"; // Using existing image as placeholder
+  static String faq = "$baseUrlLogo/faq.svg"; // Using existing image as placeholder
+  static String privacy = "$baseUrlLogo/privacy.svg"; // Using existing image as placeholder
+  static String terms = "$baseUrlLogo/terms.svg"; // Using existing image as placeholder
+  static String arrow = "$baseUrlLogo/arrow-right.svg"; // Using existing image as placeholder
+  static String change_pass = "$baseUrlLogo/change_pass.svg"; // Using existing image as placeholder
+  static String delete= "$baseUrlLogo/delete.svg"; // Using existing image as placeholder
+
 
 }

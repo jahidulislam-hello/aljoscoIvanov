@@ -205,7 +205,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         color: widget.dropdownHintTextColor ?? widget.hintTextColor ??AppColors.defaultTextColor,
       ),
       filled: widget.filledstatus ?? true,
-      fillColor: widget.filledColor ?? (widget.isEnabled ? AppColors.pureWhite : AppColors.buttonColor),
+      fillColor: widget.filledColor ?? (widget.isEnabled ? AppColors.pureWhite : AppColors.pureWhite),
       contentPadding: EdgeInsets.symmetric(
         vertical: widget.boxHeight?.toDouble() ?? 18.h,
         horizontal: 20.w,

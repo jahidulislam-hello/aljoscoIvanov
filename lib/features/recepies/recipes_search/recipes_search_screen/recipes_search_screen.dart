@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:freshbite/core/themes/app_colors.dart';
+import 'package:freshbite/core/themes/app_images.dart';
+import 'package:freshbite/core/themes/text_styles.dart';
+import 'package:freshbite/features/home/recipe_search/recipe_search_controller/recipe_search_controller.dart';
 import 'package:get/get.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
-import '../../../core/utils/app_images.dart';
-import '../controller/recipe_search_controller.dart';
+
 
 class RecipeSearchScreen extends StatelessWidget {
   final RecipeSearchController controller = Get.put(RecipeSearchController());
@@ -14,14 +15,14 @@ class RecipeSearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgColor,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.bgColor,
+        backgroundColor: AppColors.background,
         elevation: 0,
         leading: Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary),
         title: Text(
           "Recipe Search",
-          style: AppTextStyle.medium16,
+          style: AppTextStyles.heading3,
         ),
         centerTitle: true,
         actions: [
@@ -57,7 +58,7 @@ class RecipeSearchScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: AppColors.greyBorder),
+        border: Border.all(color: AppColors.buttonColor),
       ),
       child: Row(
         children: [
@@ -68,7 +69,7 @@ class RecipeSearchScreen extends StatelessWidget {
               onChanged: (value) => controller.searchQuery(value),
               decoration: InputDecoration(
                 hintText: "Search recipes",
-                hintStyle: AppTextStyle.regular14.copyWith(color: AppColors.textSecondary),
+                hintStyle: AppTextStyles.heading1.copyWith(color: AppColors.textSecondary),
                 border: InputBorder.none,
               ),
             ),
@@ -90,12 +91,12 @@ class RecipeSearchScreen extends StatelessWidget {
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
             decoration: BoxDecoration(
-              color: index == 0 ? AppColors.primary : AppColors.chipBg,
+              color: index == 0 ? AppColors.primary : AppColors.buttonColor,
               borderRadius: BorderRadius.circular(20.r),
             ),
             child: Text(
               filters[index],
-              style: AppTextStyle.medium14.copyWith(
+              style: AppTextStyles.H6_Regular.copyWith(
                 color: index == 0 ? Colors.white : AppColors.textPrimary,
               ),
             ),
@@ -112,8 +113,8 @@ class RecipeSearchScreen extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title, style: AppTextStyle.medium16),
-            Text("See all", style: AppTextStyle.regular14.copyWith(color: AppColors.textSecondary)),
+            Text(title, style: AppTextStyles.H5_Regular),
+            Text("See all", style: AppTextStyles.H5_Regular.copyWith(color: AppColors.textSecondary)),
           ],
         ),
         SizedBox(height: 12.h),
@@ -150,13 +151,13 @@ class RecipeSearchScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(recipe.title, style: AppTextStyle.medium14),
+                Text(recipe.title, style: AppTextStyles.H5_Regular),
                 SizedBox(height: 4.h),
                 Row(
                   children: [
                     Icon(Icons.timer_outlined, size: 14.sp, color: AppColors.textSecondary),
                     SizedBox(width: 4.w),
-                    Text("${recipe.duration} min", style: AppTextStyle.regular12),
+                    Text("${recipe.duration} min", style: AppTextStyles.H6_Regular),
                     Spacer(),
                     Icon(Icons.favorite_border, size: 16.sp, color: AppColors.textSecondary),
                   ],
@@ -175,7 +176,7 @@ class RecipeSearchScreen extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.r),
         image: DecorationImage(
-          image: AssetImage(AppImages.snacksBanner),
+          image: AssetImage(AppImages.soup),
           fit: BoxFit.cover,
         ),
       ),
@@ -187,8 +188,8 @@ class RecipeSearchScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("5 min Snacks Recipe", style: AppTextStyle.semiBold16.copyWith(color: Colors.white)),
-                Text("10 Recipes", style: AppTextStyle.regular12.copyWith(color: Colors.white70)),
+                Text("5 min Snacks Recipe", style: AppTextStyles.H4_Regular.copyWith(color: Colors.white)),
+                Text("10 Recipes", style: AppTextStyles.H6_Regular.copyWith(color: Colors.white70)),
                 SizedBox(height: 8.h),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
@@ -196,7 +197,7 @@ class RecipeSearchScreen extends StatelessWidget {
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(8.r),
                   ),
-                  child: Text("VIEW RECIPE", style: AppTextStyle.medium12.copyWith(color: Colors.white)),
+                  child: Text("VIEW RECIPE", style: AppTextStyles.H6_Regular.copyWith(color: Colors.white)),
                 ),
               ],
             ),

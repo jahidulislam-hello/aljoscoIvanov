@@ -1,5 +1,7 @@
 // import 'package:flutter/material.dart';
 // import 'package:flutter_svg/svg.dart';
+// import 'package:freshbite/core/appbar/custom_appbar.dart';
+// import 'package:freshbite/core/themes/app_images.dart';
 // import 'package:freshbite/features/profile/account_settings/account_settings_controller/account_settings_controller.dart';
 // import 'package:get/get.dart';
 // import '../../../../core/widgets/button.dart';
@@ -94,7 +96,7 @@
 //                           GestureDetector(
 //                             onTap: () {
 //                               // TODO: Navigate to Edit Profile Screen
-//                               Get.to(() => ViewProfileScreen());
+//                               // Get.to(() => ViewProfileScreen());
 //                             },
 //                             child: const Text(
 //                               "View & Edit Profile",
@@ -140,7 +142,7 @@
 //                       ),
 //
 //                       onTap: () {
-//                         Get.to(() => ChangePasswordScreen());
+//                         // Get.to(() => ChangePasswordScreen());
 //                       },
 //                     ),
 //
@@ -158,7 +160,7 @@
 //                         height: 16,
 //                       ),
 //                       onTap: () {
-//                         Get.to(() => PrivacyScreen());
+//                         // Get.to(() => PrivacyScreen());
 //                       },
 //                     ),
 //
@@ -177,7 +179,7 @@
 //                       ),
 //
 //                       onTap: () {
-//                         Get.to(() => TermsScreen());
+//                         // Get.to(() => TermsScreen());
 //                       },
 //                     ),
 //                     const SizedBox(height: 24),
@@ -194,7 +196,7 @@
 //                         height: 16,
 //                       ),
 //                       onTap: () {
-//                         Get.to(() => AboutUs());
+//                         // Get.to(() => AboutUs());
 //                       },
 //                     ),
 //                     const SizedBox(height: 24),
@@ -211,7 +213,7 @@
 //                         height: 16,
 //                       ),
 //                       onTap: () {
-//                         Get.to(() => PaymentOptionsScreen());
+//                         // Get.to(() => PaymentOptionsScreen());
 //                       },
 //                     ),
 //                   ],
