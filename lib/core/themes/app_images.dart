@@ -28,6 +28,8 @@ class AppImages {
   static String search =  "$baseUrlImage/search.png";
   static String imageIcon =  "$baseUrlImage/image_icon.png";
   static String filter =  "$baseUrlImage/filter.png";
+  static String cook =  "$baseUrlImage/cook.mp4";
+  static String sasuka =  "$baseUrlImage/shasuka.png";
 
 
 

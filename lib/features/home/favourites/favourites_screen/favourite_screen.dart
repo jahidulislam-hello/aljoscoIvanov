@@ -44,7 +44,7 @@ class FavoritesScreen extends StatelessWidget {
             children: [
               _buildSearchBar(),
               SizedBox(height: 20.h),
-              Text("Recent Favorites", style: AppTextStyles.H4_Regular),
+              Text("Recent Favorites", style: AppTextStyles.H5_Regular),
               SizedBox(height: 12.h),
               _buildRecentFavorites(),
               SizedBox(height: 24.h),
@@ -146,8 +146,14 @@ class FavoritesScreen extends StatelessWidget {
                     Positioned(
                       right: 8.w,
                       top: 8.h,
-                      child: Icon(Icons.favorite, color: AppColors.background),
+                      child: Image.asset(
+                        'assets/icons/favourite.png', // your image path
+                        width: 24.w,
+                        height: 24.w,
+                        color: AppColors.borderSecondary, // remove this if you don't want tint
+                      ),
                     )
+
                   ],
                 ),
                 Padding(
@@ -239,7 +245,7 @@ class FavoritesScreen extends StatelessWidget {
                 padding: EdgeInsets.all(8.w),
                 child: Text(
                   collection['title']!,
-                  style: AppTextStyles.bioText,
+                  style: AppTextStyles.bodyLarge,
                 ),
               ),
             ],

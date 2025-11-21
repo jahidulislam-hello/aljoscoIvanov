@@ -10,7 +10,7 @@ class AppTextStyles {
     fontSize: 40.sp,
     fontWeight: FontWeight.w700,
     fontFamily: GoogleFonts.rubik().fontFamily,
-    color: AppColors.defaultTextColor,
+    color: AppColors.defaulttext,
     letterSpacing: 0,
   );
 
@@ -18,7 +18,7 @@ class AppTextStyles {
     fontSize: 36.sp,
     fontWeight: FontWeight.w700,
     fontFamily: GoogleFonts.rubik().fontFamily,
-    color: AppColors.defaultTextColor,
+    color: AppColors.defaulttext,
     letterSpacing: 0,
   );
 
@@ -26,7 +26,7 @@ class AppTextStyles {
     fontSize: 32.sp,
     fontWeight: FontWeight.w500,
     fontFamily: GoogleFonts.rubik().fontFamily,
-    color: AppColors.defaultTextColor,
+    color: AppColors.defaulttext,
     letterSpacing: 0,
   );
 
@@ -34,7 +34,7 @@ class AppTextStyles {
     fontSize: 28.sp,
     fontWeight: FontWeight.w500,
     fontFamily: GoogleFonts.rubik().fontFamily,
-    color: AppColors.defaultTextColor,
+    color: AppColors.defaulttext,
     letterSpacing: 0,
   );
 
@@ -42,7 +42,7 @@ class AppTextStyles {
     fontSize: 24.sp,
     fontWeight: FontWeight.w600,
     fontFamily: GoogleFonts.rubik().fontFamily,
-    color: AppColors.defaultTextColor,
+    color: AppColors.defaulttext,
     letterSpacing: 0,
   );
 
@@ -50,7 +50,7 @@ class AppTextStyles {
     fontSize: 16.sp,
     fontWeight: FontWeight.w400,
     fontFamily: GoogleFonts.rubik().fontFamily,
-    color: AppColors.defaultTextColor,
+    color: AppColors.defaulttext,
     letterSpacing: 0,
   );
 
@@ -58,7 +58,7 @@ class AppTextStyles {
     fontSize: 14.sp,
     fontWeight: FontWeight.w400,
     fontFamily: GoogleFonts.rubik().fontFamily,
-    color: AppColors.defaultTextColor,
+    color: AppColors.defaulttext,
     letterSpacing: 0,
   );
 
@@ -66,7 +66,7 @@ class AppTextStyles {
     fontSize: 18.sp,
     fontWeight: FontWeight.w600,
     fontFamily: GoogleFonts.rubik().fontFamily,
-    color: AppColors.defaultTextColor,
+    color: AppColors.defaulttext,
     letterSpacing: 0,
   );
 
@@ -74,7 +74,7 @@ class AppTextStyles {
     fontSize: 14.sp,
     fontWeight: FontWeight.w400,
     fontFamily: GoogleFonts.rubik().fontFamily,
-    color: AppColors.defaultTextColor,
+    color: AppColors.defaulttext,
     letterSpacing: 0,
   );
 
@@ -82,7 +82,7 @@ class AppTextStyles {
     fontSize: 12.sp,
     fontWeight: FontWeight.w400,
     fontFamily: GoogleFonts.rubik().fontFamily,
-    color: AppColors.defaultTextColor,
+    color: AppColors.defaulttext,
     letterSpacing: 0,
   );
 
@@ -90,7 +90,7 @@ class AppTextStyles {
     fontSize: 14.sp,
     fontWeight: FontWeight.w500,
     fontFamily: GoogleFonts.rubik().fontFamily,
-    color: AppColors.defaultTextColor,
+    color: AppColors.defaulttext,
     letterSpacing: 0,
   );
 
@@ -103,7 +103,7 @@ class AppTextStyles {
 
   static final TextStyle heading2 = TextStyle(
     fontSize: 20.sp,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
     fontFamily: GoogleFonts.rubik().fontFamily,
   );
@@ -117,9 +117,10 @@ class AppTextStyles {
 
   static final TextStyle bodyLarge = TextStyle(
     fontSize: 16.sp,
-    fontWeight: FontWeight.w400,
-    color: AppColors.textPrimary,
+    fontWeight: FontWeight.w500,
+    color: AppColors.defaulttext,
     fontFamily: GoogleFonts.rubik().fontFamily,
+
   );
 
   static final TextStyle bodyMedium = TextStyle(
@@ -148,5 +149,65 @@ class AppTextStyles {
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary,
     fontFamily: GoogleFonts.rubik().fontFamily,
+  );
+
+  // Heading Styles
+  static TextStyle h1 = TextStyle(
+    fontSize: 28.sp,
+    fontWeight: FontWeight.bold,
+    color: AppColors.textPrimary,
+    height: 1.3,
+  );
+
+  static TextStyle h2 = TextStyle(
+    fontSize: 22.sp,
+    fontWeight: FontWeight.bold,
+    color: AppColors.textPrimary,
+    height: 1.3,
+  );
+
+  static TextStyle h3 = TextStyle(
+    fontSize: 18.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    height: 1.4,
+  );
+
+  static TextStyle h4 = TextStyle(
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    height: 1.4,
+  );
+
+  static TextStyle buttonSmall = TextStyle(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w600,
+    color: Colors.white,
+    letterSpacing: 0.5,
+  );
+
+
+
+  static TextStyle captionBold = TextStyle(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textSecondary,
+    height: 1.3,
+  );
+
+  // Label Styles
+  static TextStyle label = TextStyle(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textSecondary,
+    height: 1.4,
+  );
+
+  static TextStyle labelBold = TextStyle(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    height: 1.4,
   );
 }
