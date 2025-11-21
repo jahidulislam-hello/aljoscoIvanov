@@ -195,7 +195,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       fontSize: 20.sp,
       fontWeight: FontWeight.w600,
       color: const Color(0xFF2E3E5C),
-      fontFamily: 'Poppins',
+      fontFamily: 'Rubik',
     );
 
     return titleAlignment == AppBarTitleAlignment.center
@@ -229,10 +229,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     if (actionButtons != null && actionButtons!.isNotEmpty) {
       return Row(
         mainAxisSize: MainAxisSize.min,
-        children: actionButtons!.map((action) {
+        children: actionButtons!.asMap().entries.map((entry) {
+          final index = entry.key;
+          final action = entry.value;
+          final isLast = index == actionButtons!.length - 1; // Last icon = rightmost = border side
+
           return Padding(
             padding: EdgeInsets.only(left: 8.w),
-            child: _buildActionButton(action),
+            child: _buildActionButton(action, showBox: isLast),
           );
         }).toList(),
       );
@@ -242,7 +246,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
 
-  Widget _buildActionButton(AppBarAction action) {
+  Widget _buildActionButton(AppBarAction action, {bool showBox = false}) {
     const double fixedWidth = 36;
     const double fixedHeight = 34;
     const double fixedIconSize = 24;
@@ -258,6 +262,27 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       );
     }
 
+    // If showBox is false (not the last icon), show without background box
+    if (!showBox) {
+      return GestureDetector(
+        onTap: action.onPressed,
+        child: action.imagePath != null
+            ? Image.asset(
+          action.imagePath!,
+          fit: BoxFit.contain,
+          width: iconSize,
+          height: iconSize,
+          color: action.iconColor ?? const Color(0xFF2E3E5C),
+        )
+            : Icon(
+          action.icon ?? Icons.more_vert,
+          size: iconSize,
+          color: action.iconColor ?? const Color(0xFF2E3E5C),
+        ),
+      );
+    }
+
+    // If showBox is true (last icon = rightmost = border side), show with background box
     return GestureDetector(
       onTap: action.onPressed,
       child: Container(

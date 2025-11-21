@@ -12,7 +12,7 @@ class MealPlanController extends GetxController {
       name: 'Tomato Soup',
       image: 'assets/images/tomato_soup.png',
       servings: 4,
-      addedBy: 'Olivia afgv',
+      addedBy: 'Olivia Dis',
       date: 'May 14, 2025',
       note: 'This is dinner recipe please make it class day.',
     ),
@@ -25,7 +25,7 @@ class MealPlanController extends GetxController {
       name: 'Tomato Soup',
       image: 'assets/images/tomato_soup.png',
       servings: 4,
-      addedBy: 'Olivia afgv',
+      addedBy: 'Olivia Dis',
       date: 'May 14, 2025',
     ),
   ].obs;
@@ -35,7 +35,7 @@ class MealPlanController extends GetxController {
       name: 'Tomato Soup',
       image: 'assets/images/tomato_soup.png',
       servings: 4,
-      addedBy: 'Olivia afgv',
+      addedBy: 'Olivia Dis',
       date: 'May 14, 2025',
     ),
   ].obs;

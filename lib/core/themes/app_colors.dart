@@ -20,4 +20,36 @@ class AppColors {
   static const Color lightGrey = Color(0xFFD0DBEA);
   static const Color textPrimary = Color(0xFF0C1303);
   static const Color textSecondary = Color(0xFF9FA5C0);
+  static const Color defaulttext = Color(0xFF142005);
+
+  static const Color primaryDark = Color(0xFF1A3D28);
+  static const Color primaryLight = Color(0xFF4A8157);
+
+  // Accent Colors
+  static const Color accent = Color(0xFFE8B86D);
+
+
+  static const Color cardBackground = Colors.white;
+
+
+  static const Color textLight = Color(0xFF9E9E9E);
+
+  // Border Colors
+  static const Color border = Color(0xFFE0E0E0);
+  static const Color borderLight = Color(0xFFF0F0F0);
+
+  // Star Rating
+  static const Color starYellow = Color(0xFFFFB800);
+
+  // Status Colors
+  static const Color error = Color(0xFFE53935);
+  static const Color success = Color(0xFF43A047);
+  static const Color warning = Color(0xFFFB8C00);
+
+  // Gradient
+  static const LinearGradient primaryGradient = LinearGradient(
+    colors: [primary, primaryDark],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 }

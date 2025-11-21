@@ -33,13 +33,13 @@ class MealPrepareController extends GetxController {
     ),
     RecipeModel(
       name: 'Chicken Soup',
-      image: 'assets/images/chicken_soup.png',
+      image: 'assets/images/tomato_soup.png',
       servings: 8,
       cookedBy: 'Olivia afgv',
     ),
     RecipeModel(
       name: 'Lentil Soup',
-      image: 'assets/images/lentil_soup.png',
+      image: 'assets/images/tomato_soup.png',
       servings: 4,
       cookedBy: 'Olivia afgv',
     ),
@@ -222,7 +222,7 @@ class MealPrepareDate extends StatelessWidget {
                                   children: [
                                     CircleAvatar(
                                       radius: 12.r,
-                                      backgroundImage: AssetImage('assets/images/profile.png'),
+                                      backgroundImage: AssetImage('assets/images/profil.png'),
                                     ),
                                     SizedBox(width: 6.w),
                                     Text(recipe.cookedBy, style: TextStyle(fontSize: 12.sp)),

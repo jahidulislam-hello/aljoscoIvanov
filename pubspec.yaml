@@ -34,6 +34,7 @@ dependencies:
   image_picker: ^1.1.2
   video_player: ^2.7.2
   audioplayers: ^6.5.1
+  intl: ^0.18.0
 
   appinio_video_player: ^1.2.2
   chewie: ^1.6.4
@@ -44,6 +45,7 @@ dependencies:
   camera: ^0.11.0
   package_info_plus: ^4.2.0
   sqflite: ^2.3.0
+  smooth_page_indicator: ^1.1.0
 
 
 

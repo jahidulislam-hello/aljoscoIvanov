@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:freshbite/core/appbar/custom_appbar.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
@@ -16,17 +17,25 @@ class RecipeDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: Icon(Icons.arrow_back, color: AppColors.buttonColor),
-        title: Text('Recipe', style: AppTextStyles.bioText),
-        actions: [
-          Icon(Icons.share, color: AppColors.mainTextColor),
-          SizedBox(width: 12.w),
-          Icon(Icons.favorite_border, color: AppColors.mainTextColor),
-          SizedBox(width: 12.w),
+      appBar: CustomAppBar(
+        title: 'Favourites',
+        titleAlignment: AppBarTitleAlignment.center,
+        showBackButton: true,
+        actionButtons: [
+          AppBarAction(
+            imagePath: 'assets/icons/share.png', // your menu icon asset
+            onPressed: () {},
+          ),
+          AppBarAction(
+            imagePath: 'assets/icons/calender.png', // your menu icon asset
+            onPressed: () {},
+          ),
+          AppBarAction(
+            imagePath: 'assets/icons/charm_menu.png', // your menu icon asset
+            onPressed: () {},
+          ),
         ],
+
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),

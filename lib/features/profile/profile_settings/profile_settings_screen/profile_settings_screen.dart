@@ -25,13 +25,13 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.h),
         child: SafeArea(
           top: true,
           child: CustomAppBar(
-            title: 'Settings',
+            title: 'Account Settings',
             titleStyle: AppTextStyles.heading2,
             showShadow: false,
 
@@ -52,7 +52,7 @@ class SettingsScreen extends StatelessWidget {
               children: [
 
 
-                SizedBox(height: 30.h),
+                SizedBox(height: 20.h),
 
                 // Settings List
                 Padding(
@@ -63,14 +63,14 @@ class SettingsScreen extends StatelessWidget {
                       SettingTile(
                         iconWidget: SvgPicture.asset(
                           AppImages.profile,
-                          width: 16,
-                          height: 16,
+                          width: 24,
+                          height: 24,
                         ),
                         title: "My Profile",
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
-                          width: 16,
-                          height: 16,
+                          width: 24,
+                          height: 24,
                         ),
                         // onTap: () { Get.to (()=>ChangePasswordScreen());},
 
@@ -79,14 +79,14 @@ class SettingsScreen extends StatelessWidget {
                       SettingTile(
                         iconWidget: SvgPicture.asset(
                           AppImages.language,
-                          width: 16,
-                          height: 16,
+                          width: 24,
+                          height: 24,
                         ),
                         title: "Language",
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
-                          width: 16,
-                          height: 16,
+                          width: 24,
+                          height: 24,
                         ),
                         // onTap: () {Get.to (()=> PrivacyScreen());},
                       ),
@@ -94,14 +94,14 @@ class SettingsScreen extends StatelessWidget {
                       SettingTile(
                         iconWidget: SvgPicture.asset(
                           AppImages.faq,
-                          width: 16,
-                          height: 16,
+                          width: 24,
+                          height: 24,
                         ),
                         title: "FAQ",
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
-                          width: 16,
-                          height: 16,
+                          width: 24,
+                          height: 24,
                         ),
                         // onTap: () { Get.to (()=> TermsScreen());},
                       ),
@@ -109,14 +109,14 @@ class SettingsScreen extends StatelessWidget {
                       SettingTile(
                         iconWidget: SvgPicture.asset(
                           AppImages.privacy,
-                          width: 16,
-                          height: 16,
+                          width: 24,
+                          height: 24,
                         ),
                         title: "Privacy Policy",
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
-                          width: 16,
-                          height: 16,
+                          width: 24,
+                          height: 24,
                         ),
                         // onTap: () {Get.to (()=> AboutUs());},
                       ),
@@ -124,14 +124,14 @@ class SettingsScreen extends StatelessWidget {
                       SettingTile(
                         iconWidget: SvgPicture.asset(
                           AppImages.terms,
-                          width: 16,
-                          height: 16,
+                          width: 24,
+                          height: 24,
                         ),
                         title: "Terms & Conditions",
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
-                          width: 16,
-                          height: 16,
+                          width: 24,
+                          height: 24,
                         ),
                         // onTap: () { Get.to (()=>ChangePasswordScreen());},
 
@@ -140,14 +140,14 @@ class SettingsScreen extends StatelessWidget {
                       SettingTile(
                         iconWidget: SvgPicture.asset(
                           AppImages.change_pass,
-                          width: 16,
-                          height: 16,
+                          width: 24,
+                          height: 24,
                         ),
                         title: "Change Password",
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
-                          width: 16,
-                          height: 16,
+                          width: 24,
+                          height: 24,
                         ),
                         // onTap: () { Get.to (()=>ChangePasswordScreen());},
 
@@ -156,14 +156,14 @@ class SettingsScreen extends StatelessWidget {
                       SettingTile(
                         iconWidget: SvgPicture.asset(
                           AppImages.delete,
-                          width: 16,
-                          height: 16,
+                          width: 24,
+                          height: 24,
                         ),
                         title: "Delete Account",
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
-                          width: 16,
-                          height: 16,
+                          width: 24,
+                          height: 24,
                         ),
                         // onTap: () { Get.to (()=>ChangePasswordScreen());},
 
@@ -207,8 +207,11 @@ class SettingTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         height: 54,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
-          border: Border.all(color:  AppColors.primary),
+          color: AppColors.pureWhite,          // ⭐ Full white box background
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.pureWhite,        // Border also white (optional)
+          ),
         ),
         child: Row(
           children: [
@@ -218,12 +221,13 @@ class SettingTile extends StatelessWidget {
               child: Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
-            trailingIcon ?? const Icon(Icons.arrow_forward_ios, size: 16),
+            trailingIcon ??
+                const Icon(Icons.arrow_forward_ios, size: 24),
           ],
         ),
       ),
