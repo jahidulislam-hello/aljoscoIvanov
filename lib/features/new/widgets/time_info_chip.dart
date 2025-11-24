@@ -3,47 +3,74 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
 
-
 class TimeInfoChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
+  final String totalTime;
+  final String prepTime;
+  final String cookTime;
 
   const TimeInfoChip({
     Key? key,
-    required this.icon,
-    required this.label,
-    required this.value,
+    required this.totalTime,
+    required this.prepTime,
+    required this.cookTime,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 2.h),
       decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(8.r),
+        color: AppColors.pureWhite,
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: AppColors.borderLight),
       ),
-      child: Column(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(
-            icon,
-            size: 20.sp,
-            color: AppColors.textSecondary,
+          // Total Time
+          Column(
+            children: [
+              Text(
+                'Total Time',
+                style: AppTextStyles.labelBold.copyWith(fontSize: 14.sp),
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                totalTime,
+                style: AppTextStyles.caption.copyWith(fontSize: 11.sp),
+              ),
+              SizedBox(height: 20.h),
+            ],
           ),
-          SizedBox(height: 4.h),
-          Text(
-            value,
-            style: AppTextStyles.labelBold.copyWith(
-              fontSize: 13.sp,
-            ),
+
+          // Prep Time
+          Column(
+            children: [
+              Text(
+                'Prep Time',
+                style: AppTextStyles.labelBold.copyWith(fontSize: 14.sp),
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                prepTime,
+                style: AppTextStyles.caption.copyWith(fontSize: 11.sp),
+              ),
+            ],
           ),
-          Text(
-            label,
-            style: AppTextStyles.caption.copyWith(
-              fontSize: 11.sp,
-            ),
+
+          // Cook Time
+          Column(
+            children: [
+              Text(
+                'Cook Time',
+                style: AppTextStyles.labelBold.copyWith(fontSize: 14.sp),
+              ),
+              SizedBox(height: 4.h),
+              Text(
+                cookTime,
+                style: AppTextStyles.caption.copyWith(fontSize: 11.sp),
+              ),
+            ],
           ),
         ],
       ),

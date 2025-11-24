@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
           fallbackLocale: const Locale('en', 'US'),
 
           getPages: AppRoute.routes,
-          initialRoute: AppRoute.splashScreen,
+          initialRoute: AppRoute.newRecipeDetailScreen,
         );
       },
     );

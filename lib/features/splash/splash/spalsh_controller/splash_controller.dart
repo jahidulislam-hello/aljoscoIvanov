@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:freshbite/features/splash/onboarding/onboarding_screen/onboarding_screen.dart';
+import 'package:freshbite/routes/routes.dart';
 import 'package:get/get.dart';
 
 
@@ -22,6 +23,6 @@ class SplashController extends GetxController {
   }
 
   void checkIsLogin() async {
-    Get.offAll(() => OnboardingScreen());
+    Get.offAllNamed(AppRoute.onboardingScreen);
   }
 }
