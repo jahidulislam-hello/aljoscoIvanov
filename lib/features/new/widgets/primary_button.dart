@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
 
-
 class PrimaryButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -29,31 +28,46 @@ class PrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: height ?? 52.h,
+      height: height ?? 45.h,
       width: width ?? double.infinity,
-      child: ElevatedButton(
+      child: OutlinedButton(
         onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? AppColors.primary,
-          foregroundColor: textColor ?? Colors.white,
-          elevation: 0,
+        style: OutlinedButton.styleFrom(
+          backgroundColor: backgroundColor ?? AppColors.background,
+          foregroundColor: textColor ?? AppColors.borderSecondary,
+          side: BorderSide(
+            color: AppColors.borderSecondary,
+            width: 2,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.r),
           ),
           padding: padding ?? EdgeInsets.symmetric(horizontal: 24.w),
+        ).copyWith(
+          overlayColor: MaterialStateProperty.resolveWith<Color?>(
+                (states) {
+              if (states.contains(MaterialState.pressed)) {
+                // Change color on press
+                return AppColors.borderSecondary.withOpacity(0.1);
+              }
+              return null;
+            },
+          ),
         ),
         child: isLoading
             ? SizedBox(
           width: 24.w,
           height: 24.w,
           child: CircularProgressIndicator(
-            color: Colors.white,
-            strokeWidth: 2,
+            color: AppColors.borderSecondary,
+            strokeWidth: 12,
           ),
         )
             : Text(
           text,
-          style: AppTextStyles.button,
+          style: AppTextStyles.button.copyWith(
+            color: AppColors.borderSecondary,
+          ),
         ),
       ),
     );

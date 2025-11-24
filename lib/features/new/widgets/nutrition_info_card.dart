@@ -23,42 +23,50 @@ class NutritionInfoCard extends StatelessWidget {
         border: Border.all(color: AppColors.borderLight),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Nutrition (Typical Values Per Serving)',
-            style: AppTextStyles.h4.copyWith(fontSize: 15.sp),
-          ),
-          SizedBox(height: 16.h),
-          _buildNutritionRow('Energy Per Meal', '${nutritionInfo.calories} kcal'),
-          _buildNutritionRow('of which Protein', '${nutritionInfo.protein} g'),
-          _buildNutritionRow('Carbohydrates', '${nutritionInfo.carbs} g'),
-          _buildNutritionRow('of which Sugars', '7.8 g'),
-          _buildNutritionRow('Fat', '${nutritionInfo.fat} g'),
-          _buildNutritionRow('Salt', '0.7 g'),
+          _buildRow("Energy (kJ / kcal)", nutritionInfo.energy),
+          _divider(),
+          _buildRow("Fat", nutritionInfo.fat),
+          _divider(),
+          _buildRow("- of which Saturates", nutritionInfo.saturated),
+          _divider(),
+          _buildRow("Carbohydrate", nutritionInfo.carbs),
+          _divider(),
+          _buildRow("- of which Sugars", nutritionInfo.sugars),
+          _divider(),
+          _buildRow("Fibre", nutritionInfo.fibre),
+          _divider(),
+          _buildRow("Protein", nutritionInfo.protein),
+          _divider(),
+          _buildRow("Salt", nutritionInfo.salt),
         ],
       ),
     );
   }
 
-  Widget _buildNutritionRow(String label, String value) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: 10.h),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
+  Widget _divider() => Divider(
+    color: AppColors.defaultTextColor,
+    thickness: 1,
+    height: 14.h,
+  );
+
+  Widget _buildRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Text(
             label,
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+              color: AppColors.mainTextColor,
             ),
           ),
-          Text(
-            value,
-            style: AppTextStyles.labelBold,
-          ),
-        ],
-      ),
+        ),
+        Text(
+          value,
+          style: AppTextStyles.labelBold,
+        ),
+      ],
     );
   }
 }

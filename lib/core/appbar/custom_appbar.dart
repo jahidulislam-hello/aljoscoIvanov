@@ -79,23 +79,23 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height ?? 56.h,
+      height: height ?? 60.h,
       padding: padding ?? EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      decoration: BoxDecoration(
-        color: gradient == null ? (backgroundColor ?? AppColors.background) : null,
-        gradient: gradient,
-        border: border,
-        borderRadius: borderRadius,
-        boxShadow: showShadow
-            ? [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ]
-            : null,
-      ),
+      // decoration: BoxDecoration(
+      //   color: gradient == null ? (backgroundColor ?? AppColors.background) : null,
+      //   gradient: gradient,
+      //   border: border,
+      //   borderRadius: borderRadius,
+      //   // boxShadow: showShadow
+      //   //     ? [
+      //   //   BoxShadow(
+      //   //     color: Colors.black.withOpacity(0.05),
+      //   //     blurRadius: 10,
+      //   //     offset: const Offset(0, 2),
+      //   //   ),
+      //   // ]
+      //   //     : null,
+      // ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

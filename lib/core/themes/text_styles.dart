@@ -206,8 +206,8 @@ class AppTextStyles {
 
   static TextStyle labelBold = TextStyle(
     fontSize: 14.sp,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w800,
     color: AppColors.textPrimary,
-    height: 1.4,
+    height: 3,
   );
 }

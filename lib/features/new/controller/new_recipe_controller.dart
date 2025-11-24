@@ -1,11 +1,17 @@
+import 'package:get/get.dart';
 import 'package:freshbite/features/new/model/new_recipe_model.dart';
 
+class NewRecipeDetailController extends GetxController {
+  /// -------------------------------------------------------------
+  /// SAMPLE RECIPE DATA (Previously SampleData.getSampleRecipe())
+  /// -------------------------------------------------------------
+  late Recipe recipe;
 
-class SampleData {
-  static Recipe getSampleRecipe() {
-    return Recipe(
+  NewRecipeDetailController() {
+    recipe = Recipe(
       id: '1',
       title: 'Shakshuka',
+      titlechip: ['Protein', 'Lactose-free', 'Tomato', 'Meal Prep', 'Spring'],
       description:
       'Shakshuka is a classic Middle Eastern and North African dish consisting of eggs poached in a spicy tomato and pepper sauce. It\'s traditionally served in a cast-iron skillet and makes for a hearty, flavorful meal.',
       imageUrl: 'assets/images/shasuka.png',
@@ -18,11 +24,17 @@ class SampleData {
       reviewCount: 248,
       prepTime: Duration(minutes: 10),
       cookTime: Duration(minutes: 20),
-      difficulty: 'Medium',
       servings: 4,
-      allergens: ['Egg', 'Lactose', 'Fish', 'Lactose'],
+      allergens: [
+        'Egg',
+        'Lactose',
+        'Fish',
+        'Lactose',
+        'Lactose',
+        'Crustaceans',
+        'Tree Nuts'
+      ],
       ingredients: [
-        Ingredient(name: 'For 4 people', quantity: ''),
         Ingredient(name: 'Onion', quantity: '1pc'),
         Ingredient(name: 'Green pepper', quantity: '1pc'),
         Ingredient(name: 'Tomato', quantity: '4-5pcs'),
@@ -40,22 +52,111 @@ class SampleData {
         'Cover the skillet with a lid and cook for 5-8 minutes, or until the eggs are cooked to your desired level of doneness. For runny yolks, cook for about 5 minutes; for firmer yolks, cook for 7-8 minutes.',
         'Remove the skillet from heat and garnish with chopped fresh parsley or cilantro and crumbled feta cheese, if desired. Serve hot with crusty bread or pita for dipping.',
       ],
-      nutritionInfo: NutritionInfo(
-        calories: 218.8,
-        protein: 13.3,
-        carbs: 7.8,
-        fat: 9.6,
+      skills: [
+        "Chopping Vegetables Evenly",
+        "Sautéing Aromatics",
+        "Controlling Heat",
+        "Layering Spices & Seasoning",
+        "Poaching Eggs in Sauce"
+      ],
+      nutritionInfo:   NutritionInfo(
+         energy: "970 kJ / 230 kcal",
+        fat: "13 g",
+         saturated: "3.2 g",
+       carbs: "14 g",
+       sugars: "4 g",
+       fibre: "1 g",
+       protein: "8 g",
+       salt: "0.9 g",
       ),
-      reviews: [
-        Review(
+      personalNotes: [
+        PersonalNotes(
           userName: 'Alanna D.',
           userImage: 'assets/images/profil.png',
-          rating: 5.0,
+          comment:
+          'This was delicious! I used whole eggs instead of just egg whites and it was perfect. Will definitely make again.',
+          date: DateTime.now().subtract(Duration(days: 2)),
+        ),
+        PersonalNotes(
+          userName: 'Alanna D.',
+          userImage: 'assets/images/profil.png',
           comment:
           'This was delicious! I used whole eggs instead of just egg whites and it was perfect. Will definitely make again.',
           date: DateTime.now().subtract(Duration(days: 2)),
         ),
       ],
+
     );
+  }
+
+  /// -------------------------------------------------------------
+  /// CONTROLLER LOGIC (Previously RecipeDetailController)
+  /// -------------------------------------------------------------
+
+  /// Servings
+  var servings = 0.obs;
+
+  /// Checked Ingredients
+  late RxList<bool> checkedIngredients;
+
+  /// Expandable sections
+  var isDescriptionExpanded = true.obs;
+  var isTimeExpanded = true.obs;
+  var isAllergensExpanded = true.obs;
+  var isIngredientsExpanded = true.obs;
+  var isInstructionsExpanded = true.obs;
+  var isNutritionExpanded = true.obs;
+  var isNotesExpanded = true.obs;
+
+  /// Personal Notes (User Notes, not recipe notes)
+  var personalNotes = <String>[].obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+
+    servings.value = recipe.servings;
+
+    checkedIngredients =
+    RxList<bool>.filled(recipe.ingredients.length, false);
+
+    personalNotes.add('Remember to preheat the oven before starting.');
+    personalNotes.add('Use fresh herbs for better flavor.');
+  }
+
+  /// Toggle expand/collapse
+  void toggleDescription() =>
+      isDescriptionExpanded.value = !isDescriptionExpanded.value;
+  void toggleTime() => isTimeExpanded.value = !isTimeExpanded.value;
+  void toggleAllergens() =>
+      isAllergensExpanded.value = !isAllergensExpanded.value;
+  void toggleIngredients() =>
+      isIngredientsExpanded.value = !isIngredientsExpanded.value;
+  void toggleInstructions() =>
+      isInstructionsExpanded.value = !isInstructionsExpanded.value;
+  void toggleNutrition() =>
+      isNutritionExpanded.value = !isNutritionExpanded.value;
+  void toggleNotes() => isNotesExpanded.value = !isNotesExpanded.value;
+
+  /// Servings controls
+  void increaseServings() => servings.value++;
+  void decreaseServings() {
+    if (servings.value > 1) servings.value--;
+  }
+
+  /// Ingredient check/uncheck
+  void toggleIngredient(int index) {
+    checkedIngredients[index] = !checkedIngredients[index];
+  }
+
+  /// Manage personal notes
+  void addNote(String note) {
+    if (note.isNotEmpty) personalNotes.add(note);
+  }
+
+  void removeNoteAt(int index) {
+    if (index >= 0 && index < personalNotes.length) {
+      personalNotes.removeAt(index);
+    }
   }
 }

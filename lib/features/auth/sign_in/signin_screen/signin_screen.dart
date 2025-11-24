@@ -4,6 +4,7 @@ import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/core/widgets/custom_text_field.dart';
 import 'package:freshbite/features/auth/sign_in/signin_controller/signin_controller.dart';
+import 'package:freshbite/routes/routes.dart';
 import 'package:get/get.dart';
 import '../../../../core/themes/app_colors.dart';
 import '../../../../core/widgets/button.dart';
@@ -140,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
               text: "Log In",
               onTap: (
               ){
-                Get.offAll(() => BottomNavbar());
+                Get.offAllNamed(AppRoute.bottomNavbar);
               },
 
             ),

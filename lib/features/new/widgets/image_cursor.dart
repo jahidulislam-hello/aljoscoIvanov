@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ImageCarousel extends StatefulWidget {
   final List<String> images;
@@ -15,9 +14,8 @@ class ImageCarousel extends StatefulWidget {
 }
 
 class _ImageCarouselState extends State<ImageCarousel> {
-  final PageController _pageController = PageController(
-    viewportFraction: 0.9, // Shows part of adjacent images
-  );
+  final PageController _pageController = PageController();
+
   int _currentPage = 0;
 
   @override
@@ -28,29 +26,28 @@ class _ImageCarouselState extends State<ImageCarousel> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Column(
       children: [
-        // Image PageView
+        // MAIN IMAGE FULL WIDTH
         SizedBox(
-          height: 250.h,
+          height: 244.h,
+          width: double.infinity,
           child: PageView.builder(
             controller: _pageController,
             onPageChanged: (index) {
-              setState(() {
-                _currentPage = index;
-              });
+              setState(() => _currentPage = index);
             },
             itemCount: widget.images.length,
             itemBuilder: (context, index) {
               return Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.w), // Space between images
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.r), // Optional: rounded corners
-                    image: DecorationImage(
-                      image: AssetImage(widget.images[index]),
-                      fit: BoxFit.cover,
-                    ),
+                padding: EdgeInsets.symmetric(horizontal: 10.w), // 👈 spacing between images
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16.r),
+                  child: Image.asset(
+                    widget.images[index],
+                    width: double.infinity,
+                    height: 250.h,
+                    fit: BoxFit.cover,
                   ),
                 ),
               );
@@ -59,14 +56,17 @@ class _ImageCarouselState extends State<ImageCarousel> {
         ),
 
 
-        // Thumbnail Navigation
-        Positioned(
-          bottom: 16.h,
-          left: 16.w,
-          child: Row(
-            children: List.generate(
-              widget.images.length > 3 ? 3 : widget.images.length,
-                  (index) => GestureDetector(
+        SizedBox(height: 12.h),
+
+        // THUMBNAIL ROW UNDER MAIN IMAGE
+        SizedBox(
+          height: 60.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: widget.images.length,
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            itemBuilder: (context, index) {
+              return GestureDetector(
                 onTap: () {
                   _pageController.animateToPage(
                     index,
@@ -75,9 +75,9 @@ class _ImageCarouselState extends State<ImageCarousel> {
                   );
                 },
                 child: Container(
-                  margin: EdgeInsets.only(right: 8.w),
-                  width: 50.w,
-                  height: 50.h,
+                  margin: EdgeInsets.only(right: 10.w),
+                  width: 75.w,
+                  height: 51.h,
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: _currentPage == index
@@ -92,8 +92,8 @@ class _ImageCarouselState extends State<ImageCarousel> {
                     ),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ],

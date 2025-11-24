@@ -24,6 +24,8 @@ class AppColors {
 
   static const Color primaryDark = Color(0xFF1A3D28);
   static const Color primaryLight = Color(0xFF4A8157);
+  static const Color titleChip = Color(0xFFEDEDED);
+  static const Color rateborder = Color(0xFFC7C7C7);
 
   // Accent Colors
   static const Color accent = Color(0xFFE8B86D);
@@ -39,7 +41,7 @@ class AppColors {
   static const Color borderLight = Color(0xFFF0F0F0);
 
   // Star Rating
-  static const Color starYellow = Color(0xFFFFB800);
+  static const Color starYellow = Color(0xFFFAF9F6);
 
   // Status Colors
   static const Color error = Color(0xFFE53935);

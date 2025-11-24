@@ -17,8 +17,8 @@ class AllergenChip extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(16.r),
+        color: AppColors.pureWhite,
+        borderRadius: BorderRadius.circular(4.r),
         border: Border.all(color: AppColors.border),
       ),
       child: Text(

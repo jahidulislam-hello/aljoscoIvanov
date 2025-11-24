@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
 
-
 class InstructionStep extends StatelessWidget {
   final int stepNumber;
   final String instruction;
@@ -18,36 +17,44 @@ class InstructionStep extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(bottom: 20.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 28.w,
-            height: 28.w,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
+      child: Container(
+        padding: EdgeInsets.all(12.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8.r),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Step Number Box
+            Container(
+              width: 26.w,
+              height: 26.w,
+              alignment: Alignment.center,
               child: Text(
-                stepNumber.toString(),
-                style: AppTextStyles.labelBold.copyWith(
-                  color: Colors.white,
-                  fontSize: 14.sp,
+                "$stepNumber",
+                style: AppTextStyles.H4_Regular.copyWith(
+                  color: Colors.black,
+                  fontSize: 12.sp,
                 ),
               ),
             ),
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Text(
-              instruction,
-              style: AppTextStyles.bodyMedium.copyWith(
-                height: 1.6,
+
+            SizedBox(width: 10.w),
+
+            /// Instruction Text
+            Expanded(
+              child: Text(
+                instruction,
+                style: AppTextStyles.button.copyWith(
+                  fontSize: 13.sp,
+                  color: Colors.black,   // <-- ADD THIS
+                ),
               ),
             ),
-          ),
-        ],
+
+          ],
+        ),
       ),
     );
   }
