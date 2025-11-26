@@ -1,306 +1,414 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:get/get.dart';
-// import 'create_shopping_controller.dart';
-// import 'package:your_app/core/app_colors.dart';
-// import 'package:your_app/core/app_textstyles.dart';
-// import 'package:your_app/core/app_images.dart';
-//
-// class CreateShoppingScreen extends StatelessWidget {
-//   const CreateShoppingScreen({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final controller = Get.put(CreateShoppingController());
-//     final nameController = TextEditingController();
-//     final amountController = TextEditingController();
-//     final unitController = TextEditingController();
-//
-//     return Scaffold(
-//       backgroundColor: AppColors.background,
-//       appBar: AppBar(
-//         backgroundColor: AppColors.background,
-//         elevation: 0,
-//         leading: IconButton(
-//           icon: Icon(Icons.arrow_back_ios_new, color: AppColors.text),
-//           onPressed: () => Get.back(),
-//         ),
-//         title: Text(
-//           "create Shopping List",
-//           style: AppTextStyles.title.copyWith(fontSize: 18.sp),
-//         ),
-//         centerTitle: true,
-//         actions: [
-//           IconButton(
-//             icon: Icon(Icons.menu, color: AppColors.text),
-//             onPressed: () {},
-//           )
-//         ],
-//       ),
-//
-//       body: SingleChildScrollView(
-//         padding: EdgeInsets.symmetric(horizontal: 16.w),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             SizedBox(height: 10.h),
-//             Text(
-//               "Custom Shopping List",
-//               style: AppTextStyles.subtitle.copyWith(fontSize: 14.sp),
-//             ),
-//             SizedBox(height: 8.h),
-//
-//             /// --- Shopping list items ---
-//             Obx(() => Column(
-//               children: [
-//                 ...controller.shoppingItems.asMap().entries.map((entry) {
-//                   final index = entry.key;
-//                   final item = entry.value;
-//                   return _ShoppingItemTile(
-//                     name: item.name,
-//                     amount: item.amount,
-//                     unit: item.unit,
-//                     checked: item.isChecked,
-//                     onCheck: () => controller.toggleItem(index),
-//                   );
-//                 }).toList(),
-//
-//                 /// --- Add custom item row ---
-//                 Row(
-//                   children: [
-//                     Expanded(
-//                       flex: 2,
-//                       child: TextField(
-//                         controller: nameController,
-//                         decoration: InputDecoration(
-//                           hintText: "Add custom item",
-//                           hintStyle: AppTextStyles.body.copyWith(fontSize: 12.sp),
-//                           border: InputBorder.none,
-//                         ),
-//                       ),
-//                     ),
-//                     Expanded(
-//                       child: TextField(
-//                         controller: amountController,
-//                         decoration: InputDecoration(
-//                           hintText: "Amount",
-//                           hintStyle: AppTextStyles.body.copyWith(fontSize: 12.sp),
-//                           border: InputBorder.none,
-//                         ),
-//                       ),
-//                     ),
-//                     Expanded(
-//                       child: TextField(
-//                         controller: unitController,
-//                         decoration: InputDecoration(
-//                           hintText: "Unit",
-//                           hintStyle: AppTextStyles.body.copyWith(fontSize: 12.sp),
-//                           border: InputBorder.none,
-//                         ),
-//                       ),
-//                     ),
-//                     IconButton(
-//                       icon: Icon(Icons.add, color: AppColors.primary),
-//                       onPressed: () {
-//                         controller.addNewItem(
-//                           nameController.text,
-//                           amountController.text,
-//                           unitController.text,
-//                         );
-//                         nameController.clear();
-//                         amountController.clear();
-//                         unitController.clear();
-//                       },
-//                     )
-//                   ],
-//                 ),
-//               ],
-//             )),
-//
-//             SizedBox(height: 16.h),
-//             Text("Description", style: AppTextStyles.subtitle.copyWith(fontSize: 14.sp)),
-//             SizedBox(height: 6.h),
-//             Container(
-//               decoration: BoxDecoration(
-//                 color: AppColors.cardBackground,
-//                 borderRadius: BorderRadius.circular(8.r),
-//                 border: Border.all(color: AppColors.border.withOpacity(0.4)),
-//               ),
-//               child: TextField(
-//                 maxLines: 3,
-//                 onChanged: (v) => controller.description.value = v,
-//                 decoration: InputDecoration(
-//                   hintText: "Add a short description",
-//                   hintStyle: AppTextStyles.body.copyWith(fontSize: 12.sp),
-//                   contentPadding: EdgeInsets.all(10.w),
-//                   border: InputBorder.none,
-//                 ),
-//               ),
-//             ),
-//
-//             SizedBox(height: 20.h),
-//             Text("Plan your shopping", style: AppTextStyles.subtitle.copyWith(fontSize: 14.sp)),
-//             SizedBox(height: 6.h),
-//
-//             /// Who and When row
-//             Row(
-//               children: [
-//                 Expanded(
-//                   child: Container(
-//                     padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-//                     decoration: BoxDecoration(
-//                       borderRadius: BorderRadius.circular(8.r),
-//                       border: Border.all(color: AppColors.border.withOpacity(0.5)),
-//                     ),
-//                     child: Obx(() => DropdownButtonHideUnderline(
-//                       child: DropdownButton<String>(
-//                         value: controller.selectedUser.value,
-//                         items: [
-//                           'Aljoscha Ivanov',
-//                           'John Doe',
-//                           'Jane Smith'
-//                         ]
-//                             .map((e) => DropdownMenuItem(
-//                           value: e,
-//                           child: Text(e, style: AppTextStyles.body.copyWith(fontSize: 12.sp)),
-//                         ))
-//                             .toList(),
-//                         onChanged: (value) => controller.selectedUser.value = value!,
-//                       ),
-//                     )),
-//                   ),
-//                 ),
-//                 SizedBox(width: 10.w),
-//                 Expanded(
-//                   child: GestureDetector(
-//                     onTap: () async {
-//                       DateTime? picked = await showDatePicker(
-//                         context: context,
-//                         initialDate: controller.selectedDate.value,
-//                         firstDate: DateTime(2020),
-//                         lastDate: DateTime(2030),
-//                       );
-//                       if (picked != null) controller.selectedDate.value = picked;
-//                     },
-//                     child: Container(
-//                       padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
-//                       decoration: BoxDecoration(
-//                         borderRadius: BorderRadius.circular(8.r),
-//                         border: Border.all(color: AppColors.border.withOpacity(0.5)),
-//                       ),
-//                       child: Row(
-//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                         children: [
-//                           Obx(() => Text(
-//                             "${controller.selectedDate.value.day}.${controller.selectedDate.value.month}.${controller.selectedDate.value.year}",
-//                             style: AppTextStyles.body.copyWith(fontSize: 12.sp),
-//                           )),
-//                           Icon(Icons.calendar_today, size: 16.sp, color: AppColors.icon),
-//                         ],
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//               ],
-//             ),
-//
-//             SizedBox(height: 30.h),
-//
-//             /// --- SAVE / CANCEL Buttons ---
-//             Column(
-//               children: [
-//                 SizedBox(
-//                   width: double.infinity,
-//                   child: ElevatedButton(
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor: AppColors.primary,
-//                       shape: RoundedRectangleBorder(
-//                         borderRadius: BorderRadius.circular(6.r),
-//                       ),
-//                       padding: EdgeInsets.symmetric(vertical: 12.h),
-//                     ),
-//                     onPressed: controller.saveList,
-//                     child: Text("SAVE", style: AppTextStyles.button.copyWith(color: Colors.white)),
-//                   ),
-//                 ),
-//                 SizedBox(height: 10.h),
-//                 TextButton(
-//                   onPressed: () => Get.back(),
-//                   child: Text("CANCEL", style: AppTextStyles.body.copyWith(color: AppColors.text)),
-//                 ),
-//                 SizedBox(height: 20.h),
-//               ],
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-//
-// /// --- Single Shopping List Item Tile ---
-// class _ShoppingItemTile extends StatelessWidget {
-//   final String name;
-//   final String amount;
-//   final String unit;
-//   final bool checked;
-//   final VoidCallback onCheck;
-//
-//   const _ShoppingItemTile({
-//     required this.name,
-//     required this.amount,
-//     required this.unit,
-//     required this.checked,
-//     required this.onCheck,
-//   });
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       margin: EdgeInsets.only(bottom: 4.h),
-//       padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 8.h),
-//       decoration: BoxDecoration(
-//         color: AppColors.cardBackground,
-//         borderRadius: BorderRadius.circular(6.r),
-//       ),
-//       child: Row(
-//         children: [
-//           GestureDetector(
-//             onTap: onCheck,
-//             child: Icon(
-//               checked ? Icons.check_box : Icons.check_box_outline_blank,
-//               color: checked ? AppColors.primary : AppColors.border,
-//               size: 20.sp,
-//             ),
-//           ),
-//           SizedBox(width: 8.w),
-//           Expanded(
-//             flex: 2,
-//             child: Text(
-//               name,
-//               style: AppTextStyles.body.copyWith(
-//                 fontSize: 12.sp,
-//                 decoration: checked ? TextDecoration.lineThrough : TextDecoration.none,
-//               ),
-//             ),
-//           ),
-//           Expanded(
-//             child: Text(
-//               amount,
-//               textAlign: TextAlign.center,
-//               style: AppTextStyles.body.copyWith(fontSize: 12.sp),
-//             ),
-//           ),
-//           Expanded(
-//             child: Text(
-//               unit,
-//               textAlign: TextAlign.center,
-//               style: AppTextStyles.body.copyWith(fontSize: 12.sp, fontWeight: FontWeight.w500),
-//             ),
-//           ),
-//           Icon(Icons.edit, size: 16.sp, color: AppColors.icon.withOpacity(0.7)),
-//         ],
-//       ),
-//     );
-//   }
-// }
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:freshbite/core/appbar/custom_appbar.dart';
+import 'package:freshbite/core/themes/app_colors.dart';
+import 'package:freshbite/core/themes/app_images.dart';
+import 'package:freshbite/core/themes/text_styles.dart';
+import 'package:freshbite/core/widgets/custom_text_button.dart';
+import 'package:freshbite/features/shopping_list/create_shopping/create_shopping_controller/create_shopping_controller.dart';
+import 'package:freshbite/features/shopping_list/edit_shopping_list/edit_shopping_list_controller/edit_shopping_list_controller.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+
+import '../create_shopping_model/create_shopping_model.dart';
+
+
+class CreateShoppingScreen extends StatelessWidget {
+  const CreateShoppingScreen({super.key});
+
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.put(CreateShoppingController());
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      // Only AppBar is wrapped with SafeArea inside CustomAppBar if needed
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: SafeArea(
+          child: CustomAppBar(
+            title: 'Create Shopping List',
+            titleAlignment: AppBarTitleAlignment.center,
+            showBackButton: true,
+            actionButtons: [
+              AppBarAction(imagePath: 'assets/icons/charm_menu.png', onPressed: () {}),
+            ],
+          ),
+        ),
+      ),
+
+
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            /// Title
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                /// Title Text
+                Text(
+                  "Custom Shopping List",
+                  style: TextStyle(fontSize: 12.sp, color: Colors.black87),
+                ),
+
+                /// Edit Icon
+                GestureDetector(
+                  onTap: () {
+                    // your edit action here
+                  },
+                  child: Image.asset(
+                    AppImages.edit_icon,
+                    height: 24,
+                    width: 24,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+
+
+
+            SizedBox(height: 20.h),
+
+            /// Sections List
+            Obx(() => Column(
+              children: controller.shoppingSections
+                  .asMap()
+                  .entries
+                  .map((entry) => _buildRecipeSection(entry.value, controller, entry.key))
+                  .toList(),
+            )),
+
+            SizedBox(height: 20.h),
+
+
+
+            /// Description
+            Text("Description", style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600)),
+            SizedBox(height: 6.h),
+
+            Container(
+              padding: EdgeInsets.all(12.w),
+              decoration: BoxDecoration(
+                color: AppColors.pureWhite,
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: TextField(
+                maxLines: 4,
+                controller: controller.descriptionController,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "Add a short description about this shopping list",
+                ),
+              ),
+            ),
+
+            SizedBox(height: 20.h),
+
+            /// Plan your shopping
+            Text("Plan your shopping", style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600)),
+            SizedBox(height: 8.h),
+
+            _buildPlanSection(controller),
+
+            SizedBox(height: 30.h),
+
+            /// SAVE BUTTON
+            CustomTextButton(
+              text: 'SAVE',
+              onTap: controller.saveList,
+            ),
+
+            SizedBox(height: 10.h),
+
+            /// CANCEL BUTTON
+            Center(
+              child: TextButton(
+                onPressed: () => Get.back(),
+                child: Text("CANCEL", style: TextStyle(color: Colors.black54, fontSize: 14.sp)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+  }
+
+
+  // ------------------------------------------------------------
+  // RECIPE SECTION (with custom item input row)
+  // ------------------------------------------------------------
+  Widget _buildRecipeSection(
+      RecipeSection section,
+      CreateShoppingController controller,
+      int index,
+      ) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 20.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          /// HEADER
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  section.title,
+                  style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+                ),
+              ),
+
+
+            ],
+          ),
+
+          SizedBox(height: 12.h),
+
+          /// ITEMS
+          Column(
+            children: section.items
+                .map((item) => _buildShoppingItem(item))
+                .toList(),
+          ),
+
+          SizedBox(height: 8.h),
+
+          // /// DIVIDER
+          // Divider(
+          //   color: Colors.grey.shade300,
+          //   thickness: 1,
+          // ),
+
+          SizedBox(height: 8.h),
+
+          /// ADD CUSTOM ITEM
+          _buildAddCustomItemRow(controller, section),
+        ],
+      ),
+    );
+  }
+
+
+  // ------------------------------------------------------------
+  // SHOPPING ITEM ROW
+  // ------------------------------------------------------------
+  Widget _buildShoppingItem(ShoppingItemModel item) {
+    return Obx(() {
+      return Column(
+        children: [
+
+          /// ROW CONTENT
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 8.h),
+            child: Row(
+              children: [
+                /// Checkbox
+                GestureDetector(
+                  onTap: () {
+                    item.checked.value = !item.checked.value;
+                  },
+                  child: Image.asset(
+                    item.checked.value
+                        ? AppImages.thik_fill_icon
+                        : AppImages.thik_icon,
+                    height: 24,
+                    width: 24,
+                  ),
+                ),
+
+                SizedBox(width: 10.w),
+
+                /// Name
+                Expanded(
+                  child: Text(
+                    item.name,
+                    style: TextStyle(fontSize: 14.sp),
+                  ),
+                ),
+
+                /// Amount
+                Text(
+                  item.amount,
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14.sp
+                  ),
+                ),
+
+                SizedBox(width: 6.w),
+
+                /// Unit
+                Text(
+                  item.unit,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: Colors.black54,
+                  ),
+                ),
+
+                SizedBox(width: 6.w),
+
+                /// Edit Icon
+                Image.asset(
+                  AppImages.edit_icon,
+                  height: 24,
+                  width: 24,
+                  color: Colors.grey,
+                ),
+              ],
+            ),
+          ),
+
+          /// DIVIDER (full width)
+          Divider(
+            color: Colors.grey.shade300,
+            thickness: 2,
+            height: 2,
+          ),
+        ],
+      );
+    });
+  }
+
+
+
+  // ------------------------------------------------------------
+  // ADD CUSTOM ITEM ROW
+  // ------------------------------------------------------------
+  Widget _buildAddCustomItemRow(CreateShoppingController controller, RecipeSection section) {
+    return Row(
+      children: [
+
+
+        /// --- NAME INPUT ---
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(6.r),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: TextField(
+              controller: section.nameCtrl,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                hintText: "Add custom item",
+              ),
+            ),
+          ),
+        ),
+
+        SizedBox(width: 6.w),
+
+        /// --- AMOUNT ---
+        SizedBox(
+          width: 60.w,
+          child: TextField(
+            controller: section.amountCtrl,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(6.r)),
+              hintText: "Amt",
+            ),
+          ),
+        ),
+
+        SizedBox(width: 6.w),
+
+        /// --- UNIT ---
+        SizedBox(
+          width: 50.w,
+          child: TextField(
+            controller: section.unitCtrl,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 3.h),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(6.r)),
+              hintText: "Unit",
+            ),
+          ),
+        ),
+
+        /// --- ADD BUTTON ---
+        GestureDetector(
+          onTap: () => controller.addCustomItem(section),
+          child: Image.asset(
+            AppImages.add_icon,
+            height: 24,
+            width: 24,
+            color: Colors.grey,
+          ),
+        )
+      ],
+    );
+  }
+
+
+  // ------------------------------------------------------------
+  // PLAN SECTION
+  // ------------------------------------------------------------
+  Widget _buildPlanSection(CreateShoppingController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        /// WHO?
+        Row(
+          children: [
+            Text("Who?", style: TextStyle(fontSize: 14.sp)),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Obx(() => DropdownButtonFormField<String>(
+                value: controller.selectedPerson.value,
+                items: controller.people
+                    .map((p) => DropdownMenuItem(value: p, child: Text(p)))
+                    .toList(),
+                onChanged: controller.changePerson,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
+                ),
+              )),
+            ),
+          ],
+        ),
+
+        SizedBox(height: 12.h),
+
+        /// WHEN?
+        Row(
+          children: [
+            Text("When?", style: TextStyle(fontSize: 14.sp)),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: GestureDetector(
+                onTap: controller.pickDate,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade400),
+                    borderRadius: BorderRadius.circular(8.r),
+                    color: Colors.white,
+                  ),
+                  child:Obx(() => Text(
+                    controller.selectedDate.value == null
+                        ? "Select date"
+                        : DateFormat('dd/MM/yyyy').format(controller.selectedDate.value!),
+                    style: TextStyle(fontSize: 13.sp),
+                  ))
+
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}

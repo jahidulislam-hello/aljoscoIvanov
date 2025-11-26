@@ -1,0 +1,230 @@
+
+// view/home_screen.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'dart:ui';
+import 'package:freshbite/core/themes/app_colors.dart';
+
+
+
+class HomeScreenMenu extends StatefulWidget {
+  const HomeScreenMenu({Key? key}) : super(key: key);
+  @override
+  State<HomeScreenMenu> createState() => _HomeScreenMenuState();
+}
+
+class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _slideAnimation;
+  bool _isMenuOpen = false;
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.85).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
+    _slideAnimation = Tween<double>(begin: 0.0, end: 0.6).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
+
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _toggleMenu() {
+    setState(() {
+      _isMenuOpen = !_isMenuOpen;
+      if (_isMenuOpen) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    });
+  }
+
+  void _closeMenu() {
+    if (_isMenuOpen) {
+      setState(() {
+        _isMenuOpen = false;
+        _animationController.reverse();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
+      body: Stack(
+        children: [
+          // Sidebar Menu
+          _buildSidebar(),
+
+          // Main Content with Animation
+          AnimatedBuilder(
+            animation: _animationController,
+            builder: (context, child) {
+              return Transform.scale(
+                scale: _scaleAnimation.value,
+                child: Transform.translate(
+                  offset: Offset(
+                    MediaQuery.of(context).size.width * _slideAnimation.value,
+                    0,
+                  ),
+                  child: GestureDetector(
+                    onTap: _closeMenu,
+                    child: AbsorbPointer(
+                      absorbing: _isMenuOpen,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(_isMenuOpen ? 20.r : 0),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(
+                            sigmaX: _isMenuOpen ? 5.0 : 0.0,
+                            sigmaY: _isMenuOpen ? 5.0 : 0.0,
+                          ),
+
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
+
+  Widget _buildSidebar() {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: Colors.white, // Full sidebar background
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ==============================
+          //        FULL-WIDTH HEADER
+          // ==============================
+          Container(
+            height: 100.h,
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(10.r),
+                bottomRight: Radius.circular(10.r),
+              ),
+            ),
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'freshbite',
+              style: TextStyle(
+                fontSize: 28.sp,
+                fontWeight: FontWeight.w900,
+                fontFamily: "BasteB",
+                color: AppColors.buttonColor,
+              ),
+            ),
+          ),
+
+          // Padding starts AFTER the header
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 4.h),
+
+                _buildMenuItem(Icons.person_outline, 'My Profile'),
+                _buildMenuItem(Icons.subway, 'Subscription'),
+                _buildMenuItem(Icons.sports_soccer, 'Favourites'),
+                _buildMenuItem(Icons.bar_chart, 'Preferences'),
+                _buildMenuItem(Icons.history, 'Cooking Skills'),
+
+                SizedBox(height: 26.h),
+
+                // Divider
+                Container(
+                  height: 1,
+                  width: double.infinity,
+                  color: Colors.grey.withOpacity(0.3),
+                ),
+
+                SizedBox(height: 26.h),
+
+                _buildMenuItem(Icons.card_giftcard, 'About freshbite'),
+                _buildMenuItem(Icons.history, 'FAQ'),
+                _buildMenuItem(Icons.chat_bubble_outline, 'Privacy Policy'),
+                _buildMenuItem(Icons.sports_esports, 'Terms & Conditions'),
+
+                SizedBox(height: 16.h),
+
+                _buildMenuItem(Icons.logout, 'Sign Out', isLogout: true),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
+
+  Widget _buildMenuItem(IconData icon, String title, {bool hasArrow = false, bool isLogout = false}) {
+    return InkWell(
+      onTap: () {
+        // Handle menu item tap
+        _closeMenu();
+      },
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.h),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 20.sp,
+              color: isLogout ? Colors.red : Colors.black,
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  color: isLogout ? Colors.red : Colors.black,
+                ),
+              ),
+            ),
+            if (hasArrow)
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 14.sp,
+                color: Colors.grey[600],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+}

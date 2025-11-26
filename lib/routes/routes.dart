@@ -20,11 +20,20 @@ import 'package:freshbite/features/profile/profile_settings/profile_settings_scr
 import 'package:freshbite/features/recepies/cooking/cooking_details_screen/cooking_details_screen.dart';
 import 'package:freshbite/features/recepies/create_recipes/create_recipes_screen/create_recipes_screen.dart';
 import 'package:freshbite/features/recepies/details_recipes/details_recipes_screen/details_recipes_screen.dart';
+import 'package:freshbite/features/shopping_list/create_shopping/create_shopping_screen/create_shopping_screen.dart';
+import 'package:freshbite/features/shopping_list/edit_shopping_list/edit_shopping_list_screen/edit_shopping_list_screen.dart';
+import 'package:freshbite/features/shopping_list/select_prep_list/select_prep_list_screen/select_prep_list_screen.dart';
+import 'package:freshbite/features/shopping_list/shopping/shopping_screen/shopping_screen.dart';
+import 'package:freshbite/features/shopping_list/shopping_list/shopping_list_screen/shopping_list_screen.dart';
 import 'package:freshbite/features/splash/onboarding/onboarding_screen/onboarding_screen.dart';
 import 'package:freshbite/features/splash/splash/splash_screen/spalsh_screen.dart';
 import 'package:get/get.dart';
-
 import '../features/profile/settings/settings_screen/settings_screen.dart' show SettingsScreen;
+
+
+
+
+
 
 class AppRoute {
   static String splashScreen = '/splashScreen';
@@ -50,7 +59,7 @@ class AppRoute {
   static String getBottomNavbar() => bottomNavbar;
 
   static List<GetPage> routes = [
-    GetPage(name: splashScreen, page: () => SplashScreen()),
+    GetPage(name: splashScreen, page: () => SelectPrepListScreen()),
     GetPage(name: onboardingScreen, page: () => OnboardingScreen()),
     GetPage(name: signInScreen, page: () => LoginScreen()),
     GetPage(name: signUpScreen, page: () => SignUpScreen()),

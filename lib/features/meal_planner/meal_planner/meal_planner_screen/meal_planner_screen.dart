@@ -77,7 +77,6 @@ class MealPlannerScreen extends StatelessWidget {
   Widget _buildDateSelector() {
     final today = DateTime.now();
     final weekDates = List.generate(7, (i) => today.add(Duration(days: i - 2)));
-
     return SizedBox(
       height: 60.h,
       child: Obx(() => Row(
@@ -85,7 +84,6 @@ class MealPlannerScreen extends StatelessWidget {
         children: weekDates.map((date) {
           final isSelected = date.day == controller.selectedDate.value.day &&
               date.month == controller.selectedDate.value.month;
-
           return GestureDetector(
             onTap: () => controller.selectDate(date),
             child: Container(
