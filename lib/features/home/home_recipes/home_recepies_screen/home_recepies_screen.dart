@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
+import 'package:freshbite/features/home/home_menu/home_menu_screen/home_menu_screen.dart';
 import 'package:freshbite/features/home/home_recipes/home_recepies_controller/home_recepies_controller.dart';
 import 'package:freshbite/features/home/recipe_search/recipe_search_screen/receipe_search_screen.dart';
 import 'package:get/get.dart';
@@ -51,8 +52,19 @@ class HomeScreen extends StatelessWidget {
                       color: AppColors.pureWhite,
                     ),
                     padding: EdgeInsets.all(8.r),
-                    child: const Icon(Icons.menu),
+                    child: GestureDetector(
+                      onTap: () {
+                        Get.dialog(
+                          _SidebarMenuOverlay(),
+                          barrierColor: Colors.black.withOpacity(0.3), // transparent background
+                          useSafeArea: false,
+                        );
+                      },
+
+                      child: const Icon(Icons.menu),
+                    ),
                   ),
+
                 ],
               ),
               SizedBox(height: 16.h),
@@ -431,3 +443,53 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+
+
+
+
+class _SidebarMenuOverlay extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // BLUR BACKGROUND + CLOSE TAP
+        GestureDetector(
+          onTap: () => Get.back(),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
+            child: Container(
+              color: Colors.black.withOpacity(0.3),
+            ),
+          ),
+        ),
+
+        // SIDEBAR
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TweenAnimationBuilder(
+            tween: Tween<double>(begin: -250, end: 0),
+            duration: const Duration(milliseconds: 250),
+            builder: (context, value, child) {
+              return Transform.translate(
+                offset: Offset(value, 0),
+                child: child,
+              );
+            },
+            child: SafeArea(
+              child: Container(
+                width: 300,
+                height: Get.height,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10.r), // FULL 10
+                ),
+                child: HomeScreenMenu(),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+

@@ -30,6 +30,12 @@ class AppImages {
   static String filter =  "$baseUrlImage/filter.png";
   static String cook =  "$baseUrlImage/cook.mp4";
   static String sasuka =  "$baseUrlImage/shasuka.png";
+  static String thik_icon =  "$baseUrlImage/thik_icon.png";
+  static String thik_fill_icon =  "$baseUrlImage/thik_fill_icon.png";
+  static String edit_icon =  "$baseUrlImage/edit_icon.png";
+  static String add_icon =  "$baseUrlImage/add_icon.png";
+  static String recipe_icon =  "$baseUrlImage/recipe_icon.png";
+  static String shopping_icon =  "$baseUrlImage/shopping_icon.png";
 
 
 

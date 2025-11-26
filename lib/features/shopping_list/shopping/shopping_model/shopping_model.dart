@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class ShoppingModel {
   final String title;
   final String description;
@@ -16,4 +14,15 @@ class ShoppingModel {
     required this.date,
     this.isFinished = false,
   });
+
+  ShoppingModel copyWith({bool? isFinished}) {
+    return ShoppingModel(
+      title: title,
+      description: description,
+      image: image,
+      createdBy: createdBy,
+      date: date,
+      isFinished: isFinished ?? this.isFinished,
+    );
+  }
 }
