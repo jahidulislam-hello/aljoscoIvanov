@@ -1,3 +1,4 @@
+import 'package:freshbite/features/shopping_list/edit_shopping_list/edit_shopping_list_screen/edit_shopping_list_screen.dart';
 import 'package:get/get.dart';
 
 class PrepListController extends GetxController {
@@ -52,8 +53,8 @@ class PrepListController extends GetxController {
       return;
     }
 
-    // Navigate next
-    print("Selected Lists: $selectedIndexes");
+    // Navigate to EditShoppingListScreen with selected lists
+    Get.to(() => EditShoppingListScreen());
   }
 
   void onCancel() {

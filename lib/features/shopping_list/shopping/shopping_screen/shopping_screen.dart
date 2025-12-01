@@ -5,6 +5,8 @@ import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
+import 'package:freshbite/features/shopping_list/create_shopping/create_shopping_screen/create_shopping_screen.dart';
+import 'package:freshbite/features/shopping_list/select_prep_list/select_prep_list_screen/select_prep_list_screen.dart';
 import 'package:freshbite/features/shopping_list/shopping/shopping_controller/shopping_controller.dart';
 import 'package:freshbite/features/shopping_list/shopping/shopping_model/shopping_model.dart';
 import 'package:get/get.dart';
@@ -230,7 +232,6 @@ class ShoppingScreen extends StatelessWidget {
 class _ShoppingListTile extends StatelessWidget {
   final ShoppingModel item;
   final VoidCallback onToggle;
-
   const _ShoppingListTile({
     required this.item,
     required this.onToggle,
@@ -366,7 +367,7 @@ void showCreateShoppingListPopup(BuildContext context) {
                 text: "FROM PREP LIST",
                 onTap: () {
                   Navigator.pop(context); // close popup first
-                  // Get.to(() => FromPrepListScreen());
+                  Get.to(() => SelectPrepListScreen());
                 },
 
               ),
@@ -380,7 +381,7 @@ void showCreateShoppingListPopup(BuildContext context) {
                 text: "CUSTOM",
                 onTap: () {
                   Navigator.pop(context);
-                  // Get.to(() => CustomShoppingListScreen());
+                  Get.to(() => CreateShoppingScreen());
                 },
               ),
 

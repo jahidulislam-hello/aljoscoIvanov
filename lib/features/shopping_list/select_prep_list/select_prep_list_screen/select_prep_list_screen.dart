@@ -13,7 +13,6 @@ class SelectPrepListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: SafeArea(
@@ -118,17 +117,13 @@ class SelectPrepListScreen extends StatelessWidget {
                 ),
               ),
             ),
-
             SizedBox(height: 20.h),
-
             // NEXT BUTTON
             CustomTextButton(
               text: "NEXT",
               onTap: () => controller.onNext(),
             ),
-
             SizedBox(height: 12.h),
-
             Center(
               child: TextButton(
                 onPressed: () => controller.onCancel(),

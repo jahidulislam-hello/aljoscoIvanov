@@ -36,13 +36,20 @@ class AppImages {
   static String add_icon =  "$baseUrlImage/add_icon.png";
   static String recipe_icon =  "$baseUrlImage/recipe_icon.png";
   static String shopping_icon =  "$baseUrlImage/shopping_icon.png";
+  static String thikki_icon =  "$baseUrlImage/thikki.png";
+  static String white_thikki_icon =  "$baseUrlImage/white_thikki.png";
+  static String crown_icon =  "$baseUrlImage/crown.png";
+  static String family_icon =  "$baseUrlImage/family.png";
+  static String handshake_icon =  "$baseUrlImage/handshake.png";
+  static String pepper_icon =  "$baseUrlImage/pepper.png";
+  static String filter_icon =  "$baseUrlImage/pepper.png";
+  static String chatIcon =  "$baseUrlImage/chat_bubble.png";
 
 
 
 
 
   // Here All are SVG icons (using PNG placeholders since SVG directory is empty)
-
   static String searchIcon = "$baseUrlLogo/icons_search.svg"; // Using existing image as placeholder
   static String weuiArrowFilled = "$baseUrlImage/image.png"; // Using existing image as placeholder
   static String ArrowLeft = "$baseUrlImage/image.png"; // Using existing image as placeholder
@@ -63,6 +70,9 @@ class AppImages {
   static String arrow = "$baseUrlLogo/arrow-right.svg"; // Using existing image as placeholder
   static String change_pass = "$baseUrlLogo/change_pass.svg"; // Using existing image as placeholder
   static String delete= "$baseUrlLogo/delete.svg"; // Using existing image as placeholder
-
+  static String fill_star = "$baseUrlLogo/fill_star.svg"; // Using existing image as placeholder
+  static String blank_star = "$baseUrlLogo/blank_star.svg"; // Using existing image as placeholder
+  static String favourite = "$baseUrlLogo/favourite.svg"; // Using existing image as placeholder
+  static String outline_time = "$baseUrlLogo/outline_time.svg"; // Using existing image as placeholder
 
 }

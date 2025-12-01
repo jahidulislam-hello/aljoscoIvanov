@@ -1,3 +1,4 @@
+import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/features/home/favourites/favourites_model.dart';
 import 'package:get/get.dart';
 
@@ -30,4 +31,18 @@ class FavoritesController extends GetxController {
   void updateSearch(String value) {
     searchQuery.value = value;
   }
+
+  void addNewCollection(String name) {
+    collections.add({
+      "title": name,
+      "image": AppImages.fill_star, // or default placeholder
+    });
+  }
 }
+
+
+
+
+
+
+

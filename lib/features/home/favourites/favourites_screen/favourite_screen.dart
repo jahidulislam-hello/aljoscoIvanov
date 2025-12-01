@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:freshbite/core/appbar/custom_appbar.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
+import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/features/home/favourites/favourites_controller/favourites_controller.dart';
 import 'package:get/get.dart';
 
 
 class FavoritesScreen extends StatelessWidget {
   final controller = Get.put(FavoritesController());
-
   FavoritesScreen({super.key});
 
   @override
@@ -18,22 +19,16 @@ class FavoritesScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight((56.h) + 20.h), // Original height + desired top spacing
-        child: Column(
-          children: [
-            SizedBox(height: 30.h), // Top spacing
-            CustomAppBar(
-              title: 'Favourites',
-              titleAlignment: AppBarTitleAlignment.center,
-              showBackButton: true,
-              actionButtons: [
-                AppBarAction(
-                  imagePath: 'assets/icons/charm_menu.png', // your menu icon asset
-                  onPressed: () {},
-                ),
-              ],
-            ),
-          ],
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: SafeArea(
+          child: CustomAppBar(
+            title: 'Favourites',
+            titleAlignment: AppBarTitleAlignment.center,
+            showBackButton: true,
+            actionButtons: [
+              AppBarAction(imagePath: 'assets/icons/charm_menu.png', onPressed: () {}),
+            ],
+          ),
         ),
       ),
       body: Padding(
@@ -95,7 +90,7 @@ class FavoritesScreen extends StatelessWidget {
           width: 36.w,
           height: 36.h,
           decoration: BoxDecoration(
-            color: Colors.black,
+            color: AppColors.buttonColor,
             borderRadius: BorderRadius.circular(5.r),
           ),
           child: Center(
@@ -103,7 +98,7 @@ class FavoritesScreen extends StatelessWidget {
               AppImages.filter, // your PNG asset path
               width: 24.w,      // adjust size as needed
               height: 24.h,
-              color: AppColors.mainTextColor,
+              color: AppColors.pureWhite,
             ),
           ),
         ),
@@ -111,18 +106,99 @@ class FavoritesScreen extends StatelessWidget {
     );
   }
 
+  void _showCreateCollectionPopup(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        final TextEditingController nameController = TextEditingController();
 
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                // ---------- Header Row ----------
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Create New Collection",
+                      style: AppTextStyles.H5_Regular,
+                    ),
+
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Icon(
+                        Icons.close,
+                        size: 20.sp,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 18.h),
+
+                // ---------- Bordered Text Field ----------
+                Container(
+                  height: 48.h,
+                  padding: EdgeInsets.symmetric(horizontal: 12.w),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: Colors.grey.shade300, width: 1),
+                  ),
+                  child: TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Collection name",
+                      hintStyle: AppTextStyles.bioText,
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: 20.h),
+
+                // ---------- CustomTextButton ----------
+                CustomTextButton(
+                  text: "Create Collection",
+                  onTap: () {
+                    final name = nameController.text.trim();
+                    if (name.isEmpty) return;
+
+                    controller.addNewCollection(name);
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
   Widget _buildRecentFavorites() {
-    return Obx(() => SizedBox(
-      height: 210.h,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
+    return Obx(
+          () => GridView.builder(
+        shrinkWrap: true,
+        physics: NeverScrollableScrollPhysics(),
         itemCount: controller.recentFavorites.length,
-        separatorBuilder: (_, __) => SizedBox(width: 12.w),
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 12.h,
+          crossAxisSpacing: 12.w,
+          childAspectRatio: 0.8,
+        ),
         itemBuilder: (_, i) {
           final recipe = controller.recentFavorites[i];
           return Container(
-            width: 160.w,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12.r),
@@ -141,44 +217,84 @@ class FavoritesScreen extends StatelessWidget {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
-                      child: Image.asset(recipe.image, height: 130.h, width: 160.w, fit: BoxFit.cover),
-                    ),
-                    Positioned(
-                      right: 8.w,
-                      top: 8.h,
                       child: Image.asset(
-                        'assets/icons/favourite.png', // your image path
-                        width: 24.w,
-                        height: 24.w,
-                        color: AppColors.borderSecondary, // remove this if you don't want tint
+                        recipe.image,
+                        height: 120.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
                       ),
-                    )
+                    ),
 
+                    // Favourite Icon
+                    Positioned(
+                      right: 16.w,
+                      top: 12.h,
+                      child: Container(
+                        width: 24.w,
+                        height: 24.h,
+                        decoration: BoxDecoration(
+                          color: AppColors.pureWhite,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.black.withOpacity(0.2),
+                            width: 0.25,
+                          ),
+                        ),
+                        child: Center(
+                          child: SvgPicture.asset(
+                            AppImages.favourite,
+                            width: 14.w,
+                            height: 14.h,
+                            color: AppColors.buttonColor,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
+
+                // Text section
                 Padding(
                   padding: EdgeInsets.all(8.w),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(recipe.title, style: AppTextStyles.bioText),
-                      SizedBox(height: 4.h),
+                      Text(
+                        recipe.title,
+                        style: AppTextStyles.H5_Regular,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      SizedBox(height: 5.h),
+
                       Row(
                         children: [
-                          Icon(Icons.access_time, size: 14.sp, color: AppColors.defaultbackground),
-                          SizedBox(width: 4.w),
+                          SvgPicture.asset(
+                            AppImages.outline_time,
+                            width: 16.w,
+                            height: 16.h,
+                            color: AppColors.buttonColor,
+                          ),
+                          SizedBox(width: 6.w),
                           Text("${recipe.timeMinutes} min", style: AppTextStyles.bioText),
                         ],
                       ),
-                      SizedBox(height: 4.h),
+
+                      SizedBox(height: 5.h),
+
+                      // Rating stars
                       Row(
                         children: List.generate(5, (index) {
-                          return Icon(
-                            index < recipe.rating.round()
-                                ? Icons.star
-                                : Icons.star_border,
-                            size: 14.sp,
-                            color: AppColors.mainTextColor,
+                          return Padding(
+                            padding: EdgeInsets.only(right: 4.w),
+                            child: SvgPicture.asset(
+                              index < recipe.rating.round()
+                                  ? AppImages.fill_star
+                                  : AppImages.blank_star,
+                              width: 16.w,
+                              height: 16.h,
+                              color: AppColors.buttonColor,
+                            ),
                           );
                         }),
                       ),
@@ -190,20 +306,24 @@ class FavoritesScreen extends StatelessWidget {
           );
         },
       ),
-    ));
+    );
   }
+
 
   Widget _buildCollectionsHeader() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text("Collections", style: AppTextStyles.bioText),
-        Text("Create", style: AppTextStyles.bioText),
+        Text("Collections", style: AppTextStyles.H5_Regular),
+        GestureDetector(
+          onTap: () => _showCreateCollectionPopup(Get.context!),
+          child: Text("Create", style: AppTextStyles.bioText),
+        ),
+
+
       ],
     );
   }
-
-
   Widget _buildCollectionsGrid() {
     return Obx(() => GridView.builder(
       shrinkWrap: true,
@@ -213,7 +333,7 @@ class FavoritesScreen extends StatelessWidget {
         crossAxisCount: 2,
         mainAxisSpacing: 12.h,
         crossAxisSpacing: 12.w,
-        childAspectRatio: 0.8, // Adjust for image + text layout
+        childAspectRatio: 0.9,// Adjust for image + text layout
       ),
       itemBuilder: (_, i) {
         final collection = controller.collections[i];
@@ -237,7 +357,7 @@ class FavoritesScreen extends StatelessWidget {
                 child: Image.asset(
                   collection['image']!,
                   width: double.infinity,
-                  height: 150.h,
+                  height: 131.h,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -255,3 +375,16 @@ class FavoritesScreen extends StatelessWidget {
     ));
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
