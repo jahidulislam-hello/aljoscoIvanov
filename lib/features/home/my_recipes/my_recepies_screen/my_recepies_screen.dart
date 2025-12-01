@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:freshbite/core/appbar/custom_appbar.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
+import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
 import 'package:freshbite/features/home/my_recipes/my_recipes_controller/my_recipes_controller.dart';
 import 'package:get/get.dart';
@@ -15,17 +18,18 @@ class MyRecipesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: Icon(Icons.arrow_back, color: AppColors.mainTextColor),
-        title: Text("My Recipes", style: AppTextStyles.H3_Regular),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 16.w),
-            child: Icon(Icons.menu, color: AppColors.mainTextColor),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: SafeArea(
+          child: CustomAppBar(
+            title: 'My Recipes',
+            titleAlignment: AppBarTitleAlignment.center,
+            showBackButton: true,
+            actionButtons: [
+              AppBarAction(imagePath: 'assets/icons/charm_menu.png', onPressed: () {}),
+            ],
           ),
-        ],
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
@@ -34,7 +38,7 @@ class MyRecipesScreen extends StatelessWidget {
           children: [
             _buildSearchBar(),
             SizedBox(height: 20.h),
-            Text("My Recipes", style: AppTextStyles.H4_Regular),
+            Text("My Recipes", style: AppTextStyles.H5_Regular),
             SizedBox(height: 12.h),
             Expanded(child: _buildRecipeGrid()),
           ],
@@ -44,29 +48,58 @@ class MyRecipesScreen extends StatelessWidget {
   }
 
   Widget _buildSearchBar() {
-    return TextField(
-      onChanged: controller.updateSearch,
-      decoration: InputDecoration(
-        hintText: "Search recipes",
-        hintStyle: AppTextStyles.H4_Regular.copyWith(color: AppColors.defaultTextColor),
-        prefixIcon: Icon(Icons.search, color: AppColors.mainTextColor),
-        suffixIcon: Container(
-          margin: EdgeInsets.all(8.w),
-          decoration: BoxDecoration(
-            color: AppColors.background,
-            borderRadius: BorderRadius.circular(10.r),
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            height: 45.h,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30.r),
+              color: AppColors.pureWhite,
+            ),
+            child: Row(
+              children: [
+                SizedBox(width: 12.w),
+                Image.asset(
+                  AppImages.search, // your PNG asset path
+                  width: 24.w,      // adjust size as needed
+                  height: 24.h,
+                  color: AppColors.mainTextColor, // optional: tint the PNG
+                ),
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: "Search recipes",
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10.w),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          child: Icon(Icons.filter_alt, color: Colors.white),
         ),
-        filled: true,
-        fillColor: AppColors.borderSecondary,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide.none,
+        SizedBox(width: 10.w),
+        Container(
+          width: 36.w,
+          height: 36.h,
+          decoration: BoxDecoration(
+            color: AppColors.buttonColor,
+            borderRadius: BorderRadius.circular(5.r),
+          ),
+          child: Center(
+            child: Image.asset(
+              AppImages.filter, // your PNG asset path
+              width: 24.w,      // adjust size as needed
+              height: 24.h,
+              color: AppColors.pureWhite,
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
+
 
   Widget _buildRecipeGrid() {
     return Obx(() {
@@ -101,13 +134,34 @@ class MyRecipesScreen extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
                       child: Image.asset(recipe.image,
-                          height: 100.h, width: double.infinity, fit: BoxFit.cover),
+                          height: 120.h, width: double.infinity, fit: BoxFit.cover),
                     ),
                     Positioned(
-                      right: 8.w,
-                      top: 8.h,
-                      child: Icon(Icons.favorite, color: AppColors.background),
-                    )
+                      right: 16.w,
+                      top: 12.h,
+                      child: Container(
+                        width: 24.w,
+                        height: 24.h,
+                        decoration: BoxDecoration(
+                          color: AppColors.pureWhite,      // background circle color
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.black.withOpacity(0.2),  // subtle border color
+                            width: 0.25,                            // border width
+                          ),
+                        ),
+                        child: Center(
+                          child: SvgPicture.asset(
+                            AppImages.favourite,   // your SVG asset path
+                            width: 14.w,
+                            height: 14.h,
+                            color: AppColors.buttonColor, // optional tint
+                          ),
+                        ),
+
+                      ),
+                    ),
+
                   ],
                 ),
                 Padding(
@@ -119,27 +173,38 @@ class MyRecipesScreen extends StatelessWidget {
                           style: AppTextStyles.H5_Regular,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis),
-                      SizedBox(height: 4.h),
+                      SizedBox(height: 5.h),
                       Row(
                         children: [
-                          Icon(Icons.access_time, size: 14.sp, color: AppColors.defaultTextColor),
-                          SizedBox(width: 4.w),
+                          SvgPicture.asset(
+                            AppImages.outline_time,        // your SVG path
+                            width: 16.w,
+                            height: 16.h,
+                            color: AppColors.buttonColor,
+                          ),
+
+                          SizedBox(width: 6.w),
                           Text("${recipe.timeMinutes} min",
                               style: AppTextStyles.bioText),
                         ],
                       ),
-                      SizedBox(height: 4.h),
+                      SizedBox(height: 5.h),
                       Row(
                         children: List.generate(5, (index) {
-                          return Icon(
-                            index < recipe.rating.round()
-                                ? Icons.star
-                                : Icons.star_border,
-                            size: 14.sp,
-                            color: AppColors.buttonColor,
+                          return Padding(
+                            padding: EdgeInsets.only(right: 4.w),   // space between stars
+                            child: SvgPicture.asset(
+                              index < recipe.rating.round()
+                                  ? AppImages.fill_star
+                                  : AppImages.blank_star,
+                              width: 16.w,
+                              height: 16.h,
+                              color: AppColors.buttonColor,
+                            ),
                           );
                         }),
                       ),
+
                     ],
                   ),
                 ),

@@ -5,6 +5,8 @@ import 'package:video_player/video_player.dart';
 class CookingSkillsController extends GetxController {
   late VideoPlayerController videoController;
   final isPlaying = false.obs;
+  final isMuted = false.obs;
+  final volume = 1.0.obs;
 
   // Static skill data (non-reactive)
   final skill = CookingSkillModel(
@@ -43,6 +45,23 @@ class CookingSkillsController extends GetxController {
     final current = videoController.value.position;
     final target = current - const Duration(seconds: 10);
     videoController.seekTo(target < Duration.zero ? Duration.zero : target);
+  }
+
+  void toggleMute() {
+    if (isMuted.value) {
+      videoController.setVolume(volume.value);
+      isMuted(false);
+    } else {
+      videoController.setVolume(0);
+      isMuted(true);
+    }
+  }
+
+  void setVolume(double value) {
+    volume(value);
+    if (!isMuted.value) {
+      videoController.setVolume(value);
+    }
   }
 
   @override

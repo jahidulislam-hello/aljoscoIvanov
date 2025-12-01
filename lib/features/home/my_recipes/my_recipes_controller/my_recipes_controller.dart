@@ -30,6 +30,18 @@ class MyRecipesController extends GetxController {
         timeMinutes: 40,
         rating: 4.0,
         isFavorite: true),
+    MyRecipeModel(
+        title: 'Tacos',
+        image: 'assets/icons/03.png',
+        timeMinutes: 25,
+        rating: 5.0,
+        isFavorite: true),
+    MyRecipeModel(
+        title: 'Tacos',
+        image: 'assets/icons/03.png',
+        timeMinutes: 25,
+        rating: 5.0,
+        isFavorite: true),
   ].obs;
 
   void updateSearch(String value) {
