@@ -3,6 +3,7 @@ import 'package:freshbite/features/auth/sign_in/signin_screen/signin_screen.dart
 import 'package:freshbite/features/auth/sign_up/signUp_screen/signUp_screen.dart';
 import 'package:freshbite/features/home/home_new/screen/recipe_screen.dart';
 import 'package:freshbite/features/home/my_recipes/my_recepies_screen/my_recepies_screen.dart';
+import 'package:freshbite/features/home/terms_condition/terms_conditions.dart';
 import 'package:freshbite/features/meal_planner/meal_planner_new/meal_planner_all_screen/meal_planner_all_screen.dart';
 import 'package:freshbite/features/meal_planner/meal_planner_new/select_meal_popup/selact_meal_popup_screen/select_meal_popup_screen.dart';
 import 'package:freshbite/features/meal_planner/meal_planner_new/widget/meal_planner_popup_add.dart';
@@ -48,7 +49,7 @@ class AppRoute {
 
 
   static List<GetPage> routes = [
-    GetPage(name: splashScreen, page: () => SplashScreen()),
+    GetPage(name: splashScreen, page: () => TermsConditions()),
     GetPage(name: onboardingScreen, page: () => OnboardingScreen()),
     GetPage(name: signInScreen, page: () => LoginScreen()),
     GetPage(name: signUpScreen, page: () => SignUpScreen()),
