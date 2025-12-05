@@ -7,6 +7,7 @@ import 'package:freshbite/core/themes/text_styles.dart';
 import 'package:freshbite/features/home/home_menu/home_menu_screen/home_menu_screen.dart';
 import 'package:freshbite/features/home/home_recipes/home_recepies_controller/home_recepies_controller.dart';
 import 'package:freshbite/features/home/recipe_search/recipe_search_screen/receipe_search_screen.dart';
+import 'package:freshbite/features/home/search_filter/search_filter_screen/search_filter_screen.dart';
 import 'package:get/get.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -103,21 +104,27 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: 10.w),
-                  Container(
-                    width: 36.w,
-                    height: 36.h,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(5.r),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.tune,
-                        color: AppColors.pureWhite,
-                        size: 24.sp,
+                  GestureDetector(
+                    onTap: () {
+                      Get.to(() => SearchFilterScreen());
+                    },
+                    child: Container(
+                      width: 36.w,
+                      height: 36.h,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(5.r),
+                      ),
+                      child: Center(
+                        child: Icon(
+                          Icons.tune,
+                          color: AppColors.pureWhite,
+                          size: 24.sp,
+                        ),
                       ),
                     ),
                   ),
+
                 ],
               ),
               SizedBox(height: 20.h),
