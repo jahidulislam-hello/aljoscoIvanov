@@ -22,19 +22,35 @@ class SearchExpandableSection extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () => expanded.value = !expanded.value,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(title,
-                    style:
-                    TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
-                Icon(expanded.value ? Icons.expand_less : Icons.expand_more),
-              ],
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 6.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF2B2B2B),
+                    ),
+                  ),
+                  Icon(
+                    expanded.value ? Icons.expand_less : Icons.expand_more,
+                    color: const Color(0xFF4A4A4A),
+                    size: 22.sp,
+                  ),
+                ],
+              ),
             ),
           ),
-          if (expanded.value) SizedBox(height: 12.h),
+
+          if (expanded.value) SizedBox(height: 10.h),
+
+          // ⭐ chips will wrap automatically
           if (expanded.value) child,
-          SizedBox(height: 20.h)
+
+          SizedBox(height: 18.h),
         ],
       );
     });

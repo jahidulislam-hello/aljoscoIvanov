@@ -44,6 +44,9 @@ class AppImages {
   static String pepper_icon =  "$baseUrlImage/pepper.png";
   static String filter_icon =  "$baseUrlImage/pepper.png";
   static String chatIcon =  "$baseUrlImage/chat_bubble.png";
+  static String verifyPass =  "$baseUrlImage/verify_pass.png";
+  static String forgetPass =  "$baseUrlImage/forget_pass.png";
+  static String resetPass =  "$baseUrlImage/verify_password.png";
 
 
 

@@ -55,7 +55,7 @@ class ProfileController extends GetxController {
 
   void editProfile() {
     // Navigate to edit profile screen
-    Get.toNamed('/edit-profile');
+    Get.to(()=>ProfileSettingsScreen());
   }
 
   void changeProfilePicture() {

@@ -6,6 +6,11 @@ import 'package:freshbite/core/appbar/custom_appbar.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
+import 'package:freshbite/features/home/terms_condition/about_freshbite.dart';
+import 'package:freshbite/features/home/terms_condition/frequently_ask_question.dart';
+import 'package:freshbite/features/home/terms_condition/terms_conditions.dart';
+import 'package:freshbite/features/profile/change_password/change_password_screen.dart';
+import 'package:freshbite/features/profile/family_members/family_member_screen/family_members_screen.dart';
 import 'package:freshbite/features/profile/profile_settings/profile_settings_controller/profile_settings_controller.dart';
 import 'package:freshbite/features/profile/settings/settings_controller/settings_controller.dart';
 import 'package:get/get.dart';
@@ -72,7 +77,23 @@ class SettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        // onTap: () { Get.to (()=>ChangePasswordScreen());},
+                         // onTap: () { Get.to (()=> ChangePasswordScreen());},
+
+                      ),
+                      const SizedBox(height: 24),
+                      SettingTile(
+                        iconWidget: SvgPicture.asset(
+                          AppImages.profile,
+                          width: 24,
+                          height: 24,
+                        ),
+                        title: "Family Members",
+                        trailingIcon: SvgPicture.asset(
+                          AppImages.arrow,
+                          width: 24,
+                          height: 24,
+                        ),
+                        onTap: () { Get.to (()=> FamilyMemberScreen());},
 
                       ),
                       const SizedBox(height: 24),
@@ -88,7 +109,7 @@ class SettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        // onTap: () {Get.to (()=> PrivacyScreen());},
+                         // onTap: () {Get.to (()=> PrivacyScreen());},
                       ),
                       const SizedBox(height: 24),
                       SettingTile(
@@ -103,7 +124,7 @@ class SettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        // onTap: () { Get.to (()=> TermsScreen());},
+                        onTap: () { Get.to (()=> FrequentlyAskQuestion());},
                       ),
                       const SizedBox(height: 24),
                       SettingTile(
@@ -118,7 +139,7 @@ class SettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        // onTap: () {Get.to (()=> AboutUs());},
+                         onTap: () {Get.to (()=> AboutUs());},
                       ),
                       const SizedBox(height: 24),
                       SettingTile(
@@ -133,7 +154,7 @@ class SettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        // onTap: () { Get.to (()=>ChangePasswordScreen());},
+                         onTap: () { Get.to (()=> TermsConditions());},
 
                       ),
                       const SizedBox(height: 24),
@@ -149,7 +170,7 @@ class SettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        // onTap: () { Get.to (()=>ChangePasswordScreen());},
+                        onTap: () { Get.to (()=> ChangePasswordScreen());},
 
                       ),
                       const SizedBox(height: 24),
@@ -204,7 +225,7 @@ class SettingTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         height: 54,
         decoration: BoxDecoration(
           color: AppColors.pureWhite,          // ⭐ Full white box background

@@ -3,6 +3,7 @@ import 'package:freshbite/core/navbar/navbar/navbar_screen.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/core/widgets/custom_text_field.dart';
+import 'package:freshbite/features/auth/forget_password/forget_password_Screen/forget_email_screen.dart';
 import 'package:freshbite/features/auth/sign_in/signin_controller/signin_controller.dart';
 import 'package:freshbite/routes/routes.dart';
 import 'package:get/get.dart';
@@ -126,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 TextButton(
 
-                  onPressed: () {  },
+                  onPressed: () { Get.to(() => ForgotPasswordScreen()); },
                   child:  Text(
                     'Forgot Password?',
                     style: TextStyle(color: Colors.black),
