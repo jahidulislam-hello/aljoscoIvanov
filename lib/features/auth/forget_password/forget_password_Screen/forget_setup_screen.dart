@@ -12,15 +12,24 @@ import '../../../../core/appbar/custom_appbar.dart';
 
 
 class ResetPasswordScreen extends StatelessWidget {
-   ResetPasswordScreen({super.key});
+  final String verificationToken;
+  final String userId;
 
-  final ResetPasswordController controller = Get.put(ResetPasswordController());
+  ResetPasswordScreen({
+    super.key,
+    required this.verificationToken,
+    this.userId = '',
+  });
 
+  @override
+  Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+    // Initialize controller with verificationToken and userId
+    final controller = Get.put(
+      ResetPasswordController(token: verificationToken, uid: userId),
+    );
 
-   Widget build(BuildContext context) {
-     final Size size = MediaQuery.of(context).size; // ✅ add this
-
-     return Scaffold(
+    return Scaffold(
        backgroundColor: AppColors.background,
        body: SafeArea(
          child: Padding(
@@ -92,12 +101,16 @@ class ResetPasswordScreen extends StatelessWidget {
                const Spacer(),
 
                /// Submit Button
-               CustomTextButton(
-                 text: "Submit Now",
-                 onTap: controller.resetPassword,
-               ),
+               Obx(() => CustomTextButton(
+                 text: controller.isLoading.value ? "Resetting..." : "Submit Now",
+                 onTap: () {
+                   if (!controller.isLoading.value) {
+                     controller.resetPassword();
+                   }
+                 },
+               )),
 
-               SizedBox(height: size.height * 0.03), // ✅ fixed
+               SizedBox(height: size.height * 0.03),
              ],
            ),
          ),

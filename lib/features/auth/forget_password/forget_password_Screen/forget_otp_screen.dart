@@ -3,19 +3,31 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
-import 'package:freshbite/features/auth/forget_password/forget_password_Screen/forget_setup_screen.dart';
 import 'package:freshbite/features/auth/forget_password/forget_password_controller/forget_otp_controller.dart';
 import 'package:get/get.dart';
 
 
 
 class ForgotPasswordOtpScreen extends StatelessWidget {
-  final ForgotPasswordOtpController controller = Get.put(ForgotPasswordOtpController());
+  final String email;
+  final String verificationToken;
 
-  ForgotPasswordOtpScreen({super.key});
+  ForgotPasswordOtpScreen({
+    super.key,
+    required this.email,
+    required this.verificationToken,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // Initialize controller with email and token
+    final controller = Get.put(
+      ForgotPasswordOtpController(
+        userEmail: email,
+        token: verificationToken,
+      ),
+    );
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -94,7 +106,7 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
                             textAlign: TextAlign.center,
                             maxLength: 1,
                             keyboardType: TextInputType.number,
-                            style: const TextStyle(fontSize: 22, color: Colors.white),
+                            style: const TextStyle(fontSize: 22, color: Colors.black),
                             decoration: const InputDecoration(counterText: '', border: InputBorder.none),
                             onChanged: (val) {
                               controller.updateDigit(index, val);
@@ -165,14 +177,7 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
                 width: double.infinity,
                 child: CustomTextButton(
                   text: "Verify OTP",
-                  onTap: () {
-                    if (controller.isOtpComplete()) {
-                      Get.snackbar("Success", "OTP Verified!", snackPosition: SnackPosition.BOTTOM);
-                      Get.to (()=> ResetPasswordScreen());
-                    } else {
-                      Get.snackbar("Error", "Please enter full OTP", snackPosition: SnackPosition.BOTTOM);
-                    }
-                  },
+                  onTap: controller.verifyOtp,
                 ),
               ),
             ],

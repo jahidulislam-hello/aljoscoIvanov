@@ -142,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
               text: "Log In",
               onTap: (
               ){
-                Get.offAllNamed(AppRoute.bottomNavbar);
+               _controller.login();
               },
 
             ),

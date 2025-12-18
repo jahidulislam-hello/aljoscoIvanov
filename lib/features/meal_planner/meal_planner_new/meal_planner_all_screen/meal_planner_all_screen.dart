@@ -24,24 +24,60 @@ class AddMealPlanningScreen extends StatefulWidget {
 }
 
 class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
-  final MealPlanController _controller = MealPlanController();
+  final MealPlanController _controller = Get.put(MealPlanController());
 
   // Selected date index
-  int _selectedDateIndex = 3; // Default to 18th (index 3)
-  final List<String> _days = ["15", "16", "17", "18", "19", "20", "21"];
+  int _selectedDateIndex = 3; // Middle (today)
+  late List<DateTime> _weekDates;
+  late String _currentMonth;
 
-  // Selected tab index (0 = BY RECIPE, 1 = BY CATEGORY)
+  // Selected tab index (0 = MEAL PLAN, 1 = PREP LIST)
   int _selectedTab = 0;
 
   // Comment text controller
   final TextEditingController _commentController = TextEditingController();
 
-  // Prep list items checked state
-  List<bool> _prepItemsChecked = [false, false, false];
+  @override
+  void initState() {
+    super.initState();
+    _initializeDates();
+    // Load meal plans from local storage for today's date
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Wait a bit for controller to finish loading from storage
+      await Future.delayed(Duration(milliseconds: 500));
+
+      final todayStr = _weekDates[_selectedDateIndex].toIso8601String().split('T')[0];
+
+      // Fetch today's meal plans from API
+      await _controller.fetchMealPlansForDate(todayStr);
+
+      print("✅ Loaded meal plans for today from API");
+    });
+  }
+
+  void _initializeDates() {
+    final today = DateTime.now();
+    _weekDates = List.generate(7, (index) {
+      return today.add(Duration(days: index - 3)); // -3 to +3 from today
+    });
+    _currentMonth = _getMonthYear(_weekDates[_selectedDateIndex]);
+  }
+
+  String _getMonthYear(DateTime date) {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return '${months[date.month - 1]} ${date.year}';
+  }
+
+  String _getDayOfWeek(DateTime date) {
+    const days = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+    return days[date.weekday - 1];
+  }
 
   @override
   void dispose() {
-    _controller.dispose();
     _commentController.dispose();
     super.dispose();
   }
@@ -213,16 +249,38 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
       builder: (context) => AddPlanningPopup(
         recipeName: selectedRecipe.title,
         recipeImage: selectedRecipe.image,
-        onAddToMealPlan: (mealItems, prepItems, cookPerson) {
-          // Add recipe to meal plan
-          _controller.addRecipeToMeal(
-            mealId,
-            MealRecipe(
-              name: selectedRecipe.title,
-              servings: '${mealItems.first.servings} servings',
-              imageUrl: selectedRecipe.image,
-            ),
+        onAddToMealPlan: (mealItems, prepItems, cookPerson) async {
+          print("🔄 Starting meal plan creation...");
+          print("   Selected Recipe: ${selectedRecipe.title} (${selectedRecipe.id})");
+          print("   Meal Items: ${mealItems.length}");
+          print("   Prep Items: ${prepItems.length}");
+          print("   Cook Person: $cookPerson");
+
+          // Call API to create meal plan
+          final success = await _controller.createMealPlan(
+            recipeId: selectedRecipe.id,
+            mealItems: mealItems,
+            prepItems: prepItems,
+            cookPerson: cookPerson,
           );
+
+          if (success) {
+            print("✅ SUCCESS: Meal plan created and UI updated");
+
+            // Update local UI
+            _controller.addRecipeToMeal(
+              mealId,
+              MealRecipe(
+                name: selectedRecipe.title,
+                servings: mealItems.isNotEmpty ? '${mealItems.first.servings} servings' : '2 servings',
+                imageUrl: selectedRecipe.image,
+              ),
+            );
+          } else {
+            print("❌ FAILED: Could not create meal plan. Check logs above for details.");
+          }
+
+          return success;
         },
       ),
     );
@@ -263,20 +321,25 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
             if (_selectedTab == 0) ...[
               // MEAL PLAN Tab Content
               Expanded(
-                child: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    return ListView(
-                      children: [
-                        // Meal Sections
-                        ..._controller.meals.map((meal) => _buildMealSection(meal)),
-
-                        // Nutritional Values
-                        _buildNutritionalSection(),
-                      ],
+                child: Obx(() {
+                  if (_controller.isLoading.value) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.buttonColor,
+                      ),
                     );
-                  },
-                ),
+                  }
+
+                  return ListView(
+                    children: [
+                      // Meal Sections
+                      ..._controller.meals.map((meal) => _buildMealSection(meal)),
+
+                      // Nutritional Values
+                      _buildNutritionalSection(),
+                    ],
+                  );
+                }),
               ),
             ] else ...[
               // PREP LIST Tab Content
@@ -308,7 +371,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                 child: Row(
                   children: [
                     Text(
-                      "January 2025",
+                      _currentMonth,
                       style: AppTextStyles.heading1.copyWith(fontSize: 16.sp),
                     ),
                     SizedBox(width: 4.w),
@@ -378,37 +441,46 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
           // Weekday labels
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
-                .map(
-                  (e) => SizedBox(
-                    width: 36.w,
-                    child: Center(
-                      child: Text(
-                        e,
-                        style: AppTextStyles.caption.copyWith(
-                          fontSize: 12.sp,
-                          color: AppColors.textLight,
-                        ),
-                      ),
+            children: List.generate(7, (i) {
+              return SizedBox(
+                width: 36.w,
+                child: Center(
+                  child: Text(
+                    _getDayOfWeek(_weekDates[i]),
+                    style: AppTextStyles.caption.copyWith(
+                      fontSize: 12.sp,
+                      color: AppColors.textLight,
                     ),
                   ),
-                )
-                .toList(),
+                ),
+              );
+            }),
           ),
 
           SizedBox(height: 8.h),
 
-          // Dates row (15–21)
+          // Dates row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(7, (i) {
               bool isSelected = i == _selectedDateIndex;
+              bool isToday = i == 3; // Middle is always today
 
               return InkWell(
-                onTap: () {
+                onTap: () async {
                   setState(() {
                     _selectedDateIndex = i;
+                    _currentMonth = _getMonthYear(_weekDates[i]);
                   });
+
+                  // Fetch meal plans for the selected date from API
+                  final selectedDateStr = _weekDates[i].toIso8601String().split('T')[0];
+                  await _controller.fetchMealPlansForDate(selectedDateStr);
+
+                  // Fetch prep list for new date if on prep list tab
+                  if (_selectedTab == 1) {
+                    await _controller.fetchPrepList(_weekDates[i].toIso8601String());
+                  }
                 },
                 child: Container(
                   width: 36.w,
@@ -416,13 +488,17 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                   decoration: BoxDecoration(
                     color: isSelected ? AppColors.buttonColor : Colors.transparent,
                     borderRadius: BorderRadius.circular(18.r),
+                    border: isToday && !isSelected
+                        ? Border.all(color: AppColors.buttonColor, width: 1)
+                        : null,
                   ),
                   alignment: Alignment.center,
                   child: Text(
-                    _days[i],
+                    '${_weekDates[i].day}',
                     style: AppTextStyles.body.copyWith(
                       fontSize: 14.sp,
                       color: isSelected ? Colors.white : AppColors.text,
+                      fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                 ),
@@ -433,24 +509,30 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
           SizedBox(height: 8.h),
 
           // Icons row under dates
-          Row(
+          Obx(() => Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(7, (i) {
+              final dateStr = _weekDates[i].toIso8601String().split('T')[0];
+              final hasMealPlan = _controller.dateHasMealPlan(dateStr);
+              final hasShoppingList = _controller.dateHasShoppingList(dateStr);
+
               return SizedBox(
                 width: 36.w,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (i == _selectedDateIndex) ...[
+                    if (hasMealPlan) ...[
                       Image.asset(AppImages.recipe_icon, width: 12.w, height: 12.h),
-                      SizedBox(width: 2.w),
+                      if (hasShoppingList) SizedBox(width: 2.w),
+                    ],
+                    if (hasShoppingList) ...[
                       Image.asset(AppImages.shopping_icon, width: 12.w, height: 12.h),
                     ],
                   ],
                 ),
               );
             }),
-          ),
+          )),
 
           SizedBox(height: 16.h),
 
@@ -499,10 +581,12 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
           ),
           Expanded(
             child: GestureDetector(
-              onTap: () {
+              onTap: () async {
                 setState(() {
                   _selectedTab = 1;
                 });
+                // Fetch prep list for selected date when switching to prep list tab
+                await _controller.fetchPrepList(_weekDates[_selectedDateIndex].toIso8601String());
               },
               child: Container(
                 height: 42.h,
@@ -886,7 +970,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
   }
 
   Widget _buildNutritionalSection() {
-    return Container(
+    return Obx(() => Container(
       margin: EdgeInsets.only(top: 1),
       color: Colors.white,
       child: Column(
@@ -908,7 +992,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                 GestureDetector(
                   onTap: () => _controller.toggleNutritionExpansion(),
                   child: Icon(
-                    _controller.nutritionExpanded ? Icons.visibility : Icons.visibility_off,
+                    _controller.nutritionExpanded.value ? Icons.visibility : Icons.visibility_off,
                     color: Color(0xFF757575),
                     size: 20,
                   ),
@@ -917,14 +1001,14 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
             ),
           ),
 
-          if (_controller.nutritionExpanded) ...[
+          if (_controller.nutritionExpanded.value) ...[
             Padding(
               padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Total of 1 serving of each recipe on ${_days[_selectedDateIndex]}.1.25',
+                    'Total of 1 serving of each recipe on ${_weekDates[_selectedDateIndex].day}.${_weekDates[_selectedDateIndex].month}.${_weekDates[_selectedDateIndex].year.toString().substring(2)}',
                     style: TextStyle(
                       fontSize: 11,
                       color: Color(0xFF9E9E9E),
@@ -945,7 +1029,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
           ],
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildNutritionRow(String label, String value) {
@@ -976,41 +1060,52 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
 
   // ---------------- PREP LIST HEADER ----------------
   Widget _buildPrepListHeader() {
+    final selectedDate = _weekDates[_selectedDateIndex];
+    final formattedDate = '${selectedDate.day}.${selectedDate.month}.${selectedDate.year.toString().substring(2)}';
+
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            'Recipes to prepare on ${_days[_selectedDateIndex]}.1.25',
-            style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1A1A1A),
+          Expanded(
+            child: Text(
+              'Recipes to prepare on $formattedDate',
+              style: TextStyle(
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A1A1A),
+              ),
             ),
           ),
-          Row(
-            children: [
-              Text(
-                'Cooked by  ',
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  color: AppColors.textLight,
-                ),
-              ),
-              GestureDetector(
-                onTap: () => _showFinishedPopup(),
-                child: Text(
-                  'Finished?',
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    color: AppColors.buttonColor,
-                    fontWeight: FontWeight.w600,
+          Obx(() {
+            final hasPrepList = _controller.prepListItems.isNotEmpty;
+            final cooker = hasPrepList ? _controller.prepListItems.first.cooker : '';
+
+            return Row(
+              children: [
+                if (cooker.isNotEmpty)
+                  Text(
+                    'Cooked by $cooker  ',
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: AppColors.textLight,
+                    ),
+                  ),
+                GestureDetector(
+                  onTap: () => _showFinishedPopup(),
+                  child: Text(
+                    'Finished?',
+                    style: TextStyle(
+                      fontSize: 11.sp,
+                      color: AppColors.buttonColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            );
+          }),
         ],
       ),
     );
@@ -1018,56 +1113,99 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
 
   // ---------------- PREP LIST CONTENT ----------------
   Widget _buildPrepListContent() {
-    return ListView(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      children: [
-        // Prep list items
-        _buildPrepListItem(0, 'Tomato Soup', '4 servings', 'assets/icons/02.png'),
-        SizedBox(height: 12.h),
-        _buildPrepListItem(1, 'Grilled Chicken', '2 servings', 'assets/icons/02.png'),
-        SizedBox(height: 12.h),
-        _buildPrepListItem(2, 'Caesar Salad', '3 servings', 'assets/icons/02.png'),
-        SizedBox(height: 16.h),
+    final selectedDate = _weekDates[_selectedDateIndex];
+    final formattedDate = '${selectedDate.day}.${selectedDate.month}.${selectedDate.year.toString().substring(2)}';
 
-        // Comments section for Prep List
-        if (_controller.prepListComments.isNotEmpty) ...[
-          ..._controller.prepListComments.map((comment) => Padding(
-            padding: EdgeInsets.only(bottom: 12.h),
-            child: _buildCommentCard(comment),
-          )),
-        ],
-
-        // Comment Icon
-        GestureDetector(
-          onTap: () => _showAddCommentPopup(),
-          child: Image.asset(
-            AppImages.chatIcon, // your asset path
-            height: 24,
-            width: 24,
-            color: AppColors.buttonColor, // optional tint
+    return Obx(() {
+      if (_controller.isLoading.value) {
+        return Center(
+          child: CircularProgressIndicator(
+            color: AppColors.buttonColor,
           ),
-        ),
+        );
+      }
 
-        SizedBox(height: 16.h),
+      final hasPrepList = _controller.prepListItems.isNotEmpty;
 
-        // Create shopping list button
-        CustomButton(
-          text: 'Create shopping list for ${_days[_selectedDateIndex]}.1.25',
-          color: AppColors.buttonColor,
-          onTap: () {
-            // Handle create shopping list
-          },
-        ),
-      ],
-    );
+      return ListView(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        children: [
+          // Show message if no prep list
+          if (!hasPrepList) ...[
+            Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 40.h),
+                child: Text(
+                  'No prep list for this date',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: AppColors.textLight,
+                  ),
+                ),
+              ),
+            ),
+          ] else ...[
+            // Prep list items from API
+            ...List.generate(_controller.prepListItems.first.recipes.length, (index) {
+              final recipeItem = _controller.prepListItems.first.recipes[index];
+              return Padding(
+                padding: EdgeInsets.only(bottom: 12.h),
+                child: _buildPrepListItemFromApi(
+                  index,
+                  recipeItem,
+                  _controller.prepListItems.first.serving,
+                ),
+              );
+            }),
+
+            SizedBox(height: 16.h),
+          ],
+
+          // Comments section for Prep List
+          if (_controller.prepListComments.isNotEmpty) ...[
+            ..._controller.prepListComments.map((comment) => Padding(
+              padding: EdgeInsets.only(bottom: 12.h),
+              child: _buildCommentCard(comment),
+            )),
+          ],
+
+          // Comment Icon
+          GestureDetector(
+            onTap: () => _showAddCommentPopup(),
+            child: Image.asset(
+              AppImages.chatIcon,
+              height: 24,
+              width: 24,
+              color: AppColors.buttonColor,
+            ),
+          ),
+
+          SizedBox(height: 16.h),
+
+          // Create shopping list button
+          CustomButton(
+            text: 'Create shopping list for $formattedDate',
+            color: AppColors.buttonColor,
+            onTap: () {
+              // Handle create shopping list
+              final dateStr = selectedDate.toIso8601String().split('T')[0];
+              _controller.markDateWithShoppingList(dateStr);
+              print("✅ Shopping list created for $dateStr");
+            },
+          ),
+        ],
+      );
+    });
   }
 
-  // ---------------- PREP LIST ITEM ----------------
-  Widget _buildPrepListItem(int index, String name, String servings, String imageUrl) {
+  // Build prep list item from API data
+  Widget _buildPrepListItemFromApi(int index, PrepListRecipe recipeItem, int serving) {
+    final isDone = recipeItem.isDone;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Image Card
+        // Placeholder image (since API doesn't return image)
         Container(
           width: 100.w,
           height: 109.h,
@@ -1085,60 +1223,18 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image with edit icon
-              Stack(
-                children: [
-                  Container(
-                    width: 100.w,
-                    height: 72.h,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(8.r),
-                        topRight: Radius.circular(8.r),
-                      ),
-                      color: Color(0xFFE0E0E0),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(8.r),
-                        topRight: Radius.circular(8.r),
-                      ),
-                      child: Image.asset(
-                        imageUrl,
-                        fit: BoxFit.cover,
-                        width: 100.w,
-                        height: 72.h,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Color(0xFFFF8C42),
-                            child: Icon(Icons.restaurant, color: Colors.white, size: 28),
-                          );
-                        },
-                      ),
-                    ),
+              // Image placeholder
+              Container(
+                width: 100.w,
+                height: 72.h,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(8.r),
+                    topRight: Radius.circular(8.r),
                   ),
-                  // Edit icon
-                  Positioned(
-                    top: 4.h,
-                    right: 4.w,
-                    child: Container(
-                      width: 18.w,
-                      height: 18.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(Icons.edit, size: 10, color: Color(0xFF757575)),
-                    ),
-                  ),
-                ],
+                  color: Color(0xFFFF8C42),
+                ),
+                child: Icon(Icons.restaurant, color: Colors.white, size: 28),
               ),
               // Title and Servings
               Expanded(
@@ -1149,7 +1245,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        name,
+                        recipeItem.recipeId ?? 'Recipe',
                         style: TextStyle(
                           fontSize: 11.sp,
                           fontWeight: FontWeight.w600,
@@ -1160,7 +1256,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                       ),
                       SizedBox(height: 2.h),
                       Text(
-                        servings,
+                        '$serving servings',
                         style: TextStyle(
                           fontSize: 9.sp,
                           color: Color(0xFF757575),
@@ -1192,28 +1288,21 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
               child: Icon(Icons.person, color: Color(0xFF9E9E9E), size: 18),
             ),
             SizedBox(width: 16.w),
-            // Check icon (toggleable)
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _prepItemsChecked[index] = !_prepItemsChecked[index];
-                });
-              },
-              child: Container(
-                width: 24.w,
-                height: 24.h,
-                decoration: BoxDecoration(
-                  color: _prepItemsChecked[index] ? AppColors.buttonColor : Colors.transparent,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: _prepItemsChecked[index] ? AppColors.buttonColor : Color(0xFFE0E0E0),
-                    width: 2,
-                  ),
+            // Check icon (from API)
+            Container(
+              width: 24.w,
+              height: 24.h,
+              decoration: BoxDecoration(
+                color: isDone ? AppColors.buttonColor : Colors.transparent,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isDone ? AppColors.buttonColor : Color(0xFFE0E0E0),
+                  width: 2,
                 ),
-                child: _prepItemsChecked[index]
-                    ? Icon(Icons.check, color: Colors.white, size: 18)
-                    : null,
               ),
+              child: isDone
+                  ? Icon(Icons.check, color: Colors.white, size: 18)
+                  : null,
             ),
           ],
         ),

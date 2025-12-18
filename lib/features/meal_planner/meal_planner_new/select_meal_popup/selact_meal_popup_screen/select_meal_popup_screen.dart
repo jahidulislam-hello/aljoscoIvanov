@@ -94,15 +94,34 @@ class SelectMealPopup extends StatelessWidget {
     return SizedBox(
       height: 180.h,
       child: Obx(
-        () => ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: list.length,
-          separatorBuilder: (_, __) => SizedBox(width: 12.w),
-          itemBuilder: (_, i) {
-            final recipe = list[i];
-            return _buildCard(recipe);
-          },
-        ),
+        () {
+          if (controller.isLoading.value) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: AppColors.buttonColor,
+              ),
+            );
+          }
+
+          if (list.isEmpty) {
+            return Center(
+              child: Text(
+                "No recipes available",
+                style: AppTextStyles.bioText,
+              ),
+            );
+          }
+
+          return ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: list.length,
+            separatorBuilder: (_, __) => SizedBox(width: 12.w),
+            itemBuilder: (_, i) {
+              final recipe = list[i];
+              return _buildCard(recipe);
+            },
+          );
+        },
       ),
     );
   }
@@ -137,12 +156,60 @@ class SelectMealPopup extends StatelessWidget {
                 ClipRRect(
                   borderRadius:
                       BorderRadius.vertical(top: Radius.circular(12.r)),
-                  child: Image.asset(
-                    recipe.image,
-                    height: 110.h,
-                    width: 150.w,
-                    fit: BoxFit.cover,
-                  ),
+                  child: recipe.image.startsWith('http')
+                      ? Image.network(
+                          recipe.image,
+                          height: 110.h,
+                          width: 150.w,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              height: 110.h,
+                              width: 150.w,
+                              color: AppColors.buttonColor.withOpacity(0.3),
+                              child: Icon(
+                                Icons.restaurant,
+                                color: AppColors.buttonColor,
+                                size: 40,
+                              ),
+                            );
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              height: 110.h,
+                              width: 150.w,
+                              color: Colors.grey[200],
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColors.buttonColor,
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                              ),
+                            );
+                          },
+                        )
+                      : Image.asset(
+                          recipe.image,
+                          height: 110.h,
+                          width: 150.w,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              height: 110.h,
+                              width: 150.w,
+                              color: AppColors.buttonColor.withOpacity(0.3),
+                              child: Icon(
+                                Icons.restaurant,
+                                color: AppColors.buttonColor,
+                                size: 40,
+                              ),
+                            );
+                          },
+                        ),
                 ),
 
                 // Favourite icon
