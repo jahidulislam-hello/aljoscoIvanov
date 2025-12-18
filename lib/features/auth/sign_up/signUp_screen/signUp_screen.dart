@@ -139,7 +139,7 @@ class SignUpScreen extends StatelessWidget {
                   CustomTextButton(
                     text: "Sign Up",
                     onTap: () {
-                      Get.offAllNamed(AppRoute.bottomNavbar);
+                      controller.registerUser();
 
                     },
                   ),

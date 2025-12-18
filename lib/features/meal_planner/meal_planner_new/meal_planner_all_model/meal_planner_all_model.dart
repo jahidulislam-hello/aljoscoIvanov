@@ -62,9 +62,117 @@ class MealPlanningItem {
 class PreparationItem {
   String day;
   String servings;
+  String? cooker;
 
   PreparationItem({
     required this.day,
     required this.servings,
+    this.cooker,
   });
+}
+
+// ============================================
+// API RESPONSE MODELS
+// ============================================
+class MealPlanApiModel {
+  final String id;
+  final String userId;
+  final String date;
+  final int serving;
+  final String mealTime;
+  final List<dynamic> recipes;
+  final List<dynamic> comments;
+
+  MealPlanApiModel({
+    required this.id,
+    required this.userId,
+    required this.date,
+    required this.serving,
+    required this.mealTime,
+    required this.recipes,
+    required this.comments,
+  });
+
+  factory MealPlanApiModel.fromJson(Map<String, dynamic> json) {
+    return MealPlanApiModel(
+      id: json['_id'] ?? '',
+      userId: json['userId'] ?? '',
+      date: json['date'] ?? '',
+      serving: json['serving'] ?? 0,
+      mealTime: json['meal_time'] ?? '',
+      recipes: json['recipes'] ?? [],
+      comments: json['comments'] ?? [],
+    );
+  }
+}
+
+class PrepListApiModel {
+  final String id;
+  final String userId;
+  final String date;
+  final int serving;
+  final String cooker;
+  final List<PrepListRecipe> recipes;
+
+  PrepListApiModel({
+    required this.id,
+    required this.userId,
+    required this.date,
+    required this.serving,
+    required this.cooker,
+    required this.recipes,
+  });
+
+  factory PrepListApiModel.fromJson(Map<String, dynamic> json) {
+    return PrepListApiModel(
+      id: json['_id'] ?? '',
+      userId: json['userId'] ?? '',
+      date: json['date'] ?? '',
+      serving: json['serving'] ?? 0,
+      cooker: json['cooker'] ?? '',
+      recipes: (json['recipes'] as List?)
+              ?.map((r) => PrepListRecipe.fromJson(r))
+              .toList() ??
+          [],
+    );
+  }
+}
+
+class PrepListRecipe {
+  final String? recipeId;
+  final String? recipeTitle;
+  final String? recipeImage;
+  final bool isDone;
+
+  PrepListRecipe({
+    this.recipeId,
+    this.recipeTitle,
+    this.recipeImage,
+    required this.isDone,
+  });
+
+  factory PrepListRecipe.fromJson(Map<String, dynamic> json) {
+    // Handle recipeId which can be either a String or a populated Map
+    String? id;
+    String? title;
+    String? image;
+
+    final recipeData = json['recipeId'];
+    if (recipeData is String) {
+      id = recipeData;
+    } else if (recipeData is Map<String, dynamic>) {
+      id = recipeData['_id'] ?? '';
+      title = recipeData['title'] ?? '';
+      if (recipeData['images'] != null && (recipeData['images'] as List).isNotEmpty) {
+        image = recipeData['images'][0];
+      }
+    }
+
+    return PrepListRecipe(
+      recipeId: id,
+      recipeTitle: title,
+      recipeImage: image,
+      isDone: json['isDone'] ?? false,
+    );
+  }
 }

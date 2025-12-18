@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:freshbite/features/meal_planner/meal_planner_new/meal_planner_all_model/meal_planner_all_model.dart';
 
-
-
-
 // ============================================
 // ADD PLANNING POPUP
 // ============================================
 class AddPlanningPopup extends StatefulWidget {
   final String recipeName;
   final String? recipeImage;
-  final Function(List<MealPlanningItem>, List<PreparationItem>, String) onAddToMealPlan;
+  final Future<bool> Function(List<MealPlanningItem>, List<PreparationItem>, String) onAddToMealPlan;
 
   AddPlanningPopup({
     required this.recipeName,
@@ -33,6 +30,48 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
   ];
 
   String cookPerson = '';
+  bool isLoading = false;
+
+  /// Validate meal items for duplicates
+  String? _validateMealItems() {
+    // Filter out empty items
+    final validItems = mealItems.where((item) =>
+    item.day.isNotEmpty && item.meal.isNotEmpty
+    ).toList();
+
+    if (validItems.isEmpty) {
+      return 'Please add at least one meal with a day and meal type.';
+    }
+
+    // Check for duplicates (same day + same meal type)
+    final seen = <String>{};
+    for (var item in validItems) {
+      final key = '${item.day.trim().toLowerCase()}_${item.meal.trim().toLowerCase()}';
+      if (seen.contains(key)) {
+        return 'Duplicate meal detected: "${item.meal}" on "${item.day}". Please use different meal types or dates.';
+      }
+      seen.add(key);
+    }
+
+    return null;
+  }
+
+  /// Show error dialog
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Validation Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -229,18 +268,65 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                       width: double.infinity,
                       height: 48,
                       child: ElevatedButton(
-                        onPressed: () {
-                          widget.onAddToMealPlan(mealItems, prepItems, cookPerson);
-                          Navigator.pop(context);
+                        onPressed: isLoading
+                            ? null
+                            : () async {
+                          // Validate before submitting
+                          final validationError = _validateMealItems();
+                          if (validationError != null) {
+                            _showErrorDialog(validationError);
+                            return;
+                          }
+
+                          setState(() {
+                            isLoading = true;
+                          });
+
+                          final success = await widget.onAddToMealPlan(
+                              mealItems, prepItems, cookPerson);
+
+                          setState(() {
+                            isLoading = false;
+                          });
+
+                          if (success) {
+                            Navigator.pop(context);
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text('Failed to Add Meal Plan'),
+                                content: Text(
+                                  'This recipe already exists in the meal plan for the selected date. Please choose a different date or recipe.',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text('OK'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color(0xFF2D4A2B),
+                          disabledBackgroundColor: Color(0xFF2D4A2B).withOpacity(0.5),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                           elevation: 0,
                         ),
-                        child: Text(
+                        child: isLoading
+                            ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                            : Text(
                           'ADD TO MEAL PLAN',
                           style: TextStyle(
                             fontSize: 14,

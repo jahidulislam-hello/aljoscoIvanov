@@ -12,6 +12,8 @@ import 'package:freshbite/features/meal_planner/meal_planner_new/widget/meal_pla
 import 'package:freshbite/features/new/controller/new_recipe_controller.dart';
 import 'package:freshbite/features/new/screen/new_recipe.dart';
 import 'package:freshbite/features/recepies/cooking/cooking_details_screen/cooking_details_screen.dart';
+import 'package:freshbite/features/recepies/details_recipes/details_recipes_screen/details_recipes_screen.dart';
+import 'package:freshbite/features/recepies/recipes_details/recipes_details_screen/recipes_details_screen.dart';
 import 'package:freshbite/features/shopping_list/edit_shopping_list/edit_shopping_list_screen/edit_shopping_list_screen.dart';
 import 'package:freshbite/features/splash/onboarding/onboarding_screen/onboarding_screen.dart';
 import 'package:freshbite/features/splash/splash/splash_screen/spalsh_screen.dart';
@@ -51,7 +53,7 @@ class AppRoute {
 
 
   static List<GetPage> routes = [
-    GetPage(name: splashScreen, page: () => SearchFilterScreen()),
+    GetPage(name: splashScreen, page: () => CookingDetailsScreen()),
     GetPage(name: onboardingScreen, page: () => OnboardingScreen()),
     GetPage(name: signInScreen, page: () => LoginScreen()),
     GetPage(name: signUpScreen, page: () => SignUpScreen()),

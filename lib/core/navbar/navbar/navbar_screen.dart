@@ -8,6 +8,7 @@ import 'package:freshbite/features/home/home_new/screen/recipe_screen.dart';
 import 'package:freshbite/features/home/home_recipes/home_recepies_screen/home_recepies_screen.dart';
 import 'package:freshbite/features/meal_planner/meal_planner_new/meal_planner_all_screen/meal_planner_all_screen.dart';
 import 'package:freshbite/features/profile/profile/profile_screen/profile_screen.dart';
+import 'package:freshbite/features/recepies/recipes_search/recipes_search_screen/recipes_search_screen.dart';
 import 'package:freshbite/features/shopping_list/shopping/shopping_screen/shopping_screen.dart';
 import 'package:get/get.dart';
 
@@ -34,7 +35,8 @@ class _BottomNavbarState extends State<BottomNavbar> {
     // CookingSkillsScreen(),
     ShoppingScreen(),
     AddMealPlanningScreen(),
-    FavoritesScreen(),
+    RecipeRecipeSearchScreen(),
+    // FavoritesScreen(),
     ProfileScreen(),
   ];
 

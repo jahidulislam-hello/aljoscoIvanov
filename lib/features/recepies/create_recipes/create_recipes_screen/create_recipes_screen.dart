@@ -29,25 +29,18 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:  AppColors.background,
+      backgroundColor: AppColors.background,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight((56.h) + 20.h), // Original height + desired top spacing
-        child: Column(
-          children: [
-            SizedBox(height: 20.h), // Top spacing
-            CustomAppBar(
-              title: 'Create Recipe',
-              titleAlignment: AppBarTitleAlignment.center,
-              showBackButton: true,
-              leadingImage: 'assets/icons/arrow-back.png', // optional custom image
-              actionButtons: [
-                AppBarAction(
-                  imagePath: 'assets/icons/charm_menu.png', // your menu icon asset
-                  onPressed: () {},
-                ),
-              ],
-            ),
-          ],
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: SafeArea(
+          child: CustomAppBar(
+            title: 'Create Recipe',
+            titleAlignment: AppBarTitleAlignment.center,
+            showBackButton: true,
+            actionButtons: [
+              AppBarAction(imagePath: 'assets/icons/charm_menu.png', onPressed: () {}),
+            ],
+          ),
         ),
       ),
       body: AnimatedBuilder(
@@ -121,7 +114,27 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: controller.saveRecipe,
+                      onPressed: controller.isLoading
+                          ? null
+                          : () async {
+                              final success = await controller.saveRecipe();
+                              if (success && context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Recipe created successfully!'),
+                                    backgroundColor: Color(0xFF2D5016),
+                                  ),
+                                );
+                                Navigator.pop(context);
+                              } else if (!success && context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Failed to create recipe. Please check all fields.'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF2D5016),
                         foregroundColor: Colors.white,
@@ -130,14 +143,23 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
-                      child: const Text(
-                        'SAVE RECIPE',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+                      child: controller.isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text(
+                              'SAVE RECIPE',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -447,7 +469,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               index: entry.key,
               hint: 'e.g. Heat oil and sauté onions until translucent...',
               instruction: entry.value,
-              onChanged: (text) => controller.updateInstruction(entry.key, text),
+              onChanged: (text) => controller.updateInstruction(entry.key, text: text),
             ),
           );
         }).toList(),
@@ -715,7 +737,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
           maxLines: 2,
           onChanged: (v) => controller.allergens = v,
           decoration: InputDecoration(
-            hintText: 'Select allergens contained in this recipe',
+            hintText: 'Enter allergens (comma separated)',
             hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
             filled: true,
             fillColor: Colors.white,
@@ -736,7 +758,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Suggested: Peanut containing, gluten, Celery, Soy, Lupin, Lactose, Egg, Nuts, Mustard, Sesame, Fish, Shellfish, Sulfite',
+          'Suggested: gluten, dairy, egg, peanut, soy, fish, shellfish, nuts',
           style: TextStyle(fontSize: 11, color: Colors.grey[600]),
         ),
       ],
@@ -750,8 +772,9 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
         _buildSectionTitle('Tags (Maximum 10)'),
         const SizedBox(height: 8),
         TextField(
+          onChanged: (v) => controller.tagsInput = v,
           decoration: InputDecoration(
-            hintText: 'Add keywords',
+            hintText: 'Add keywords (comma separated)',
             hintStyle: const TextStyle(fontSize: 13, color: Colors.grey),
             filled: true,
             fillColor: Colors.white,
