@@ -18,10 +18,10 @@ class RecipeController extends ChangeNotifier {
   String cookTime = '';
 
   List<InstructionStep> instructions = [InstructionStep()];
-  List<Ingredient> ingredients = [Ingredient()];
+  List<Ingredient> ingredients = [Ingredient(), Ingredient()];
   List<NutritionalValue> nutritionalValues = [
-    NutritionalValue(name: 'Calories'),
-    NutritionalValue(name: 'Protein'),
+    NutritionalValue(name: '', quantity: '', unit: 'kcal'),
+    NutritionalValue(name: '', quantity: '', unit: 'g'),
   ];
 
   String allergens = '';
@@ -74,16 +74,19 @@ class RecipeController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateIngredient(int index, {String? name, String? quantity, String? unit, String? category}) {
+  void updateIngredient(int index, {String? name, String? quantity, String? quantity2, String? unit, String? unit2, String? category, String? manualInput}) {
     if (name != null) ingredients[index].name = name;
     if (quantity != null) ingredients[index].quantity = quantity;
+    if (quantity2 != null) ingredients[index].quantity2 = quantity2;
     if (unit != null) ingredients[index].unit = unit;
+    if (unit2 != null) ingredients[index].unit2 = unit2;
     if (category != null) ingredients[index].category = category;
+    if (manualInput != null) ingredients[index].manualInput = manualInput;
     notifyListeners();
   }
 
   void removeIngredient(int index) {
-    if (ingredients.length > 1) {
+    if (ingredients.length > 2) {
       ingredients.removeAt(index);
       notifyListeners();
     }
@@ -102,7 +105,7 @@ class RecipeController extends ChangeNotifier {
   }
 
   void removeNutritionalValue(int index) {
-    if (nutritionalValues.length > 1) {
+    if (nutritionalValues.length > 2) {
       nutritionalValues.removeAt(index);
       notifyListeners();
     }
@@ -158,8 +161,11 @@ class RecipeController extends ChangeNotifier {
           .map((ing) => {
                 'name': ing.name,
                 'unit': ing.unit,
+                'unit2': ing.unit2,
                 'value': ing.quantity,
+                'value2': ing.quantity2,
                 'category': ing.category,
+                'manualInput': ing.manualInput,
               })
           .toList();
 
@@ -231,14 +237,17 @@ class InstructionStep {
 class Ingredient {
   String name = '';
   String quantity = '';
-  String unit = 'g';
-  String category = 'General';
+  String quantity2 = '';
+  String unit = '';
+  String unit2 = '';
+  String category = '';
+  String manualInput = '';
 }
 
 class NutritionalValue {
   String name = '';
   String quantity = '';
-  String unit = 'Unit';
+  String unit = '';
 
-  NutritionalValue({this.name = '', this.quantity = '', this.unit = 'Unit'});
+  NutritionalValue({this.name = '', this.quantity = '', this.unit = ''});
 }

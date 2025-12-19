@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/features/new/controller/new_recipe_controller.dart';
+import 'package:freshbite/features/recepies/recipes_details/recipes_details_controller/recipes_details_controller.dart';
 import 'package:get/get.dart';
 
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
 import '../model/new_recipe_model.dart';
-import '../new_controller.dart';
+import '../../recepies/recipes_details/recipes_details_model/recipes_details_model.dart';
+import '../../recepies/dummy_code/new_controller.dart';
 
 class IngredientItem extends StatelessWidget {
-  final Ingredient ingredient;
+  final dynamic ingredient; // Accepts both Ingredient and IngredientDetails
   final bool isChecked;
   final ValueChanged<bool?>? onChanged;
 
@@ -22,21 +24,54 @@ class IngredientItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<NewRecipeDetailController>();
+    // Try to find the controller, but make it optional
+    // Check for both NewRecipeDetailController and RecipesDetailsRecipeController
+    final newRecipeController = Get.isRegistered<NewRecipeDetailController>()
+        ? Get.find<NewRecipeDetailController>()
+        : null;
+
+    final recipeDetailsController = Get.isRegistered<RecipesDetailsRecipeController>()
+        ? Get.find<RecipesDetailsRecipeController>()
+        : null;
 
     // Local Rx for selected dropdown values
     final selectedUnit = "g/ml".obs;
     final selectedHousehold = "HouseHold".obs;
 
+    // Determine if we should show servings controls (for first ingredient only)
+    bool showServingsControls = false;
+    if (newRecipeController != null && newRecipeController.recipe.ingredients.first == ingredient) {
+      showServingsControls = true;
+    } else if (recipeDetailsController != null &&
+               recipeDetailsController.recipeDetails.value != null &&
+               recipeDetailsController.recipeDetails.value!.ingredients.first == ingredient) {
+      showServingsControls = true;
+    }
+
+    // Get servings value and functions based on which controller is available
+    RxInt? servingsValue;
+    VoidCallback? increaseServings;
+    VoidCallback? decreaseServings;
+
+    if (newRecipeController != null) {
+      servingsValue = newRecipeController.servings;
+      increaseServings = newRecipeController.increaseServings;
+      decreaseServings = newRecipeController.decreaseServings;
+    } else if (recipeDetailsController != null) {
+      servingsValue = recipeDetailsController.servings;
+      increaseServings = recipeDetailsController.increaseServings;
+      decreaseServings = recipeDetailsController.decreaseServings;
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (controller.recipe.ingredients.first == ingredient) ...[
+        if (showServingsControls && servingsValue != null) ...[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Obx(() => Text(
-                "For ${controller.servings.value} People",
+                "For ${servingsValue!.value} People",
                 style: AppTextStyles.HeadBold.copyWith(fontSize: 14.sp),
               )),
               Container(
@@ -49,15 +84,15 @@ class IngredientItem extends StatelessWidget {
                 child: Row(
                   children: [
                     IconButton(
-                      onPressed: controller.decreaseServings,
+                      onPressed: decreaseServings,
                       icon: const Icon(Icons.remove_circle_outline),
                     ),
                     Obx(() => Text(
-                      "${controller.servings.value}",
+                      "${servingsValue!.value}",
                       style: AppTextStyles.buttonText,
                     )),
                     IconButton(
-                      onPressed: controller.increaseServings,
+                      onPressed: increaseServings,
                       icon: const Icon(Icons.add_circle_outline),
                     ),
                   ],
