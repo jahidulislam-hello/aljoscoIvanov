@@ -6,6 +6,8 @@ import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
 import 'package:freshbite/features/recepies/create_recipes/create_recipes_screen/create_recipes_screen.dart';
+import 'package:freshbite/features/recepies/recipes_details/recipes_details_screen/recipes_details_screen.dart';
+import 'package:freshbite/features/recepies/recipes_details/recipes_details_controller/recipes_details_controller.dart';
 import 'package:freshbite/features/recepies/recipes_search/recipes_search_controller/recipes_search_controller.dart';
 import 'package:get/get.dart';
 
@@ -265,22 +267,29 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
         separatorBuilder: (_, __) => SizedBox(width: 12.w),
         itemBuilder: (_, i) {
           final recipe = recipes[i];
-          return Container(
-            width: 165.w,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12.r),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          return GestureDetector(
+            onTap: () {
+              // Navigate to details screen with recipe ID
+              Get.delete<RecipesDetailsRecipeController>();
+              Get.put(RecipesDetailsRecipeController(recipeId: recipe.id));
+              Get.to(() => RecipesDetailsRecipeScreen());
+            },
+            child: Container(
+              width: 165.w,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 Stack(
                   children: [
                     ClipRRect(
@@ -390,6 +399,7 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
             ),
           );
         },

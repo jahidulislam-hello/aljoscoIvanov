@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:freshbite/core/themes/app_colors.dart';
 
 class ImageCarousel extends StatefulWidget {
   final List<String> images;
@@ -14,88 +15,149 @@ class ImageCarousel extends StatefulWidget {
 }
 
 class _ImageCarouselState extends State<ImageCarousel> {
-  final PageController _pageController = PageController();
+  /// Helper method to check if image is a network URL
+  bool _isNetworkImage(String imagePath) {
+    return imagePath.startsWith('http://') || imagePath.startsWith('https://');
+  }
 
-  int _currentPage = 0;
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
+  /// Build image widget based on whether it's a network or asset image
+  Widget _buildImage(String imagePath, {required double width, required double height, BoxFit? fit}) {
+    if (_isNetworkImage(imagePath)) {
+      return Image.network(
+        imagePath,
+        width: width,
+        height: height,
+        fit: fit ?? BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: width,
+            height: height,
+            color: Colors.grey[300],
+            child: Center(
+              child: Icon(
+                Icons.broken_image,
+                size: 50.sp,
+                color: Colors.grey[600],
+              ),
+            ),
+          );
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            width: width,
+            height: height,
+            color: Colors.grey[200],
+            child: Center(
+              child: CircularProgressIndicator(
+                color: AppColors.buttonColor,
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded /
+                        loadingProgress.expectedTotalBytes!
+                    : null,
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      return Image.asset(
+        imagePath,
+        width: width,
+        height: height,
+        fit: fit ?? BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: width,
+            height: height,
+            color: Colors.grey[300],
+            child: Center(
+              child: Icon(
+                Icons.broken_image,
+                size: 50.sp,
+                color: Colors.grey[600],
+              ),
+            ),
+          );
+        },
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.images.isEmpty) {
+      return Container(
+        height: 244.h,
+        color: Colors.grey[300],
+        child: Center(
+          child: Icon(Icons.image_not_supported, size: 50.sp),
+        ),
+      );
+    }
+
+    // Get cover image (first image) and other images
+    final coverImage = widget.images.first;
+    final otherImages = widget.images.length > 1
+        ? widget.images.sublist(1)
+        : <String>[];
+
     return Column(
       children: [
-        // MAIN IMAGE FULL WIDTH
-        SizedBox(
-          height: 244.h,
-          width: double.infinity,
-          child: PageView.builder(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() => _currentPage = index);
-            },
-            itemCount: widget.images.length,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: EdgeInsets.symmetric(horizontal: 10.w), // 👈 spacing between images
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16.r),
-                  child: Image.asset(
-                    widget.images[index],
-                    width: double.infinity,
-                    height: 250.h,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              );
-            },
+        // MAIN COVER IMAGE (First image only)
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 10.w),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16.r),
+            child: _buildImage(
+              coverImage,
+              width: double.infinity,
+              height: 244.h,
+              fit: BoxFit.cover,
+            ),
           ),
         ),
 
-
-        SizedBox(height: 12.h),
-
-        // THUMBNAIL ROW UNDER MAIN IMAGE
-        SizedBox(
-          height: 60.h,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: widget.images.length,
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  _pageController.animateToPage(
-                    index,
-                    duration: Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                },
-                child: Container(
-                  margin: EdgeInsets.only(right: 10.w),
-                  width: 75.w,
-                  height: 51.h,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: _currentPage == index
-                          ? Colors.white
-                          : Colors.transparent,
-                      width: 2.w,
+        // THUMBNAIL ROW (Other images if available)
+        if (otherImages.isNotEmpty) ...[
+          SizedBox(height: 12.h),
+          SizedBox(
+            height: 60.h,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: otherImages.length,
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    // Optional: You can add functionality to view full image
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(right: 10.w),
+                    width: 75.w,
+                    height: 51.h,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey[400]!,
+                        width: 1.w,
+                      ),
+                      borderRadius: BorderRadius.circular(8.r),
                     ),
-                    borderRadius: BorderRadius.circular(8.r),
-                    image: DecorationImage(
-                      image: AssetImage(widget.images[index]),
-                      fit: BoxFit.cover,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.r),
+                      child: _buildImage(
+                        otherImages[index],
+                        width: 75.w,
+                        height: 51.h,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
-        ),
+        ],
       ],
     );
   }

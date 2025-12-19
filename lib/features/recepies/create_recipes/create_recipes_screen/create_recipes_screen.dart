@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/appbar/custom_appbar.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
+import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/features/recepies/create_recipes/create_recipes_controller/create_recipes_controller.dart';
 import 'package:freshbite/features/recepies/create_recipes/text_editor/rich_text_editor.dart';
 
@@ -110,57 +111,15 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                   _buildTags(),
                   const SizedBox(height: 32),
 
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: controller.isLoading
-                          ? null
-                          : () async {
-                              final success = await controller.saveRecipe();
-                              if (success && context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Recipe created successfully!'),
-                                    backgroundColor: Color(0xFF2D5016),
-                                  ),
-                                );
-                                Navigator.pop(context);
-                              } else if (!success && context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Failed to create recipe. Please check all fields.'),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2D5016),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomTextButton(
+                          text: 'SAVE RECIPE',
+                          onTap: () {},
                         ),
                       ),
-                      child: controller.isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Text(
-                              'SAVE RECIPE',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                    ),
+                    ],
                   ),
                   const SizedBox(height: 24),
                 ],
@@ -445,7 +404,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(4),
-                    borderSide: const BorderSide(color: Color(0xFF2D5016), width: 1.5),
+                    borderSide: const BorderSide(color: Color(0xFF1C2D07), width: 1.5),
                   ),
                 ),
               ),
@@ -473,19 +432,33 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
             ),
           );
         }).toList(),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: controller.addInstruction,
-            icon: const Icon(Icons.add, size: 18),
-            label: const Text('Add another step'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF2D5016),
-              side: const BorderSide(color: Color(0xFF2D5016)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 12),
+        GestureDetector(
+          onTap: controller.addInstruction,
+          child: Container(
+            height: 40,
+            width: 151.w,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1C2D07),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 18,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Add another step',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -590,19 +563,33 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
             ),
           );
         }).toList(),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: controller.addIngredient,
-            icon: const Icon(Icons.add, size: 18),
-            label: const Text('Add ingredient'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF2D5016),
-              side: const BorderSide(color: Color(0xFF2D5016)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 12),
+        GestureDetector(
+          onTap: controller.addIngredient,
+          child: Container(
+            height: 40,
+            width: 151.w,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1C2D07),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 18,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Add ingredient',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
@@ -707,19 +694,33 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
             ),
           );
         }).toList(),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: controller.addNutritionalValue,
-            icon: const Icon(Icons.add, size: 18),
-            label: const Text('Add Nutritional Value'),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF2D5016),
-              side: const BorderSide(color: Color(0xFF2D5016)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 12),
+        GestureDetector(
+          onTap: controller.addNutritionalValue,
+          child: Container(
+            height: 40,
+            width: 151.w,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1C2D07),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: 18,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Add Nutritional Value',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
