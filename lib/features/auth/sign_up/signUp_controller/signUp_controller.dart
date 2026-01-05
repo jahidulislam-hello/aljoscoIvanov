@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:freshbite/core/navbar/navbar/navbar_screen.dart';
 import 'package:freshbite/core/utils/shared_preference_helper.dart';
+import 'package:freshbite/features/subscription/subscription_screen.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -99,8 +100,7 @@ class SignUpController extends GetxController {
         print("✅ Registration Success for $email");
         print("✅ Token: $token");
 
-        // Navigate to BottomNavbar
-        Get.offAll(() => BottomNavbar());
+        Get.offAll(() => SubscriptionScreen());
       } else {
         final errorMessage = responseData["message"] ?? "Registration failed.";
         print("❌ Registration failed: $errorMessage");

@@ -8,7 +8,6 @@ class ChangePasswordController extends GetxController {
 
   // Observables
   RxBool isLoading = false.obs;
-  RxString profileImage = ''.obs;
   RxString firstName = ''.obs;
   RxString lastName = ''.obs;
   RxString email = ''.obs;
@@ -66,7 +65,7 @@ class ChangePasswordController extends GetxController {
   void openSettings() {
     // Navigate to settings screen
     // Get.toNamed('/settings');
-    Get.to(()=>SettingsScreen());
+    Get.to(()=> ProfileSettingsScreen());
 
   }
 

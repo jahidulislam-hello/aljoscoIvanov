@@ -1,44 +1,74 @@
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/features/profile/profile/model/profile_recipe_model.dart';
 import 'package:freshbite/features/profile/profile/model/user_model.dart';
+import 'package:freshbite/features/profile/profile/profile_service/profile_service.dart';
 import 'package:freshbite/features/profile/profile_settings/profile_settings_screen/profile_settings_screen.dart';
 import 'package:freshbite/features/profile/settings/settings_screen/settings_screen.dart';
 import 'package:get/get.dart';
 
 class ProfileController extends GetxController {
-  final Rx<UserModel> user = UserModel(
-    userId: 'its_cheryl_btw',
-    name: 'Hariza Williamson',
-    email: 'cherylboss@gmail.com',
-    phoneNumber: '+999999999999',
-    isPremium: true,
-  ).obs;
-
-  final RxList<ProfileRecipeModel> recipes = <ProfileRecipeModel>[
-    ProfileRecipeModel(
-      id: '1',
-      title: 'Red velvet cupcake',
-      imageUrl: AppImages.recipeImage1,
-      addedDate: DateTime.now().subtract(Duration(days: 7)),
-      isLiked: false,
-    ),
-    ProfileRecipeModel(
-      id: '2',
-      title: 'Red velvet cupcake',
-      imageUrl: AppImages.recipeImage1,
-      addedDate: DateTime.now().subtract(Duration(days: 21)),
-      isLiked: false,
-    ),
-    ProfileRecipeModel(
-      id: '3',
-      title: 'Red velvet cupcake',
-      imageUrl: AppImages.recipeImage1,
-      addedDate: DateTime.now().subtract(Duration(days: 35)),
-      isLiked: false,
-    ),
-  ].obs;
-
+  final Rx<UserModel?> user = Rx<UserModel?>(null);
+  final RxList<ProfileRecipeModel> recipes = <ProfileRecipeModel>[].obs;
   final RxInt selectedTabIndex = 0.obs;
+  final RxBool isLoadingProfile = false.obs;
+  final RxBool isLoadingRecipes = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchProfileData();
+    fetchUserRecipes();
+  }
+
+  Future<void> fetchProfileData() async {
+    try {
+      isLoadingProfile.value = true;
+      final response = await ProfileService.getMyProfile();
+
+      if (response['success'] == true && response['data'] != null) {
+        user.value = UserModel.fromJson(response['data']);
+      }
+    } catch (e) {
+      print('Error fetching profile: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to load profile data',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoadingProfile.value = false;
+    }
+  }
+
+  Future<void> fetchUserRecipes() async {
+    try {
+      isLoadingRecipes.value = true;
+      final response = await ProfileService.getUserRecipes();
+
+      if (response['success'] == true && response['response'] != null) {
+        final recipesList = response['response'] as List;
+        recipes.value = recipesList
+            .map((recipe) => ProfileRecipeModel.fromJson(recipe))
+            .toList();
+      }
+    } catch (e) {
+      print('Error fetching recipes: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to load recipes',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoadingRecipes.value = false;
+    }
+  }
+
+  Future<void> refreshProfile() async {
+    await Future.wait([
+      fetchProfileData(),
+      fetchUserRecipes(),
+    ]);
+  }
 
   void changeTab(int index) {
     selectedTabIndex.value = index;
@@ -55,7 +85,7 @@ class ProfileController extends GetxController {
 
   void editProfile() {
     // Navigate to edit profile screen
-    Get.to(()=>ProfileSettingsScreen());
+    Get.to(()=> SettingsScreen());
   }
 
   void changeProfilePicture() {
@@ -65,7 +95,7 @@ class ProfileController extends GetxController {
   void openSettings() {
     // Navigate to settings screen
     // Get.toNamed('/settings');
-    Get.to(()=>SettingsScreen());
+    Get.to(()=> ProfileSettingsScreen());
 
   }
 

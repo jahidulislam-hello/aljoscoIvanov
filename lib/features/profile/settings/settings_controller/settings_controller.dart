@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
-class ProfileSettingsController extends GetxController {
+class SettingsController extends GetxController {
   var isEditing = false.obs;
 
   // Observables
@@ -88,7 +88,7 @@ class ProfileSettingsController extends GetxController {
   void openSettings() {
     // Navigate to settings screen
     // Get.toNamed('/settings');
-    Get.to(()=>SettingsScreen());
+    Get.to(()=> ProfileSettingsScreen());
 
   }
 

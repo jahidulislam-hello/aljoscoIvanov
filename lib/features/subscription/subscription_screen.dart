@@ -4,6 +4,7 @@ import 'package:freshbite/core/appbar/custom_appbar.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/features/subscription/subscription_controller/subscription_controller.dart';
+import 'package:freshbite/routes/routes.dart';
 import 'package:get/get.dart';
 import '../../core/themes/app_colors.dart';
 import '../../core/themes/text_styles.dart';
@@ -18,7 +19,16 @@ class SubscriptionScreen extends StatelessWidget{
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const CustomAppBar(title: "Subscription"),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight ),
+        child: Padding(
+          padding: EdgeInsets.only(top: 20.h),
+          child: CustomAppBar(
+            title: "Subscription",
+            height: kToolbarHeight,
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.w),
         child: Column(
@@ -97,6 +107,8 @@ class SubscriptionScreen extends StatelessWidget{
               onTap: () {
                 if (controller.selectedPlan.value == -1) {
                   Get.snackbar("Alert", "Please select a plan first");
+                } else {
+                  Get.offAllNamed(AppRoute.getBottomNavbar());
                 }
               },
             ),
