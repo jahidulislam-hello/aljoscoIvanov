@@ -1,10 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:freshbite/core/navbar/controller/navbar_controller.dart';
-import 'package:freshbite/features/home/favourites/favourites_screen/favourite_screen.dart';
-import 'package:freshbite/features/home/filter/filter_screen/filter_screen.dart';
-import 'package:freshbite/features/home/home_new/screen/cooking_screen.dart';
-import 'package:freshbite/features/home/home_new/screen/recipe_screen.dart';
 import 'package:freshbite/features/home/home_recipes/home_recepies_screen/home_recepies_screen.dart';
 import 'package:freshbite/features/meal_planner/meal_planner_new/meal_planner_all_screen/meal_planner_all_screen.dart';
 import 'package:freshbite/features/profile/profile/profile_screen/profile_screen.dart';
@@ -32,11 +28,9 @@ class _BottomNavbarState extends State<BottomNavbar> {
 
   final List<Widget> pages = [
     HomeScreen(),
-    // CookingSkillsScreen(),
     ShoppingScreen(),
     AddMealPlanningScreen(),
     RecipeRecipeSearchScreen(),
-    // FavoritesScreen(),
     ProfileScreen(),
   ];
 

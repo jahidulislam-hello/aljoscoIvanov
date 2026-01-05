@@ -34,7 +34,7 @@ class ChangePasswordScreen extends StatelessWidget {
         child: SafeArea(
           top: true,
           child: CustomAppBar(
-            title: 'My Profile',
+            title: "Change Password",
             titleStyle: AppTextStyles.heading2,
             showShadow: false,
             actionButtons: [
@@ -62,60 +62,52 @@ class ChangePasswordScreen extends StatelessWidget {
 
                 SizedBox(height: 24),
 
-                // ============================
-                // NAME FIELD
-                // ============================
-                const Text("Name",
+
+                const Text("Old Password",
                     style: TextStyle(color: Colors.black54, fontSize: 14)),
                 SizedBox(height: 6),
 
                 CustomTextField(
                   controller: controller.fullNameController,
-                  hintText: "Enter your name",
+                  hintText: "Enter your Old Password",
                   isEnabled: controller.isEditing.value,
                 ),
 
 
                 SizedBox(height: 16),
 
-                // ============================
-                // PHONE FIELD
-                // ============================
-                const Text("Phone",
+
+                const Text("New Password",
                     style: TextStyle(color: Colors.black54, fontSize: 14)),
                 SizedBox(height: 6),
 
                 CustomTextField(
                   controller: controller.phoneController,
-                  hintText: "Enter your phone number",
+                  hintText: "Enter your New Password",
                   isEnabled: controller.isEditing.value,
                 ),
 
                 SizedBox(height: 16),
 
-                // ============================
-                // EMAIL FIELD (READ ONLY)
-                // ============================
-                const Text("Email",
+
+                const Text(" Confirm New Password",
                     style: TextStyle(color: Colors.black45, fontSize: 14)),
                 SizedBox(height: 6),
 
                 CustomTextField(
                   controller: controller.emailController,
-                  hintText: "Enter your email",
+                  hintText: "Enter your Confirm New Password",
                   isEnabled: false,
                   readOnly: true,
                 ),
 
                 SizedBox(height: 100),
 
-                // ============================
-                // UPDATE / EDIT BUTTON
-                // ============================
+
                 Obx(() => CustomTextButton(
                   text: controller.isEditing.value
-                      ? "Update Profile"
-                      : "Edit Profile",
+                      ? "Update Password"
+                      : "Edit Password",
                   onTap: () {
                     if (controller.isEditing.value) {
                       controller.updateProfile();

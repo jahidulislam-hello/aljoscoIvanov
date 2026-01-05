@@ -15,10 +15,10 @@ import 'package:freshbite/features/profile/profile_settings/profile_settings_con
 import 'package:freshbite/features/profile/settings/settings_controller/settings_controller.dart';
 import 'package:get/get.dart';
 
-class SettingsScreen extends StatelessWidget {
-  final controller = Get.put(SettingsController());
+class ProfileSettingsScreen extends StatelessWidget {
+  final controller = Get.put(ProfileSettingsController());
 
-  SettingsScreen({super.key});
+  ProfileSettingsScreen({super.key});
 
   String _getInitials(String name) {
     if (name.trim().isEmpty) return '';

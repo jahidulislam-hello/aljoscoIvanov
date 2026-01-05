@@ -13,6 +13,30 @@ class ProfileRecipeModel {
     this.isLiked = false,
   });
 
+  factory ProfileRecipeModel.fromJson(Map<String, dynamic> json) {
+    return ProfileRecipeModel(
+      id: json['_id'] ?? '',
+      title: json['title'] ?? '',
+      imageUrl: (json['images'] != null && (json['images'] as List).isNotEmpty)
+          ? json['images'][0]
+          : '',
+      addedDate: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+      isLiked: false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'title': title,
+      'images': [imageUrl],
+      'createdAt': addedDate.toIso8601String(),
+      'isLiked': isLiked,
+    };
+  }
+
   String getTimeAgo() {
     final now = DateTime.now();
     final difference = now.difference(addedDate);

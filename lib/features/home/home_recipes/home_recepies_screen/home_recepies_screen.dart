@@ -15,6 +15,51 @@ class HomeScreen extends StatelessWidget {
 
   final HomeController controller = Get.put(HomeController());
 
+  // Helper method to determine if image is a network URL or local asset
+  Widget _buildImage(String imagePath, {required double width, required double height, BoxFit fit = BoxFit.cover}) {
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      // Network image
+      return Image.network(
+        imagePath,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) {
+          // Fallback to placeholder if network image fails
+          return Container(
+            width: width,
+            height: height,
+            color: AppColors.background,
+            child: Icon(Icons.image_not_supported, color: Colors.grey),
+          );
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            width: width,
+            height: height,
+            color: AppColors.background,
+            child: Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                    : null,
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      // Local asset
+      return Image.asset(
+        imagePath,
+        width: width,
+        height: height,
+        fit: fit,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,8 +176,8 @@ class HomeScreen extends StatelessWidget {
 
               // Featured recipe card
               Obx(() {
-                if (controller.recipes.isEmpty) return const SizedBox.shrink();
-                final item = controller.recipes.first;
+                if (controller.featuredRecipe.value == null) return const SizedBox.shrink();
+                final item = controller.featuredRecipe.value!;
                 return Stack(
                   clipBehavior: Clip.none,
                   children: [
@@ -177,7 +222,7 @@ class HomeScreen extends StatelessWidget {
                       bottom: -20.h,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(12.r),
-                        child: Image.asset(
+                        child: _buildImage(
                           item.image,
                           width: 140.w,
                           height: 150.h,
@@ -218,7 +263,6 @@ class HomeScreen extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: controller.recipes
-                      .skip(1)
                       .map((recipe) => Padding(
                     padding: EdgeInsets.only(right: 10.w),
                     child: Column(
@@ -228,7 +272,7 @@ class HomeScreen extends StatelessWidget {
                             ClipRRect(
                               borderRadius:
                               BorderRadius.circular(12.r),
-                              child: Image.asset(
+                              child: _buildImage(
                                 recipe.image,
                                 width: 110.w,
                                 height: 145.h,
@@ -387,14 +431,19 @@ class HomeScreen extends StatelessWidget {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              width: 70.w,
-                              height: 70.h,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.r),
-                                border: Border.all(color: AppColors.buttonColor),
-                                image: DecorationImage(
-                                  image: AssetImage(shop.image),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10.r),
+                              child: Container(
+                                width: 70.w,
+                                height: 70.h,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: AppColors.buttonColor),
+                                  borderRadius: BorderRadius.circular(10.r),
+                                ),
+                                child: _buildImage(
+                                  shop.image,
+                                  width: 70.w,
+                                  height: 70.h,
                                   fit: BoxFit.cover,
                                 ),
                               ),

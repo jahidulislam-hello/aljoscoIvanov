@@ -53,7 +53,6 @@ class AppRoute {
 
 
 
-
   static List<GetPage> routes = [
     GetPage(name: splashScreen, page: () => SplashScreen()),
     GetPage(name: onboardingScreen, page: () => OnboardingScreen()),
@@ -61,11 +60,11 @@ class AppRoute {
     GetPage(name: signUpScreen, page: () => SignUpScreen()),
     GetPage(name: bottomNavbar, page: () => const BottomNavbar()),
 
-    // Home screen routes
+
     GetPage(name: homeScreen, page: () => RecipeDetailScreen()),
     GetPage(name: recipeDetailScreen, page: () => CookingDetailsScreen()),
 
-    // New recipe detail screen route with proper controller instantiation
+
     GetPage(
       name: newRecipeDetailScreen,
       page: () {

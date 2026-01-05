@@ -12,10 +12,10 @@ import '../../../../core/appbar/custom_appbar.dart';
 import '../../../../core/widgets/button.dart';
 
 
-class ProfileSettingsScreen extends StatelessWidget {
-  final controller = Get.put(ProfileSettingsController());
+class SettingsScreen extends StatelessWidget {
+  final controller = Get.put(SettingsController());
 
-  ProfileSettingsScreen({super.key});
+  SettingsScreen({super.key});
 
   String _getInitials(String name) {
     if (name.trim().isEmpty) return '';

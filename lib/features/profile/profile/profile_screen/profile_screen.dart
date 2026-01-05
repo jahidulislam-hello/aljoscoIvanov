@@ -19,20 +19,35 @@ class ProfileScreen extends StatelessWidget {
           children: [
             _buildAppBar(),
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(height: 24.h),
-                    _buildProfileHeader(),
-                    SizedBox(height: 32.h),
-                    _buildProfileInformation(),
-                    SizedBox(height: 32.h),
-                    _buildTabs(),
-                    SizedBox(height: 16.h),
-                    _buildContent(),
-                  ],
-                ),
-              ),
+              child: Obx(() {
+                if (controller.isLoadingProfile.value && controller.user.value == null) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.primary,
+                    ),
+                  );
+                }
+
+                return RefreshIndicator(
+                  onRefresh: controller.refreshProfile,
+                  color: AppColors.primary,
+                  child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: [
+                        SizedBox(height: 24.h),
+                        _buildProfileHeader(),
+                        SizedBox(height: 32.h),
+                        _buildProfileInformation(),
+                        SizedBox(height: 32.h),
+                        _buildTabs(),
+                        SizedBox(height: 16.h),
+                        _buildContent(),
+                      ],
+                    ),
+                  ),
+                );
+              }),
             ),
           ],
         ),
@@ -58,6 +73,10 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildProfileHeader() {
     return Obx(() {
       final user = controller.user.value;
+      if (user == null) {
+        return SizedBox.shrink();
+      }
+
       return Column(
         children: [
           Stack(
@@ -70,7 +89,7 @@ class ProfileScreen extends StatelessWidget {
                   color: AppColors.lightGrey,
                   image: user.profileImageUrl != null
                       ? DecorationImage(
-                    image: AssetImage(user.profileImageUrl!),
+                    image: NetworkImage(user.profileImageUrl!),
                     fit: BoxFit.cover,
                   )
                       : null,
@@ -124,33 +143,42 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
           ),
-          if (user.isPremium) ...[
-            SizedBox(height: 12.h),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.lightGrey, width: 1.5.w),
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.workspace_premium,
-                    size: 16.sp,
-                    color: AppColors.black,
-                  ),
-                  SizedBox(width: 6.w),
-                  Text(
-                    'Premium',
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
+          SizedBox(height: 12.h),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.lightGrey, width: 1.5.w),
+              borderRadius: BorderRadius.circular(10.r),
             ),
-          ],
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  user.isGuestUser
+                      ? Icons.person_outline
+                      : Icons.workspace_premium,
+                  size: 16.sp,
+                  color: user.isTrialUser
+                      ? Colors.orange
+                      : user.isGuestUser
+                          ? AppColors.grey
+                          : AppColors.black,
+                ),
+                SizedBox(width: 6.w),
+                Text(
+                  user.getPlanDisplayName(),
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: user.isTrialUser
+                        ? Colors.orange
+                        : user.isGuestUser
+                            ? AppColors.grey
+                            : AppColors.black,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       );
     });
@@ -159,6 +187,10 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildProfileInformation() {
     return Obx(() {
       final user = controller.user.value;
+      if (user == null) {
+        return SizedBox.shrink();
+      }
+
       return Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         child: Column(
@@ -302,6 +334,41 @@ class ProfileScreen extends StatelessWidget {
     bool showTimeAgo = false,
   }) {
     return Obx(() {
+      if (controller.isLoadingRecipes.value && controller.recipes.isEmpty) {
+        return Padding(
+          padding: EdgeInsets.symmetric(vertical: 40.h),
+          child: Center(
+            child: CircularProgressIndicator(
+              color: AppColors.primary,
+            ),
+          ),
+        );
+      }
+
+      if (controller.recipes.isEmpty) {
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 40.h),
+          child: Center(
+            child: Column(
+              children: [
+                Icon(
+                  Icons.restaurant_menu,
+                  size: 64.sp,
+                  color: AppColors.grey,
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  'No recipes yet',
+                  style: AppTextStyles.bodyLarge.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
       return ListView.builder(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
@@ -346,10 +413,35 @@ class ProfileScreen extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10.r),
               color: AppColors.lightGrey,
-              image: DecorationImage(
-                image: AssetImage(recipe.imageUrl),
-                fit: BoxFit.cover,
-              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10.r),
+              child: recipe.imageUrl.isNotEmpty
+                  ? Image.network(
+                      recipe.imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(
+                          Icons.restaurant,
+                          size: 40.sp,
+                          color: AppColors.grey,
+                        );
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                            strokeWidth: 2,
+                          ),
+                        );
+                      },
+                    )
+                  : Icon(
+                      Icons.restaurant,
+                      size: 40.sp,
+                      color: AppColors.grey,
+                    ),
             ),
           ),
           SizedBox(width: 12.w),
