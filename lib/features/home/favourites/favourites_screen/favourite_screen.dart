@@ -7,6 +7,7 @@ import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/features/home/favourites/favourites_controller/favourites_controller.dart';
+import 'package:freshbite/features/home/my_recipes/my_recepies_screen/my_recepies_screen.dart';
 import 'package:get/get.dart';
 
 
@@ -337,40 +338,49 @@ class FavoritesScreen extends StatelessWidget {
       ),
       itemBuilder: (_, i) {
         final collection = controller.collections[i];
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12.r),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
-                child: Image.asset(
-                  collection['image']!,
-                  width: double.infinity,
-                  height: 131.h,
-                  fit: BoxFit.cover,
+        return InkWell(
+          borderRadius: BorderRadius.circular(12.r),
+          onTap: () {
+            if (collection['title'] == 'My Recipes') {
+              Get.to(() =>  MyRecipesScreen());
+            }
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12.r),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(8.w),
-                child: Text(
-                  collection['title']!,
-                  style: AppTextStyles.bodyLarge,
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
+                  child: Image.asset(
+                    collection['image']!,
+                    width: double.infinity,
+                    height: 131.h,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: EdgeInsets.all(8.w),
+                  child: Text(
+                    collection['title']!,
+                    style: AppTextStyles.bodyLarge,
+                  ),
+                ),
+              ],
+            ),
           ),
         );
+
       },
     ));
   }

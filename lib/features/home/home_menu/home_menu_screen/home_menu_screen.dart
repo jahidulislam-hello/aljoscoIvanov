@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:ui';
 import 'package:freshbite/core/themes/app_colors.dart';
+import 'package:freshbite/features/home/favourites/favourites_screen/favourite_screen.dart';
+import 'package:get/get.dart';
 
 
 
@@ -155,7 +157,20 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
 
                 _buildMenuItem(Icons.person_outline, 'My Profile'),
                 _buildMenuItem(Icons.subway, 'Subscription'),
-                _buildMenuItem(Icons.sports_soccer, 'Favourites'),
+                _buildMenuItem(
+                  Icons.sports_soccer,
+                  'Favourites',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>  FavoritesScreen(),
+                      ),
+                    );
+                  },
+                ),
+
+
                 _buildMenuItem(Icons.bar_chart, 'Preferences'),
                 _buildMenuItem(Icons.history, 'Cooking Skills'),
 
@@ -189,11 +204,19 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
 
 
 
-  Widget _buildMenuItem(IconData icon, String title, {bool hasArrow = false, bool isLogout = false}) {
+  Widget _buildMenuItem(
+      IconData icon,
+      String title, {
+        bool hasArrow = false,
+        bool isLogout = false,
+        VoidCallback? onTap,
+      }) {
     return InkWell(
       onTap: () {
-        // Handle menu item tap
-        _closeMenu();
+        _closeMenu(); // close sidebar animation first
+        if (onTap != null) {
+          onTap();
+        }
       },
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 12.h),
@@ -226,5 +249,6 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
       ),
     );
   }
+
 
 }

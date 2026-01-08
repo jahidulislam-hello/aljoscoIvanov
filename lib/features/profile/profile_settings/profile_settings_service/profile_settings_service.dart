@@ -3,20 +3,15 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:freshbite/core/network_celler/endpoints.dart';
 import 'package:freshbite/core/utils/shared_preference_helper.dart';
+import 'package:freshbite/core/network_celler/http_client.dart';
 
 class ProfileSettingsService {
   static Future<Map<String, dynamic>> getMyProfile() async {
     try {
-      final token = await SharedPreferencesHelper.getAccessToken();
-
       print('📤 Fetching profile for settings...');
 
-      final response = await http.get(
+      final response = await HttpClient.get(
         Uri.parse(Urls.getMyProfile),
-        headers: {
-          "Content-Type": "application/json",
-          if (token != null) "Authorization": "Bearer $token",
-        },
       );
 
       print('📥 Profile settings response: ${response.statusCode}');
@@ -44,8 +39,6 @@ class ProfileSettingsService {
     String? profileImagePath,
   }) async {
     try {
-      final token = await SharedPreferencesHelper.getAccessToken();
-
       print('📤 Updating profile...');
 
       var request = http.MultipartRequest(
@@ -54,9 +47,6 @@ class ProfileSettingsService {
       );
 
       request.headers['Content-Type'] = 'multipart/form-data';
-      if (token != null) {
-        request.headers['Authorization'] = 'Bearer $token';
-      }
 
       // Add text fields
       request.fields['fullName'] = fullName;
@@ -76,7 +66,7 @@ class ProfileSettingsService {
 
       print('📤 Sending update request with: fullName=$fullName, phone=$phoneNumber');
 
-      final streamedResponse = await request.send();
+      final streamedResponse = await HttpClient.sendMultipart(request);
       final response = await http.Response.fromStream(streamedResponse);
 
       print('📥 Update profile response: ${response.statusCode}');

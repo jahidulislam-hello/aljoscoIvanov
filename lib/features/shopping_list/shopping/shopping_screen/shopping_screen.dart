@@ -184,18 +184,41 @@ class ShoppingScreen extends StatelessWidget {
                   /// LISTVIEW
                   SizedBox(
                     height: 300.h, // Must constrain inside column
-                    child: Obx(
-                          () => ListView.builder(
-                        itemCount: controller.shoppingLists.length,
-                        itemBuilder: (context, index) {
-                          final item = controller.shoppingLists[index];
-                          return _ShoppingListTile(
-                            item: item,
-                            onToggle: () => controller.toggleFinished(index),
-                          );
-                        },
-                      ),
-                    ),
+                    child: Obx(() {
+                      if (controller.isLoading.value) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.buttonColor,
+                          ),
+                        );
+                      }
+
+                      if (controller.shoppingLists.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No shopping lists yet',
+                            style: AppTextStyles.body.copyWith(
+                              color: AppColors.textLight,
+                            ),
+                          ),
+                        );
+                      }
+
+                      return RefreshIndicator(
+                        onRefresh: controller.refreshShoppingLists,
+                        color: AppColors.buttonColor,
+                        child: ListView.builder(
+                          itemCount: controller.shoppingLists.length,
+                          itemBuilder: (context, index) {
+                            final item = controller.shoppingLists[index];
+                            return _ShoppingListTile(
+                              item: item,
+                              onToggle: () => controller.toggleFinished(index),
+                            );
+                          },
+                        ),
+                      );
+                    }),
                   ),
                 ],
               ),
@@ -212,7 +235,7 @@ class ShoppingScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.r),
         ),
         onPressed: () {
-          showCreateShoppingListPopup(context);
+          showCreateShoppingListPopup(context, controller);
         },
         child: Icon(
           Icons.add,
@@ -249,12 +272,49 @@ class _ShoppingListTile extends StatelessWidget {
               topLeft: Radius.circular(8.r),
               bottomLeft: Radius.circular(8.r),
             ),
-            child: Image.asset(
-              item.image,
-              width: 90.w,
-              height: 90.h,
-              fit: BoxFit.cover,
-            ),
+            child: item.coverImage.isNotEmpty
+                ? Image.network(
+                    item.coverImage,
+                    width: 90.w,
+                    height: 90.h,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 90.w,
+                        height: 90.h,
+                        color: AppColors.border.withOpacity(0.3),
+                        child: Icon(
+                          Icons.shopping_bag,
+                          color: AppColors.buttonColor,
+                          size: 32.sp,
+                        ),
+                      );
+                    },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        width: 90.w,
+                        height: 90.h,
+                        color: AppColors.border.withOpacity(0.2),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.buttonColor,
+                            strokeWidth: 2,
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : Container(
+                    width: 90.w,
+                    height: 90.h,
+                    color: AppColors.border.withOpacity(0.3),
+                    child: Icon(
+                      Icons.shopping_bag,
+                      color: AppColors.buttonColor,
+                      size: 32.sp,
+                    ),
+                  ),
           ),
 
           SizedBox(width: 10.w),
@@ -269,6 +329,8 @@ class _ShoppingListTile extends StatelessWidget {
                   Text(
                     item.title,
                     style: AppTextStyles.heading1.copyWith(fontSize: 14.sp),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 4.h),
                   Text(
@@ -288,11 +350,15 @@ class _ShoppingListTile extends StatelessWidget {
                         backgroundImage: AssetImage(AppImages.profile),
                       ),
                       SizedBox(width: 4.w),
-                      Text(
-                        "created by ${item.createdBy}, on ${item.date}",
-                        style: AppTextStyles.caption.copyWith(
-                          fontSize: 10.sp,
-                          color: AppColors.textLight,
+                      Expanded(
+                        child: Text(
+                          "created by ${item.coocker}, on ${item.getFormattedDate()}",
+                          style: AppTextStyles.caption.copyWith(
+                            fontSize: 10.sp,
+                            color: AppColors.textLight,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -308,8 +374,8 @@ class _ShoppingListTile extends StatelessWidget {
             child: Container(
               margin: EdgeInsets.only(right: 12.w),
               child: Icon(
-                item.isFinished ? Icons.check_circle : Icons.radio_button_unchecked,
-                color: item.isFinished ? AppColors.buttonColor : AppColors.buttonColor,
+                item.isDone ? Icons.check_circle : Icons.radio_button_unchecked,
+                color: AppColors.buttonColor,
                 size: 22.sp,
               ),
             ),
@@ -331,7 +397,7 @@ class _ShoppingListTile extends StatelessWidget {
 
 
 
-void showCreateShoppingListPopup(BuildContext context) {
+void showCreateShoppingListPopup(BuildContext context, ShoppingController controller) {
   showDialog(
     context: context,
     barrierDismissible: true,
@@ -365,9 +431,11 @@ void showCreateShoppingListPopup(BuildContext context) {
               // ==============================
               CustomTextButton(
                 text: "FROM PREP LIST",
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context); // close popup first
-                  Get.to(() => SelectPrepListScreen());
+                  await Get.to(() => SelectPrepListScreen());
+                  // Refresh list after returning
+                  controller.refreshShoppingLists();
                 },
 
               ),
@@ -379,9 +447,11 @@ void showCreateShoppingListPopup(BuildContext context) {
               // ==============================
               CustomTextButton(
                 text: "CUSTOM",
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  Get.to(() => CreateShoppingScreen());
+                  await Get.to(() => CreateShoppingScreen());
+                  // Refresh list after returning
+                  controller.refreshShoppingLists();
                 },
               ),
 

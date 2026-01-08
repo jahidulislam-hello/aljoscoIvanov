@@ -56,65 +56,126 @@ class SelectPrepListScreen extends StatelessWidget {
                   border: Border.all(color: Colors.grey.shade300, width: 1),
                 ),
 
-                child: ListView.builder(
-                  padding: EdgeInsets.zero,
-                  itemCount: controller.prepLists.length,
-                  itemBuilder: (context, index) {
-                    return Obx(() {
-                      bool isSelected = controller.selectedIndexes.contains(index);
+                child: Obx(() {
+                  // Loading state
+                  if (controller.isLoading.value) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.buttonColor,
+                      ),
+                    );
+                  }
 
-                      return GestureDetector(
-                        onTap: () => controller.toggleSelect(index),
-                        child: Container(
-                          padding: EdgeInsets.all(14.w),
-                          margin: EdgeInsets.only(bottom: 12.h),
-                          decoration: BoxDecoration(
-                            color: isSelected ? Color(0xFFEFF4EC) : Colors.white,
-                            borderRadius: BorderRadius.circular(12.r),
+                  // Empty state
+                  if (controller.prepLists.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.list_alt,
+                            size: 48.sp,
+                            color: Colors.grey[400],
                           ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // LEFT TEXT
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      controller.prepLists[index]["title"].toString(),
-                                      style: TextStyle(
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                          SizedBox(height: 16.h),
+                          Text(
+                            'No prep lists available',
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          SizedBox(height: 8.h),
+                          TextButton(
+                            onPressed: controller.refreshPrepLists,
+                            child: Text(
+                              'Tap to refresh',
+                              style: TextStyle(
+                                color: AppColors.buttonColor,
+                                fontSize: 13.sp,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  // List of prep lists
+                  return RefreshIndicator(
+                    onRefresh: controller.refreshPrepLists,
+                    color: AppColors.buttonColor,
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      itemCount: controller.prepLists.length,
+                      itemBuilder: (context, index) {
+                        final prepList = controller.prepLists[index];
+
+                        return Obx(() {
+                          bool isSelected = controller.selectedIndexes.contains(index);
+
+                          return GestureDetector(
+                            onTap: () => controller.toggleSelect(index),
+                            child: Container(
+                              padding: EdgeInsets.all(14.w),
+                              margin: EdgeInsets.only(bottom: 12.h),
+                              decoration: BoxDecoration(
+                                color: isSelected ? Color(0xFFEFF4EC) : Colors.white,
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // LEFT TEXT
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          prepList.getFormattedDate(),
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        SizedBox(height: 6.h),
+                                        Text(
+                                          "Includes: ${prepList.getIncludesText()}",
+                                          style: TextStyle(
+                                            fontSize: 12.sp,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                        SizedBox(height: 4.h),
+                                        Text(
+                                          "Serving: ${prepList.serving} | Cooker: ${prepList.cooker}",
+                                          style: TextStyle(
+                                            fontSize: 11.sp,
+                                            color: Colors.grey[500],
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    SizedBox(height: 6.h),
-                                    Text(
-                                      "Includes: ${controller.prepLists[index]["includes"]}",
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+
+                                  SizedBox(width: 8.w),
+
+                                  /// --- Tick button ---
+                                  Icon(
+                                    isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
+                                    color: isSelected ? AppColors.buttonColor : Colors.grey,
+                                    size: 22.sp,
+                                  ),
+                                ],
                               ),
 
-                              SizedBox(width: 8.w),
-
-                              /// --- Tick button ---
-                              Icon(
-                                isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-                                color: isSelected ? AppColors.buttonColor : Colors.grey,
-                                size: 22.sp,
-                              ),
-                            ],
-                          ),
-
-                        ),
-                      );
-                    });
-                  },
-                ),
+                            ),
+                          );
+                        });
+                      },
+                    ),
+                  );
+                }),
               ),
             ),
             SizedBox(height: 20.h),

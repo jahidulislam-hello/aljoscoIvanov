@@ -5,15 +5,12 @@ import 'package:freshbite/routes/routes.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:freshbite/localization/localization/localization_controller.dart';
-// ^ this file will contain translations like shown earlier
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   final sharedPreferences = await SharedPreferences.getInstance();
-
   Get.put(LocalizationController(sharedPreferences: sharedPreferences));
-
   runApp(const MyApp());
 }
 
@@ -32,7 +29,6 @@ class MyApp extends StatelessWidget {
           translations: AppTranslations(),
           locale: Get.find<LocalizationController>().locale,
           fallbackLocale: const Locale('en', 'US'),
-
           getPages: AppRoute.routes,
           initialRoute: AppRoute.splashScreen,
         );
