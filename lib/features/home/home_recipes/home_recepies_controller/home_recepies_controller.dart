@@ -1,12 +1,17 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:freshbite/core/network_celler/endpoints.dart';
+import 'package:freshbite/core/network_celler/http_client.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/utils/shared_preference_helper.dart';
 import 'package:freshbite/features/home/home_recipes/home_recepies_model.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 
 class HomeController extends GetxController {
+  // User profile data
+  var userName = 'User'.obs;
+  var userProfileImage = ''.obs;
+
   // Featured recipe (static Poutine card)
   var featuredRecipe = Rx<HomeRecepieModel?>(null);
 
@@ -16,15 +21,45 @@ class HomeController extends GetxController {
   var shoppingList = <HomeRecepieModel>[].obs;
   var isLoading = false.obs;
 
-  final String assignedText = "Assigned to Aljoscha, on January 18, 2025";
+  var assignedText = "".obs;
 
   @override
   void onInit() {
     super.onInit();
+    fetchUserProfile();
     setFeaturedRecipe();
     fetchRecipes();
     fetchPrepList();
     fetchShoppingList();
+  }
+
+  /// Fetch user profile from API
+  Future<void> fetchUserProfile() async {
+    try {
+      debugPrint('📤 Fetching user profile...');
+
+      final response = await HttpClient.get(
+        Uri.parse('${Urls.baseUrl}/auth/get-my-profile'),
+      );
+
+      debugPrint('📥 Profile response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+
+        if (responseData['success'] == true && responseData['data'] != null) {
+          final data = responseData['data'];
+
+          userName.value = data['fullName'] ?? 'User';
+          userProfileImage.value = data['profileImage'] ?? '';
+
+          debugPrint('✅ User profile loaded: ${userName.value}');
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error fetching user profile: $e');
+      // Keep default values on error
+    }
   }
 
   // Set static featured recipe (Poutine)
@@ -42,22 +77,13 @@ class HomeController extends GetxController {
     try {
       isLoading.value = true;
 
-      // Get token from SharedPreferences
-      final token = await SharedPreferencesHelper.getAccessToken();
+      debugPrint("🔍 Fetching recipes from API...");
 
-      print("🔍 Fetching recipes from API...");
-      print("   Token: ${token != null ? 'exists' : 'missing'}");
-
-      final response = await http.get(
+      final response = await HttpClient.get(
         Uri.parse(Urls.getAllRecipes),
-        headers: {
-          "Content-Type": "application/json",
-          if (token != null) "Authorization": "Bearer $token",
-        },
       );
 
-      print("📥 Response Status: ${response.statusCode}");
-      print("📥 Response Body: ${response.body}");
+      debugPrint("📥 Recipes response status: ${response.statusCode}");
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
@@ -70,42 +96,139 @@ class HomeController extends GetxController {
               .map((json) => HomeRecepieModel.fromJson(json))
               .toList();
 
-          print("✅ Successfully fetched ${recipes.length} recipes");
+          debugPrint("✅ Successfully fetched ${recipes.length} recipes");
         } else {
-          print("❌ API returned success=false or no data");
+          debugPrint("❌ API returned success=false or no data");
         }
       } else {
-        print("❌ Failed to fetch recipes: ${response.statusCode}");
+        debugPrint("❌ Failed to fetch recipes: ${response.statusCode}");
       }
     } catch (e) {
-      print("❌ Error fetching recipes: $e");
+      debugPrint("❌ Error fetching recipes: $e");
       // Keep empty list on error
     } finally {
       isLoading.value = false;
     }
   }
 
-  void fetchPrepList() {
-    prepList.value = [
-      HomeRecepieModel(
-        title: "Regular meal plan",
-        category: "",
-        image: "",
-        description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
-      ),
-    ];
+  /// Fetch prep list from API
+  Future<void> fetchPrepList() async {
+    try {
+      debugPrint('📤 Fetching prep list...');
+
+      final response = await HttpClient.get(
+        Uri.parse('${Urls.baseUrl}/preplist/get-prepList'),
+      );
+
+      debugPrint('📥 Prep list response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+
+        if (responseData['success'] == true && responseData['data'] != null) {
+          final data = responseData['data'];
+
+          // Extract prep list info
+          final serving = data['serving'] ?? 0;
+          final cooker = data['cooker'] ?? 'Unknown';
+          final date = data['date'] ?? '';
+          final recipes = data['recipes'] as List<dynamic>? ?? [];
+
+          // Format date
+          String formattedDate = '';
+          if (date.isNotEmpty) {
+            try {
+              final dateTime = DateTime.parse(date);
+              formattedDate = "${dateTime.day}.${dateTime.month}.${dateTime.year}";
+            } catch (e) {
+              formattedDate = date;
+            }
+          }
+
+          // Update assigned text
+          assignedText.value = "Assigned to $cooker${formattedDate.isNotEmpty ? ', on $formattedDate' : ''}";
+
+          prepList.value = [
+            HomeRecepieModel(
+              title: "Prep List for $formattedDate",
+              category: "",
+              image: "",
+              description: "Serving: $serving | Cooker: $cooker | Recipes: ${recipes.length}",
+            ),
+          ];
+
+          debugPrint('✅ Prep list loaded');
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error fetching prep list: $e');
+      prepList.clear();
+    }
   }
 
-  void fetchShoppingList() {
-    shoppingList.value = [
-      HomeRecepieModel(
-        title: "Title of Shopping List",
-        category: "",
-        image: AppImages.everyday,
-        description:
-        "Lorem Ipsum is simply dummy text of the printing and typesetting industry...",
-      ),
-    ];
+  /// Fetch shopping list from API
+  Future<void> fetchShoppingList() async {
+    try {
+      debugPrint('📤 Fetching shopping lists...');
+
+      final response = await HttpClient.get(
+        Uri.parse('${Urls.baseUrl}/shopping/get-my-shopping-lists'),
+      );
+
+      debugPrint('📥 Shopping lists response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+
+        if (responseData['success'] == true && responseData['data'] != null) {
+          final List<dynamic> data = responseData['data'];
+
+          if (data.isNotEmpty) {
+            // Get the first (most recent) shopping list
+            final firstList = data.first;
+
+            final title = firstList['title'] ?? 'Shopping List';
+            final description = firstList['description'] ?? '';
+            final coocker = firstList['coocker'] ?? 'Unknown';
+            final coverImage = firstList['coverImages'] ?? '';
+            final date = firstList['date'] ?? '';
+            final isDone = firstList['isDone'] ?? false;
+
+            // Format date
+            String formattedDate = '';
+            if (date.isNotEmpty) {
+              try {
+                final dateTime = DateTime.parse(date);
+                formattedDate = "${dateTime.day}.${dateTime.month}.${dateTime.year}";
+              } catch (e) {
+                formattedDate = date;
+              }
+            }
+
+            // Update assigned text for shopping
+            if (assignedText.value.isEmpty) {
+              assignedText.value = "Assigned to $coocker${formattedDate.isNotEmpty ? ', on $formattedDate' : ''}";
+            }
+
+            shoppingList.value = [
+              HomeRecepieModel(
+                title: title,
+                category: isDone ? "Completed" : "Pending",
+                image: coverImage.isNotEmpty ? coverImage : AppImages.everyday,
+                description: description,
+              ),
+            ];
+
+            debugPrint('✅ Shopping lists loaded: ${shoppingList.length}');
+          } else {
+            shoppingList.clear();
+            debugPrint('ℹ️ No shopping lists found');
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ Error fetching shopping lists: $e');
+      shoppingList.clear();
+    }
   }
 }

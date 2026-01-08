@@ -76,15 +76,31 @@ class HomeScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      CircleAvatar(
-                        radius: 22.r,
-                        backgroundImage: AssetImage(AppImages.appLogo),
-                      ),
+                      Obx(() {
+                        if (controller.userProfileImage.value.isNotEmpty) {
+                          return CircleAvatar(
+                            radius: 22.r,
+                            backgroundImage: NetworkImage(controller.userProfileImage.value),
+                            backgroundColor: AppColors.background,
+                            onBackgroundImageError: (exception, stackTrace) {
+                              debugPrint('Error loading profile image');
+                            },
+                          );
+                        } else {
+                          return CircleAvatar(
+                            radius: 22.r,
+                            backgroundImage: AssetImage(AppImages.appLogo),
+                          );
+                        }
+                      }),
                       SizedBox(width: 10.w),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Hi, Hariza", style: AppTextStyles.H4_Regular),
+                          Obx(() => Text(
+                            "Hi, ${controller.userName.value}",
+                            style: AppTextStyles.H4_Regular,
+                          )),
                           Text("Ready to cook?",
                               style: AppTextStyles.bioText.copyWith(
                                   color: AppColors.defaultTextColor)),
@@ -374,11 +390,11 @@ class HomeScreen extends StatelessWidget {
                                 color: AppColors.black, fontWeight: FontWeight.w400),
                           ),
                           SizedBox(height: 4.h),
-                          Text(
-                            controller.assignedText,
+                          Obx(() => Text(
+                            controller.assignedText.value,
                             style: AppTextStyles.bioText.copyWith(
                                 color: AppColors.mainTextColor.withOpacity(0.7)),
-                          ),
+                          )),
                           SizedBox(height: 16.h),
                         ],
                       );
@@ -465,11 +481,11 @@ class HomeScreen extends StatelessWidget {
                                         color: AppColors.black, fontWeight: FontWeight.w400),
                                   ),
                                   SizedBox(height: 4.h),
-                                  Text(
-                                    controller.assignedText,
+                                  Obx(() => Text(
+                                    controller.assignedText.value,
                                     style: AppTextStyles.bioText.copyWith(
                                         color: AppColors.mainTextColor.withOpacity(0.7)),
-                                  ),
+                                  )),
                                 ],
                               ),
                             ),

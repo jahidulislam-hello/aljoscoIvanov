@@ -58,7 +58,7 @@ class AppRoute {
     GetPage(name: onboardingScreen, page: () => OnboardingScreen()),
     GetPage(name: signInScreen, page: () => LoginScreen()),
     GetPage(name: signUpScreen, page: () => SignUpScreen()),
-    GetPage(name: bottomNavbar, page: () => const BottomNavbar()),
+    GetPage(name: bottomNavbar, page: () =>  BottomNavbar()),
 
 
     GetPage(name: homeScreen, page: () => RecipeDetailScreen()),

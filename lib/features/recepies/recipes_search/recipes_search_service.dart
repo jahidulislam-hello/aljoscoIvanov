@@ -2,21 +2,16 @@ import 'dart:convert';
 import 'package:freshbite/core/network_celler/endpoints.dart';
 import 'package:freshbite/core/utils/shared_preference_helper.dart';
 import 'package:http/http.dart' as http;
+import 'package:freshbite/core/network_celler/http_client.dart';
 
 class RecipesSearchService {
   /// Get all recipes
   static Future<Map<String, dynamic>> getAllRecipes() async {
     try {
-      final token = await SharedPreferencesHelper.getAccessToken();
-
       print("📤 Fetching all recipes from API...");
 
-      final response = await http.get(
+      final response = await HttpClient.get(
         Uri.parse("${Urls.baseUrl}/recipe/get-all-recipe"),
-        headers: {
-          "Content-Type": "application/json",
-          if (token != null) "Authorization": "Bearer $token",
-        },
       );
 
       print("📥 Get all recipes response (${response.statusCode})");

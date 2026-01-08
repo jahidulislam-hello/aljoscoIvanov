@@ -2,21 +2,16 @@ import 'dart:convert';
 import 'package:freshbite/core/network_celler/endpoints.dart';
 import 'package:freshbite/core/utils/shared_preference_helper.dart';
 import 'package:http/http.dart' as http;
+import 'package:freshbite/core/network_celler/http_client.dart';
 
 class MyRecipesDetailsService {
   /// Get all user recipes
   static Future<Map<String, dynamic>> getUserRecipes() async {
     try {
-      final token = await SharedPreferencesHelper.getAccessToken();
-
       print("📤 Fetching user recipes from API...");
 
-      final response = await http.get(
+      final response = await HttpClient.get(
         Uri.parse("${Urls.baseUrl}/user-recipe/get-recipes"),
-        headers: {
-          "Content-Type": "application/json",
-          if (token != null) "Authorization": "Bearer $token",
-        },
       );
 
       print("📥 Get user recipes response (${response.statusCode})");
@@ -42,16 +37,10 @@ class MyRecipesDetailsService {
   /// Get single user recipe by ID
   static Future<Map<String, dynamic>> getSingleUserRecipe(String recipeId) async {
     try {
-      final token = await SharedPreferencesHelper.getAccessToken();
-
       print("📤 Fetching user recipe details for ID: $recipeId");
 
-      final response = await http.get(
+      final response = await HttpClient.get(
         Uri.parse("${Urls.baseUrl}/user-recipe/get-recipe/$recipeId"),
-        headers: {
-          "Content-Type": "application/json",
-          if (token != null) "Authorization": "Bearer $token",
-        },
       );
 
       print("📥 Get single user recipe response (${response.statusCode})");

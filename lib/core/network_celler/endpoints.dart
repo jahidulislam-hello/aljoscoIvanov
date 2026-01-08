@@ -10,4 +10,9 @@ class Urls {
 
   // Recipe endpoints
   static const String getAllRecipes = '$baseUrl/recipe/get-all-recipe';
+
+  // Shopping List endpoints
+  static const String getMyShoppingLists = '$baseUrl/shopping/get-my-shopping-lists';
+  static const String createShoppingList = '$baseUrl/shopping/create-shopping-list';
+  static const String getPrepList = '$baseUrl/preplist/get-prepList';
 }

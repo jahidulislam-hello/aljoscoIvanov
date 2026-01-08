@@ -2,19 +2,14 @@ import 'dart:convert';
 import 'package:freshbite/core/network_celler/endpoints.dart';
 import 'package:freshbite/core/utils/shared_preference_helper.dart';
 import 'package:http/http.dart' as http;
+import 'package:freshbite/core/network_celler/http_client.dart';
 
 class MealPlannerService {
   /// Get all recipes
   static Future<Map<String, dynamic>> getAllRecipes() async {
     try {
-      final token = await SharedPreferencesHelper.getAccessToken();
-
-      final response = await http.get(
+      final response = await HttpClient.get(
         Uri.parse("${Urls.baseUrl}/recipe/get-all-recipe"),
-        headers: {
-          "Content-Type": "application/json",
-          if (token != null) "Authorization": "Bearer $token",
-        },
       );
 
       print("📥 Get all recipes response: ${response.body}");
@@ -37,8 +32,6 @@ class MealPlannerService {
     required List<Map<String, dynamic>> meals,
   }) async {
     try {
-      final token = await SharedPreferencesHelper.getAccessToken();
-
       final body = {
         "recipes": recipeId,
         "prepList": prepList,
@@ -56,12 +49,8 @@ class MealPlannerService {
         print("   Meal ${i + 1}: ${meals[i]['meal_time']} on ${meals[i]['date']} (${meals[i]['serving']} servings)");
       }
 
-      final response = await http.post(
+      final response = await HttpClient.post(
         Uri.parse("${Urls.baseUrl}/mealplan/create-meal"),
-        headers: {
-          "Content-Type": "application/json",
-          if (token != null) "Authorization": "Bearer $token",
-        },
         body: jsonEncode(body),
       );
 
@@ -103,8 +92,6 @@ class MealPlannerService {
   /// Uses POST with ISO 8601 date in body as per API documentation
   static Future<Map<String, dynamic>> getMealPlan(String date) async {
     try {
-      final token = await SharedPreferencesHelper.getAccessToken();
-
       // Format date as ISO 8601 with time at 8:00 AM UTC (as per API example: "2025-11-15T08:00:00.000Z")
       final parsedDate = DateTime.parse(date);
       final formattedDate = DateTime.utc(
@@ -120,12 +107,8 @@ class MealPlannerService {
       print("   URL: ${Urls.baseUrl}/mealplan/get-meal-plan");
       print("   Body: ${jsonEncode(requestBody)}");
 
-      final response = await http.post(
+      final response = await HttpClient.post(
         Uri.parse("${Urls.baseUrl}/mealplan/get-meal-plan"),
-        headers: {
-          "Content-Type": "application/json",
-          if (token != null) "Authorization": "Bearer $token",
-        },
         body: jsonEncode(requestBody),
       );
 
@@ -163,20 +146,14 @@ class MealPlannerService {
   /// Get prep list
   static Future<Map<String, dynamic>> getPrepList(String date) async {
     try {
-      final token = await SharedPreferencesHelper.getAccessToken();
-
       // Format date as YYYY-MM-DD for query parameter
       final parsedDate = DateTime.parse(date);
       final formattedDate = '${parsedDate.year}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.day.toString().padLeft(2, '0')}';
 
       print("📤 Fetching prep list with GET query: ?date=$formattedDate");
 
-      final response = await http.get(
+      final response = await HttpClient.get(
         Uri.parse("${Urls.baseUrl}/preplist/get-preplist?date=$formattedDate"),
-        headers: {
-          "Content-Type": "application/json",
-          if (token != null) "Authorization": "Bearer $token",
-        },
       );
 
       print("📥 Get prep list response (${response.statusCode}): ${response.body.substring(0, response.body.length > 200 ? 200 : response.body.length)}...");
