@@ -118,10 +118,16 @@ class EditShoppingListScreen extends StatelessWidget {
             SizedBox(height: 30.h),
 
             /// SAVE BUTTON
-            CustomTextButton(
-              text: 'SAVE',
-              onTap: controller.saveList,
-            ),
+            Obx(() => controller.isSaving.value
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.buttonColor,
+                    ),
+                  )
+                : CustomTextButton(
+                    text: 'SAVE',
+                    onTap: controller.saveList,
+                  )),
 
             SizedBox(height: 10.h),
 

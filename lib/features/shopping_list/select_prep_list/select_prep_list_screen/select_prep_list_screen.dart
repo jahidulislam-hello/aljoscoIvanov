@@ -148,7 +148,7 @@ class SelectPrepListScreen extends StatelessWidget {
                                         ),
                                         SizedBox(height: 4.h),
                                         Text(
-                                          "Serving: ${prepList.serving} | Cooker: ${prepList.cooker}",
+                                          "Total Servings: ${prepList.getTotalServings()}",
                                           style: TextStyle(
                                             fontSize: 11.sp,
                                             color: Colors.grey[500],

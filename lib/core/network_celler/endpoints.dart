@@ -15,4 +15,8 @@ class Urls {
   static const String getMyShoppingLists = '$baseUrl/shopping/get-my-shopping-lists';
   static const String createShoppingList = '$baseUrl/shopping/create-shopping-list';
   static const String getPrepList = '$baseUrl/preplist/get-prepList';
+
+  // Family Member endpoints
+  static const String getChild = '$baseUrl/user/get-child';
+  static const String createChild = '$baseUrl/user/create-child';
 }

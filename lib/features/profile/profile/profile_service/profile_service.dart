@@ -104,6 +104,14 @@ class ProfileService {
         final responseData = jsonDecode(response.body);
         if (responseData['success'] == true) {
           print('✅ Profile updated successfully');
+
+          // Save new JWT token if provided in response
+          if (responseData['data'] is String && responseData['data'].isNotEmpty) {
+            final newToken = responseData['data'] as String;
+            await SharedPreferencesHelper.saveToken(newToken);
+            print('✅ New JWT token saved');
+          }
+
           return responseData;
         } else {
           throw Exception("${responseData['message']}");

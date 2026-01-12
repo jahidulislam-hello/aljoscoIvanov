@@ -10,9 +10,12 @@ import 'package:freshbite/features/home/terms_condition/about_freshbite.dart';
 import 'package:freshbite/features/home/terms_condition/frequently_ask_question.dart';
 import 'package:freshbite/features/home/terms_condition/terms_conditions.dart';
 import 'package:freshbite/features/profile/change_password/change_password_screen.dart';
+import 'package:freshbite/features/profile/delete_account/delete_account_screen/delete_account_screen.dart';
 import 'package:freshbite/features/profile/family_members/family_member_screen/family_members_screen.dart';
+import 'package:freshbite/features/profile/language_select/language_select/language_select_screen.dart';
 import 'package:freshbite/features/profile/profile_settings/profile_settings_controller/profile_settings_controller.dart';
 import 'package:freshbite/features/profile/settings/settings_controller/settings_controller.dart';
+import 'package:freshbite/features/profile/settings/settings_screen/settings_screen.dart';
 import 'package:get/get.dart';
 
 class ProfileSettingsScreen extends StatelessWidget {
@@ -77,7 +80,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                         // onTap: () { Get.to (()=> ChangePasswordScreen());},
+                         onTap: () { Get.to (()=> SettingsScreen());},
 
                       ),
                       const SizedBox(height: 24),
@@ -109,7 +112,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                         // onTap: () {Get.to (()=> PrivacyScreen());},
+                         onTap: () {Get.to (()=> LanguageScreen());},
                       ),
                       const SizedBox(height: 24),
                       SettingTile(
@@ -155,7 +158,6 @@ class ProfileSettingsScreen extends StatelessWidget {
                           height: 24,
                         ),
                          onTap: () { Get.to (()=> TermsConditions());},
-
                       ),
                       const SizedBox(height: 24),
                       SettingTile(
@@ -186,11 +188,10 @@ class ProfileSettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        // onTap: () { Get.to (()=>ChangePasswordScreen());},
+                        onTap: () { Get.to (()=> DeleteAccountScreen());},
 
                       ),
                       const SizedBox(height: 24),
-
                     ],
                   ),
                 ),

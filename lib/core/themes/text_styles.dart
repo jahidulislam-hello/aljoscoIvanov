@@ -151,7 +151,6 @@ class AppTextStyles {
     fontFamily: GoogleFonts.rubik().fontFamily,
   );
 
-  // Heading Styles
   static TextStyle h1 = TextStyle(
     fontSize: 28.sp,
     fontWeight: FontWeight.bold,
@@ -186,8 +185,6 @@ class AppTextStyles {
     color: Colors.white,
     letterSpacing: 0.5,
   );
-
-
 
   static TextStyle captionBold = TextStyle(
     fontSize: 12.sp,

@@ -31,12 +31,18 @@ class FamilyMemberScreen extends StatelessWidget {
       ),
 
       body: Obx(() {
+        // Show loading indicator
+        if (controller.isLoading.value && controller.members.isEmpty) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
         return SingleChildScrollView(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               /// Title
               Text(
                 "Manage Linked Accounts",
@@ -49,42 +55,90 @@ class FamilyMemberScreen extends StatelessWidget {
               SizedBox(height: 20.h),
 
               /// Member List
-              ...controller.members.map((m) {
-                return Container(
-                  margin: EdgeInsets.only(bottom: 15.h),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 52.w,
-                        height: 52.w,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(width: 1, color: Colors.grey),
-                          image: DecorationImage(
-                            image: AssetImage(m.image),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+              if (controller.members.isEmpty)
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40.h),
+                  child: Center(
+                    child: Text(
+                      "No family members added yet",
+                      style: TextStyle(
+                        fontFamily: "Rubik",
+                        fontSize: 16.sp,
+                        color: Colors.grey,
                       ),
-
-                      SizedBox(width: 12.w),
-
-                      Expanded(
-                        child: Text(
-                          m.name,
-                          style: TextStyle(
-                            fontFamily: "Rubik",
-                            fontWeight: FontWeight.w500,
-                            fontSize: 18.sp,
-                          ),
-                        ),
-                      ),
-
-                      Icon(Icons.more_vert, size: 24.sp),
-                    ],
+                    ),
                   ),
-                );
-              }).toList(),
+                )
+              else
+                ...controller.members.map((m) {
+                  return Container(
+                    margin: EdgeInsets.only(bottom: 15.h),
+                    child: Row(
+                      children: [
+                        // Profile Image
+                        Container(
+                          width: 52.w,
+                          height: 52.w,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            border: Border.all(width: 1, color: Colors.grey),
+                            color: Colors.grey.shade200,
+                          ),
+                          child: m.image != null && m.image!.isNotEmpty
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(30),
+                                  child: Image.network(
+                                    m.image!,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Icon(
+                                        Icons.person,
+                                        size: 30.sp,
+                                        color: Colors.grey,
+                                      );
+                                    },
+                                  ),
+                                )
+                              : Icon(
+                                  Icons.person,
+                                  size: 30.sp,
+                                  color: Colors.grey,
+                                ),
+                        ),
+
+                        SizedBox(width: 12.w),
+
+                        // Member Info
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                m.name ?? m.email ?? 'Unknown',
+                                style: TextStyle(
+                                  fontFamily: "Rubik",
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 18.sp,
+                                ),
+                              ),
+                              if (m.name != null && m.email != null)
+                                Text(
+                                  m.email!,
+                                  style: TextStyle(
+                                    fontFamily: "Rubik",
+                                    fontSize: 14.sp,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+
+                        Icon(Icons.more_vert, size: 24.sp),
+                      ],
+                    ),
+                  );
+                }).toList(),
 
               SizedBox(height: 10.h),
 
@@ -102,7 +156,7 @@ class FamilyMemberScreen extends StatelessWidget {
                   ),
                   child: Center(
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,   // 🟢 FIXES OVERFLOW
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.add, size: 20.sp),
                         SizedBox(width: 6.w),
@@ -119,7 +173,6 @@ class FamilyMemberScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
 
               SizedBox(height: 35.h),
             ],

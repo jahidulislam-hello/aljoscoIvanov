@@ -89,58 +89,69 @@ class MealPlannerService {
   }
 
   /// Get meal plan for a specific date
-  /// Uses POST with ISO 8601 date in body as per API documentation
+  /// Tries multiple endpoint variations since the exact path is unclear
   static Future<Map<String, dynamic>> getMealPlan(String date) async {
-    try {
-      // Format date as ISO 8601 with time at 8:00 AM UTC (as per API example: "2025-11-15T08:00:00.000Z")
-      final parsedDate = DateTime.parse(date);
-      final formattedDate = DateTime.utc(
-        parsedDate.year,
-        parsedDate.month,
-        parsedDate.day,
-        8, 0, 0
-      ).toIso8601String();
+    // Format date as YYYY-MM-DD for query parameter
+    final parsedDate = DateTime.parse(date);
+    final formattedDate = '${parsedDate.year}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.day.toString().padLeft(2, '0')}';
 
-      final requestBody = {"date": formattedDate};
+    // List of possible endpoint variations to try
+    final endpoints = [
+      "${Urls.baseUrl}/meal-plan/get-meal-plan?date=$formattedDate",
+      "${Urls.baseUrl}/mealplan/getmealplan?date=$formattedDate",
+      "${Urls.baseUrl}/mealplans/get-mealplans?date=$formattedDate",
+      "${Urls.baseUrl}/mealplan/get?date=$formattedDate",
+    ];
 
-      print("📤 Fetching meal plan with POST request");
-      print("   URL: ${Urls.baseUrl}/mealplan/get-meal-plan");
-      print("   Body: ${jsonEncode(requestBody)}");
+    Exception? lastException;
 
-      final response = await HttpClient.post(
-        Uri.parse("${Urls.baseUrl}/mealplan/get-meal-plan"),
-        body: jsonEncode(requestBody),
-      );
+    for (var endpoint in endpoints) {
+      try {
+        print("📤 Trying meal plan endpoint: $endpoint");
 
-      print("📥 Get meal plan response (${response.statusCode}): ${response.body.substring(0, response.body.length > 200 ? 200 : response.body.length)}...");
+        final response = await HttpClient.get(Uri.parse(endpoint));
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
+        print("📥 Response (${response.statusCode}): ${response.body.substring(0, response.body.length > 100 ? 100 : response.body.length)}...");
 
-        // Sort data by date (ascending - oldest first)
-        if (responseData['success'] == true && responseData['data'] != null) {
-          final List<dynamic> mealPlans = responseData['data'];
-          mealPlans.sort((a, b) {
-            try {
-              final dateA = DateTime.parse(a['date'] ?? '');
-              final dateB = DateTime.parse(b['date'] ?? '');
-              return dateA.compareTo(dateB);
-            } catch (e) {
-              return 0;
-            }
-          });
-          responseData['data'] = mealPlans;
-          print("✅ Found ${mealPlans.length} meal plans for $formattedDate");
+        if (response.statusCode == 200) {
+          final responseData = jsonDecode(response.body);
+
+          // Sort data by date (ascending - oldest first)
+          if (responseData['success'] == true && responseData['data'] != null) {
+            final List<dynamic> mealPlans = responseData['data'];
+            mealPlans.sort((a, b) {
+              try {
+                final dateA = DateTime.parse(a['date'] ?? '');
+                final dateB = DateTime.parse(b['date'] ?? '');
+                return dateA.compareTo(dateB);
+              } catch (e) {
+                return 0;
+              }
+            });
+            responseData['data'] = mealPlans;
+            print("✅ SUCCESS! Found ${mealPlans.length} meal plans at: $endpoint");
+          }
+
+          return responseData;
+        } else if (response.statusCode != 404) {
+          // If it's not a 404, it might be the right endpoint but with another error
+          print("⚠️ Endpoint exists but returned ${response.statusCode}");
+          lastException = Exception("Failed to load meal plan: ${response.statusCode}");
         }
-
-        return responseData;
-      } else {
-        throw Exception("Failed to load meal plan");
+      } catch (e) {
+        print("❌ Endpoint failed: $e");
+        lastException = e as Exception;
+        continue; // Try next endpoint
       }
-    } catch (e) {
-      print("❌ Get meal plan error: $e");
-      rethrow;
     }
+
+    // All endpoints failed
+    print("❌ All meal plan endpoints failed. Please check backend API documentation.");
+    print("💡 Working endpoints for reference:");
+    print("   - Recipes: ${Urls.baseUrl}/recipe/get-all-recipe");
+    print("   - Prep List: ${Urls.baseUrl}/preplist/get-preplist?date=...");
+    print("   - Create Meal: ${Urls.baseUrl}/mealplan/create-meal");
+    throw lastException ?? Exception("Failed to load meal plan - no valid endpoint found");
   }
 
   /// Get prep list
