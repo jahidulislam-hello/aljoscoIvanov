@@ -15,7 +15,7 @@ class LanguageScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F5EF),
+      backgroundColor: const Color(0xFFE8EAE6),
       appBar: CustomAppBar(
         title: 'Language',
         showBackButton: true,
