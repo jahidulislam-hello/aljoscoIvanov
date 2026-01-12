@@ -90,6 +90,34 @@ class ShoppingService {
     }
   }
 
+  /// Get grocery list with full recipe details
+  static Future<Map<String, dynamic>> getGroceryList() async {
+    try {
+      debugPrint('📤 Fetching grocery list...');
+
+      final response = await HttpClient.get(
+        Uri.parse('${Urls.baseUrl}/grocery/get-grocery'),
+      );
+
+      debugPrint('📥 Get grocery list response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['success'] == true) {
+          debugPrint('✅ Grocery list retrieved successfully');
+          return responseData;
+        } else {
+          throw Exception(responseData['message'] ?? 'Failed to fetch grocery list');
+        }
+      } else {
+        throw Exception('Failed to fetch grocery list with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('❌ Error fetching grocery list: $e');
+      rethrow;
+    }
+  }
+
   /// Get prep list for a specific date
   static Future<Map<String, dynamic>> getPrepList({String? date}) async {
     try {
@@ -211,6 +239,42 @@ class ShoppingService {
       }
     } catch (e) {
       debugPrint('❌ Error updating shopping list: $e');
+      rethrow;
+    }
+  }
+
+  /// Create grocery list
+  static Future<Map<String, dynamic>> createGroceryList({
+    required String date,
+    required List<String> recipeIds,
+  }) async {
+    try {
+      debugPrint('📤 Creating grocery list...');
+
+      final response = await HttpClient.post(
+        Uri.parse('${Urls.baseUrl}/grocery/create-grocery'),
+        body: jsonEncode({
+          'date': date,
+          'recipes': recipeIds,
+        }),
+      );
+
+      debugPrint('📥 Create grocery list response: ${response.statusCode}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['success'] == true) {
+          debugPrint('✅ Grocery list created successfully');
+          return responseData;
+        } else {
+          throw Exception(responseData['message'] ?? 'Failed to create grocery list');
+        }
+      } else {
+        final errorData = jsonDecode(response.body);
+        throw Exception(errorData['message'] ?? 'Failed to create grocery list');
+      }
+    } catch (e) {
+      debugPrint('❌ Error creating grocery list: $e');
       rethrow;
     }
   }

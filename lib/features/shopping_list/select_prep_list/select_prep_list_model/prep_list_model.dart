@@ -2,9 +2,7 @@ class PrepListModel {
   final String id;
   final String userId;
   final String date;
-  final int serving;
-  final String cooker;
-  final List<PrepListRecipe> recipes;
+  final List<RecipeDetail> recipes;
   final bool isDeleted;
   final String createdAt;
   final String updatedAt;
@@ -13,8 +11,6 @@ class PrepListModel {
     required this.id,
     required this.userId,
     required this.date,
-    required this.serving,
-    required this.cooker,
     required this.recipes,
     this.isDeleted = false,
     required this.createdAt,
@@ -26,10 +22,8 @@ class PrepListModel {
       id: json['_id'] ?? '',
       userId: json['userId'] ?? '',
       date: json['date'] ?? '',
-      serving: json['serving'] ?? 0,
-      cooker: json['cooker'] ?? '',
       recipes: (json['recipes'] as List<dynamic>?)
-              ?.map((item) => PrepListRecipe.fromJson(item))
+              ?.map((item) => RecipeDetail.fromJson(item))
               .toList() ??
           [],
       isDeleted: json['isDeleted'] ?? false,
@@ -43,8 +37,6 @@ class PrepListModel {
       '_id': id,
       'userId': userId,
       'date': date,
-      'serving': serving,
-      'cooker': cooker,
       'recipes': recipes.map((item) => item.toJson()).toList(),
       'isDeleted': isDeleted,
       'createdAt': createdAt,
@@ -87,7 +79,7 @@ class PrepListModel {
 
   // Helper method to get recipe count text
   String getRecipeCountText() {
-    final count = recipes.where((r) => r.recipeId != null).length;
+    final count = recipes.where((r) => !r.isDeleted).length;
     if (count == 0) {
       return "No recipes";
     } else if (count == 1) {
@@ -99,35 +91,115 @@ class PrepListModel {
 
   // Helper method to get includes text (for display)
   String getIncludesText() {
-    final validRecipes = recipes.where((r) => r.recipeId != null).toList();
+    final validRecipes = recipes.where((r) => !r.isDeleted).toList();
     if (validRecipes.isEmpty) {
       return "No recipes included";
     }
-    // You can enhance this to show actual recipe names if you fetch recipe details
-    return "${validRecipes.length} recipe(s) included";
+    // Show actual recipe names
+    final recipeNames = validRecipes.map((r) => r.title).take(2).join(", ");
+    return validRecipes.length > 2
+        ? "$recipeNames, +${validRecipes.length - 2} more"
+        : recipeNames;
+  }
+
+  // Helper method to get total servings from all recipes
+  int getTotalServings() {
+    final validRecipes = recipes.where((r) => !r.isDeleted).toList();
+    if (validRecipes.isEmpty) {
+      return 0;
+    }
+    return validRecipes.fold<int>(0, (sum, recipe) => sum + recipe.serving);
   }
 }
 
-class PrepListRecipe {
-  final String? recipeId;
-  final bool isDone;
+class RecipeDetail {
+  final String id;
+  final String title;
+  final String description;
+  final List<String> images;
+  final List<String> allergens;
+  final List<String> tags;
+  final int serving;
+  final List<Ingredient> ingredients;
+  final bool isDeleted;
 
-  PrepListRecipe({
-    this.recipeId,
-    this.isDone = false,
+  RecipeDetail({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.images,
+    required this.allergens,
+    required this.tags,
+    required this.serving,
+    required this.ingredients,
+    this.isDeleted = false,
   });
 
-  factory PrepListRecipe.fromJson(Map<String, dynamic> json) {
-    return PrepListRecipe(
-      recipeId: json['recipeId'],
-      isDone: json['isDone'] ?? false,
+  factory RecipeDetail.fromJson(Map<String, dynamic> json) {
+    return RecipeDetail(
+      id: json['_id'] ?? '',
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      images: (json['images'] as List<dynamic>?)
+              ?.map((item) => item.toString())
+              .toList() ??
+          [],
+      allergens: (json['allergens'] as List<dynamic>?)
+              ?.map((item) => item.toString())
+              .toList() ??
+          [],
+      tags: (json['tags'] as List<dynamic>?)
+              ?.map((item) => item.toString())
+              .toList() ??
+          [],
+      serving: json['serving'] ?? 0,
+      ingredients: (json['ingredients'] as List<dynamic>?)
+              ?.map((item) => Ingredient.fromJson(item))
+              .toList() ??
+          [],
+      isDeleted: json['isDeleted'] ?? false,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'recipeId': recipeId,
-      'isDone': isDone,
+      '_id': id,
+      'title': title,
+      'description': description,
+      'images': images,
+      'allergens': allergens,
+      'tags': tags,
+      'serving': serving,
+      'ingredients': ingredients.map((item) => item.toJson()).toList(),
+      'isDeleted': isDeleted,
+    };
+  }
+}
+
+class Ingredient {
+  final String name;
+  final String unit;
+  final String value;
+
+  Ingredient({
+    required this.name,
+    required this.unit,
+    required this.value,
+  });
+
+  factory Ingredient.fromJson(Map<String, dynamic> json) {
+    return Ingredient(
+      name: json['name'] ?? '',
+      unit: json['unit'] ?? '',
+      value: json['value'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'unit': unit,
+      'value': value,
     };
   }
 }

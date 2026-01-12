@@ -5,7 +5,7 @@ class UserModel {
   final String phoneNumber;
   final String? profileImageUrl;
   final bool isPremium;
-  final String planType; // guest, premium, trial
+  final String planType; // guest, premium, trial, family
   final String subscriptionStatus; // active, inactive
 
   UserModel({
@@ -31,7 +31,7 @@ class UserModel {
       profileImageUrl: json['profileImage'],
       planType: planType,
       subscriptionStatus: subscriptionStatus,
-      isPremium: (planType == 'premium' || planType == 'trial') && subscriptionStatus == 'active',
+      isPremium: (planType == 'premium' || planType == 'trial' || planType == 'family') && subscriptionStatus == 'active',
     );
   }
 
@@ -52,11 +52,14 @@ class UserModel {
       return 'Trial';
     } else if (planType == 'premium') {
       return 'Premium';
+    } else if (planType == 'family') {
+      return 'Family';
     }
     return 'Guest';
   }
 
   bool get isTrialUser => planType == 'trial' && subscriptionStatus == 'active';
   bool get isPremiumUser => planType == 'premium' && subscriptionStatus == 'active';
+  bool get isFamilyUser => planType == 'family' && subscriptionStatus == 'active';
   bool get isGuestUser => planType == 'guest';
 }

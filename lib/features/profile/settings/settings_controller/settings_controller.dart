@@ -153,11 +153,6 @@ class SettingsController extends GetxController {
         lastName.value = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : "";
         phone.value = phoneController.text.trim();
 
-        // Update profile image from response if available
-        if (response['data'] != null && response['data']['profileImage'] != null) {
-          profileImage.value = response['data']['profileImage'];
-        }
-
         Get.snackbar(
           "Success",
           response['message'] ?? "Profile updated successfully!",
@@ -167,6 +162,13 @@ class SettingsController extends GetxController {
         );
 
         debugPrint("✅ Profile updated successfully");
+        debugPrint("✅ New JWT token received and saved");
+
+        // Refresh profile to get updated data including new profile image
+        await fetchProfile();
+
+        // Exit edit mode after successful update
+        isEditing.value = false;
       }
     } catch (e) {
       debugPrint("❌ Error updating profile: $e");
@@ -180,6 +182,11 @@ class SettingsController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  /// Toggle edit mode
+  void toggleEditMode() {
+    isEditing.toggle();
   }
 
 

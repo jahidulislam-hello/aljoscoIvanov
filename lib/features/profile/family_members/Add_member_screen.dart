@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freshbite/core/appbar/custom_appbar.dart';
+import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
 import 'package:freshbite/features/profile/family_members/family_members_controller/family_members_controller.dart';
 import 'package:get/get.dart';
@@ -18,13 +19,16 @@ class AddMemberScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-
-      appBar:  CustomAppBar(
-      title: 'Add Member',
-      titleStyle: AppTextStyles.heading2,
-      showShadow: false,
-
+      backgroundColor: AppColors.background,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60.h),
+        child: SafeArea(
+          child: CustomAppBar(
+            title: 'Add Member',
+            titleStyle: AppTextStyles.heading2,
+            showShadow: false,
+          ),
+        ),
       ),
 
       body: SingleChildScrollView(
@@ -74,22 +78,43 @@ class AddMemberScreen extends StatelessWidget {
             SizedBox(height: 30.h),
 
             /// Add Member Button
-            CustomTextButton(
-              text: "Add Member",
-              onTap: () {
-                String email = emailController.text.trim();
+            Obx(() => CustomTextButton(
+              text: controller.isLoading.value ? "Adding..." : "Add Member",
+              onTap: controller.isLoading.value
+                  ? null
+                  : () {
+                      String email = emailController.text.trim();
+                      String password = passwordController.text.trim();
 
-                if (email.isEmpty) {
-                  Get.snackbar("Error", "Email is required");
-                  return;
-                }
+                      if (email.isEmpty) {
+                        Get.snackbar(
+                          "Error",
+                          "Email is required",
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                        return;
+                      }
 
-                /// Add to List
-                controller.addMember(email, "assets/images/tomato_soup.png");
+                      if (password.isEmpty) {
+                        Get.snackbar(
+                          "Error",
+                          "Password is required",
+                          snackPosition: SnackPosition.BOTTOM,
+                        );
+                        return;
+                      }
 
-                Get.back(); /// Return to Family Members Screen
-              },
-            ),
+                      /// Call API to create child account
+                      controller.createMember(
+                        email: email,
+                        password: password,
+                      ).then((success) {
+                        if (success) {
+                          Get.back(); /// Return to Family Members Screen
+                        }
+                      });
+                    },
+            )),
           ],
         ),
       ),

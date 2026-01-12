@@ -7,7 +7,7 @@ class CustomTextButton extends StatelessWidget {
   final double? padding;
   final Color? color;      // button color or border color
   final Color? textColor;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final double? radius;
   final bool filled;       // true = filled, false = outlined
 

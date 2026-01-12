@@ -159,17 +159,28 @@ class SettingsScreen extends StatelessWidget {
                 // ============================
                 // UPDATE / EDIT BUTTON
                 // ============================
-                Obx(() => CustomTextButton(
-                  text: controller.isEditing.value
-                      ? "Update Profile"
-                      : "Edit Profile",
-                  onTap: () {
-                    if (controller.isEditing.value) {
-                      controller.updateProfile();
-                    }
-                    controller.isEditing.toggle();
-                  },
-                )),
+                Obx(() {
+                  if (controller.isLoading.value) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.buttonColor,
+                      ),
+                    );
+                  }
+
+                  return CustomTextButton(
+                    text: controller.isEditing.value
+                        ? "Update Profile"
+                        : "Edit Profile",
+                    onTap: () {
+                      if (controller.isEditing.value) {
+                        controller.updateProfile();
+                      } else {
+                        controller.toggleEditMode();
+                      }
+                    },
+                  );
+                }),
               ],
             ),
           );

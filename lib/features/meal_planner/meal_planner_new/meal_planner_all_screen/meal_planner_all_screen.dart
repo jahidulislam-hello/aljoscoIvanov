@@ -87,7 +87,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: AppColors.pureWhite,
+        backgroundColor: AppColors.background,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.r),
         ),

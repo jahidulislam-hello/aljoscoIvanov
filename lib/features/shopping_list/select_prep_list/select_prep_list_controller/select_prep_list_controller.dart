@@ -27,7 +27,7 @@ class PrepListController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
 
-      final response = await ShoppingService.getAllPrepLists();
+      final response = await ShoppingService.getGroceryList();
 
       if (response['success'] == true) {
         // Handle both single object and array responses

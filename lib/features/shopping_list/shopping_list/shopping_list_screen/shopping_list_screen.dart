@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
@@ -34,8 +35,16 @@ class ShoppingListScreen extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundImage: AssetImage(AppImages.profile),
                   radius: 20.r,
+                  backgroundColor: AppColors.primary.withOpacity(0.1),
+                  child: ClipOval(
+                    child: SvgPicture.asset(
+                      AppImages.profile,
+                      width: 40.r,
+                      height: 40.r,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
                 SizedBox(width: 8.w),
                 Expanded(
