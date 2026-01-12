@@ -1,4 +1,5 @@
 import 'package:freshbite/core/themes/app_images.dart';
+import 'package:freshbite/core/utils/shared_preference_helper.dart';
 import 'package:freshbite/features/profile/profile/model/profile_recipe_model.dart';
 import 'package:freshbite/features/profile/profile/model/user_model.dart';
 import 'package:freshbite/features/profile/profile/profile_service/profile_service.dart';
@@ -27,6 +28,30 @@ class ProfileController extends GetxController {
 
       if (response['success'] == true && response['data'] != null) {
         user.value = UserModel.fromJson(response['data']);
+
+        // Save user name to SharedPreferences for use in notes
+        if (user.value != null) {
+          final fullName = user.value!.name;
+          final nameParts = fullName.split(' ');
+          final firstName = nameParts.isNotEmpty ? nameParts[0] : '';
+          final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+
+          // Get existing token to preserve it
+          final token = await SharedPreferencesHelper.getAccessToken() ?? '';
+
+          // Update SharedPreferences with user name
+          await SharedPreferencesHelper.saveUserData(
+            token: token,
+            userId: user.value!.userId,
+            email: user.value!.email,
+            phone: user.value!.phoneNumber,
+            firstName: firstName,
+            lastName: lastName,
+            fcmToken: await SharedPreferencesHelper.getFcmToken() ?? '',
+          );
+
+          print('✅ Saved user name to preferences: $firstName $lastName');
+        }
       }
     } catch (e) {
       print('Error fetching profile: $e');

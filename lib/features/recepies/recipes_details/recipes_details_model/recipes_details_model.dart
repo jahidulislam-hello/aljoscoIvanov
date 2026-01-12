@@ -162,13 +162,11 @@ class RecipesDetailsModel {
     List<PersonalNotesDeatils> notesList = [];
     if (json['notes'] != null && json['notes'] is List) {
       notesList = (json['notes'] as List)
-          .map((note) => PersonalNotesDeatils(
-                userName: note['userName'] ?? 'Anonymous',
-                userImage: note['userImage'] ?? 'assets/images/profil.png',
-                comment: note['comment'] ?? '',
-                date: note['date'] != null
-                    ? DateTime.tryParse(note['date']) ?? DateTime.now()
-                    : DateTime.now(),
+          .map((noteItem) => PersonalNotesDeatils(
+                userName: 'Anonymous', // Always show as Anonymous for privacy
+                userImage: 'assets/images/profil.png', // Default avatar
+                comment: noteItem['note'] ?? '', // API uses 'note' field
+                date: DateTime.now(), // Use current date as placeholder
               ))
           .toList();
     }

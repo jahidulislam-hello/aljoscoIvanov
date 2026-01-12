@@ -1,5 +1,6 @@
 import 'package:freshbite/features/recepies/recipes_details/recipes_details_model/recipes_details_model.dart';
 import 'package:freshbite/features/recepies/recipes_details/recipes_details_service/recipes_details_service.dart';
+import 'package:freshbite/core/utils/shared_preference_helper.dart';
 import 'package:get/get.dart';
 import 'package:freshbite/features/new/model/new_recipe_model.dart';
 
@@ -46,6 +47,9 @@ class RecipesDetailsRecipeController extends GetxController {
         if (recipeDetails.value != null) {
           servings.value = recipeDetails.value!.servings;
           checkedIngredients = RxList<bool>.filled(recipeDetails.value!.ingredients.length, false);
+
+          // Update personal notes with actual user name
+          await _updateNotesWithUserName();
         }
 
         print("✅ Successfully loaded recipe: ${recipeDetails.value?.title}");
@@ -60,6 +64,53 @@ class RecipesDetailsRecipeController extends GetxController {
       _loadSampleData();
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// Update personal notes with actual user name from SharedPreferences
+  Future<void> _updateNotesWithUserName() async {
+    try {
+      // Get user's first and last name from SharedPreferences
+      final firstName = await SharedPreferencesHelper.getUserFirstName() ?? '';
+      final lastName = await SharedPreferencesHelper.getUserLastName() ?? '';
+      final fullName = '$firstName $lastName'.trim();
+
+      // If we have a name, update all notes (they're all from the current user)
+      if (fullName.isNotEmpty && recipeDetails.value != null) {
+        final updatedNotes = recipeDetails.value!.personalNotes.map((note) {
+          return PersonalNotesDeatils(
+            userName: fullName,
+            userImage: note.userImage,
+            comment: note.comment,
+            date: note.date,
+          );
+        }).toList();
+
+        // Update the recipe details with the new notes
+        recipeDetails.value = RecipesDetailsModel(
+          id: recipeDetails.value!.id,
+          title: recipeDetails.value!.title,
+          titlechip: recipeDetails.value!.titlechip,
+          description: recipeDetails.value!.description,
+          imageUrl: recipeDetails.value!.imageUrl,
+          images: recipeDetails.value!.images,
+          rating: recipeDetails.value!.rating,
+          reviewCount: recipeDetails.value!.reviewCount,
+          prepTime: recipeDetails.value!.prepTime,
+          cookTime: recipeDetails.value!.cookTime,
+          servings: recipeDetails.value!.servings,
+          allergens: recipeDetails.value!.allergens,
+          ingredients: recipeDetails.value!.ingredients,
+          skills: recipeDetails.value!.skills,
+          instructions: recipeDetails.value!.instructions,
+          nutritionInfo: recipeDetails.value!.nutritionInfo,
+          personalNotes: updatedNotes,
+        );
+
+        print("✅ Updated notes with user name: $fullName");
+      }
+    } catch (e) {
+      print("⚠️ Could not update user name in notes: $e");
     }
   }
 

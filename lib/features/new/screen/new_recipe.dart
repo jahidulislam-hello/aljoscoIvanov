@@ -16,6 +16,8 @@ import 'package:freshbite/features/new/controller/new_recipe_controller.dart';
 import 'package:freshbite/features/new/widgets/skills_chip.dart';
 import 'package:freshbite/features/new/widgets/time_info_chip.dart';
 import 'package:freshbite/features/new/widgets/title_chip.dart';
+import 'package:freshbite/features/new/popup/popup_screen/personal_notes_popup.dart';
+import 'package:freshbite/features/new/popup/popup_screen/rating_popup.dart';
 import 'package:get/get.dart';
 
 class NewRecipeDetailScreen extends StatefulWidget {
@@ -339,7 +341,10 @@ class _NewRecipeDetailScreenState extends State<NewRecipeDetailScreen> {
                   _expandableHeader(
                     'Personal Notes (${widget.recipe.personalNotes.length})',
                     _expNotes,
-                        () => setState(() => _expNotes = !_expNotes),
+                        () {
+                      setState(() => _expNotes = !_expNotes);
+                      print('Personal Notes section expanded: $_expNotes');
+                    },
                   ),
 
                   if (_expNotes)
@@ -356,22 +361,48 @@ class _NewRecipeDetailScreenState extends State<NewRecipeDetailScreen> {
                             ),
                           ),
                           // Two buttons inline
-                          Row(
-                            children: [
-                              Expanded(
-                                child: CustomTextButton(
-                                  text: 'Note',
-                                  onTap: () {},
+                          Padding(
+                            padding: EdgeInsets.only(top: 12.h),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: CustomTextButton(
+                                    text: 'Note',
+                                    filled: false,
+                                    onTap: () {
+                                      print('Note button tapped!');
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: true,
+                                        builder: (BuildContext dialogContext) => PersonalNotesModal(
+                                          recipeId: widget.recipe.id,
+                                          onSave: (note) {
+                                            print('Note saved: $note');
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: 12.w),
-                              Expanded(
-                                child: PrimaryButton(
-                                  text: 'Review',
-                                  onPressed: () {},
+                                SizedBox(width: 12.w),
+                                Expanded(
+                                  child: PrimaryButton(
+                                    text: 'Review',
+                                    onPressed: () {
+                                      print('Review button tapped!');
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: true,
+                                        builder: (BuildContext dialogContext) => RecipeRatingModal(
+                                          recipeName: widget.recipe.title,
+                                          recipeId: widget.recipe.id,
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
