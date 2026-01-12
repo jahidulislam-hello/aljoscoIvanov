@@ -26,11 +26,26 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    fetchUserProfile();
-    setFeaturedRecipe();
-    fetchRecipes();
-    fetchPrepList();
-    fetchShoppingList();
+    setFeaturedRecipe(); // Set static data immediately
+    _fetchAllData(); // Fetch all data in parallel
+  }
+
+  /// Fetch all data in parallel for faster loading
+  Future<void> _fetchAllData() async {
+    isLoading.value = true;
+    try {
+      // Run all API calls in parallel
+      await Future.wait([
+        fetchUserProfile(),
+        fetchRecipes(),
+        fetchPrepList(),
+        fetchShoppingList(),
+      ]);
+    } catch (e) {
+      debugPrint('❌ Error fetching data: $e');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   /// Fetch user profile from API
@@ -75,8 +90,6 @@ class HomeController extends GetxController {
 
   Future<void> fetchRecipes() async {
     try {
-      isLoading.value = true;
-
       debugPrint("🔍 Fetching recipes from API...");
 
       final response = await HttpClient.get(
@@ -106,8 +119,6 @@ class HomeController extends GetxController {
     } catch (e) {
       debugPrint("❌ Error fetching recipes: $e");
       // Keep empty list on error
-    } finally {
-      isLoading.value = false;
     }
   }
 

@@ -17,6 +17,8 @@ import 'package:freshbite/features/new/widgets/skills_chip.dart';
 import 'package:freshbite/features/new/widgets/time_info_chip.dart';
 import 'package:freshbite/features/new/widgets/title_chip.dart';
 import 'package:freshbite/features/recepies/recipes_details/recipes_details_controller/recipes_details_controller.dart';
+import 'package:freshbite/features/new/popup/popup_screen/personal_notes_popup.dart';
+import 'package:freshbite/features/new/popup/popup_screen/rating_popup.dart';
 import 'package:get/get.dart';
 
 class RecipesDetailsRecipeScreen extends StatefulWidget {
@@ -404,22 +406,60 @@ class _RecipesDetailsRecipeScreenState extends State<RecipesDetailsRecipeScreen>
                               ),
                             ),
                             // Two buttons inline
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: CustomTextButton(
-                                    text: 'Note',
-                                    onTap: () {},
+                            Padding(
+                              padding: EdgeInsets.only(top: 12.h),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: CustomTextButton(
+                                      text: 'Note',
+                                      filled: true,
+                                      color: AppColors.buttonColor,
+                                      textColor: Colors.white,
+                                      onTap: () {
+                                        if (controller.recipeId != null) {
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: true,
+                                            builder: (BuildContext dialogContext) => PersonalNotesModal(
+                                              recipeId: controller.recipeId!,
+                                              onSave: (note) {
+                                                print('✅ Note saved: $note');
+                                                // Optionally refresh the recipe details
+                                                controller.fetchRecipeDetails(controller.recipeId!);
+                                              },
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    ),
                                   ),
-                                ),
-                                SizedBox(width: 12.w),
-                                Expanded(
-                                  child: PrimaryButton(
-                                    text: 'Review',
-                                    onPressed: () {},
+                                  SizedBox(width: 12.w),
+                                  Expanded(
+                                    child: PrimaryButton(
+                                      text: 'Review',
+                                      onPressed: () {
+                                        if (controller.recipeId != null && recipeDetails.title.isNotEmpty) {
+                                          showDialog(
+                                            context: context,
+                                            barrierDismissible: true,
+                                            builder: (BuildContext dialogContext) => RecipeRatingModal(
+                                              recipeName: recipeDetails.title,
+                                              recipeId: controller.recipeId!,
+                                            ),
+                                          ).then((result) {
+                                            if (result == true) {
+                                              print('✅ Review submitted successfully');
+                                              // Optionally refresh the recipe details
+                                              controller.fetchRecipeDetails(controller.recipeId!);
+                                            }
+                                          });
+                                        }
+                                      },
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ],
                         ),
