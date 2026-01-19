@@ -66,7 +66,7 @@ class ShoppingScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   /// Month selector row
-                  Row(
+                  Obx(() => Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       InkWell(
@@ -74,7 +74,7 @@ class ShoppingScreen extends StatelessWidget {
                         child: Row(
                           children: [
                             Text(
-                              "January 2025",
+                              controller.currentMonth.value,
                               style: AppTextStyles.heading1.copyWith(fontSize: 16.sp),
                             ),
                             SizedBox(width: 4.w),
@@ -84,45 +84,44 @@ class ShoppingScreen extends StatelessWidget {
                       ),
                       Icon(Icons.more_vert, color: AppColors.grey),
                     ],
-                  ),
+                  )),
 
                   SizedBox(height: 16.h),
 
                   /// Weekday labels
-                  Row(
+                  Obx(() => Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
-                        .map(
-                          (e) => SizedBox(
-                        width: 30.w,
+                    children: List.generate(7, (i) {
+                      if (controller.weekDates.isEmpty) return SizedBox(width: 36.w);
+                      return SizedBox(
+                        width: 36.w,
                         child: Center(
                           child: Text(
-                            e,
+                            controller.getDayOfWeek(controller.weekDates[i]),
                             style: AppTextStyles.caption.copyWith(
                               fontSize: 12.sp,
                               color: AppColors.textLight,
                             ),
                           ),
                         ),
-                      ),
-                    )
-                        .toList(),
-                  ),
+                      );
+                    }),
+                  )),
 
                   SizedBox(height: 8.h),
 
-                  /// Dates row (15–21)
-                  Row(
+                  /// Dates row (dynamic)
+                  Obx(() => Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(7, (i) {
-                      final days = ["15", "16", "17", "18", "19", "20", "21"];
-                      bool isSelected = days[i] == "18";
+                      if (controller.weekDates.isEmpty) return SizedBox(width: 36.w);
+
+                      bool isSelected = i == controller.selectedDateIndex.value;
+                      bool isToday = i == 3; // Middle is always today
 
                       return InkWell(
                         onTap: () {
-                          controller.changeDate(
-                            DateTime(2025, 1, int.parse(days[i])),
-                          );
+                          controller.selectDate(i);
                         },
                         child: Container(
                           width: 36.w,
@@ -130,29 +129,54 @@ class ShoppingScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: isSelected ? AppColors.buttonColor : Colors.transparent,
                             borderRadius: BorderRadius.circular(18.r),
+                            border: isToday && !isSelected
+                                ? Border.all(color: AppColors.buttonColor, width: 1)
+                                : null,
                           ),
                           alignment: Alignment.center,
                           child: Text(
-                            days[i],
+                            '${controller.weekDates[i].day}',
                             style: AppTextStyles.body.copyWith(
                               fontSize: 14.sp,
                               color: isSelected ? Colors.white : AppColors.text,
+                              fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                             ),
                           ),
                         ),
                       );
                     }),
-                  ),
+                  )),
 
                   SizedBox(height: 8.h),
 
-                  /// Icons row
-                  Row(
-                    children: [
-                      Image.asset(AppImages.recipe_icon, width: 16.w, height: 16.h),
-                      Image.asset(AppImages.shopping_icon, width: 16.w, height: 16.h),
-                    ],
-                  ),
+                  /// Icons row under dates
+                  Obx(() => Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List.generate(7, (i) {
+                      if (controller.weekDates.isEmpty) return SizedBox(width: 36.w);
+
+                      final date = controller.weekDates[i];
+                      final dateStr = '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+                      final hasMealPlan = controller.dateHasMealPlan(dateStr);
+                      final hasShoppingList = controller.dateHasShoppingList(dateStr);
+
+                      return SizedBox(
+                        width: 36.w,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (hasMealPlan) ...[
+                              Image.asset(AppImages.recipe_icon, width: 12.w, height: 12.h),
+                              if (hasShoppingList) SizedBox(width: 2.w),
+                            ],
+                            if (hasShoppingList) ...[
+                              Image.asset(AppImages.shopping_icon, width: 12.w, height: 12.h),
+                            ],
+                          ],
+                        ),
+                      );
+                    }),
+                  )),
 
                   SizedBox(height: 30.h),
 

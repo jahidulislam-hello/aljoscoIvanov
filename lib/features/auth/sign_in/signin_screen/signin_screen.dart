@@ -25,15 +25,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool rememberMe = false;
 
+  // Store listener function to remove it later
+  void _emailListener() {
+    if (!mounted || _controller.emailController.text.isEmpty) return;
+    final isValid = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
+        .hasMatch(_controller.emailController.text.trim());
+    _controller.isEmailValid.value = isValid;
+  }
+
   @override
   void initState() {
     super.initState();
+    _controller.emailController.addListener(_emailListener);
+  }
 
-    _controller.emailController.addListener(() {
-      final isValid = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
-          .hasMatch(_controller.emailController.text.trim());
-      _controller.isEmailValid.value = isValid;
-    });
+  @override
+  void dispose() {
+    // Remove listener before disposing to prevent accessing disposed controller
+    _controller.emailController.removeListener(_emailListener);
+    super.dispose();
   }
 
   @override

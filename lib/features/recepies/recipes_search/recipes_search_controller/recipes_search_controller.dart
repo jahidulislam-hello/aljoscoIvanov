@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/features/recepies/recipes_search/recipe_search_model.dart';
 import 'package:freshbite/features/recepies/recipes_search/recipes_search_service.dart';
@@ -8,6 +10,16 @@ class RecipeRecipeSearchController extends GetxController {
   var searchQuery = ''.obs;
   var selectedFilter = ''.obs;
   var isLoading = false.obs;
+
+  // Search functionality
+  final TextEditingController searchController = TextEditingController();
+  var isSearching = false.obs;
+  var isSearchLoading = false.obs;
+  var searchResults = <RecipeRecipeSearchModel>[].obs;
+  var searchPage = 1.obs;
+  var searchLimit = 10.obs;
+  var totalSearchResults = 0.obs;
+  Timer? _debounceTimer;
 
   // Recipe lists organized by cooking mode
   var everydayRecipes = <RecipeRecipeSearchModel>[].obs;
@@ -22,6 +34,108 @@ class RecipeRecipeSearchController extends GetxController {
   void onInit() {
     super.onInit();
     fetchRecipes();
+
+    // Listen to search text changes with debounce
+    searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void onClose() {
+    _debounceTimer?.cancel();
+    searchController.removeListener(_onSearchChanged);
+    searchController.dispose();
+    super.onClose();
+  }
+
+  /// Debounced search listener
+  void _onSearchChanged() {
+    final query = searchController.text.trim();
+
+    // Cancel previous timer
+    _debounceTimer?.cancel();
+
+    if (query.isEmpty) {
+      // Clear search results and show default view
+      isSearching.value = false;
+      searchResults.clear();
+      searchQuery.value = '';
+      return;
+    }
+
+    // Set debounce timer (500ms delay)
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      searchQuery.value = query;
+      isSearching.value = true;
+      searchPage.value = 1;
+      searchRecipes(query);
+    });
+  }
+
+  /// Search recipes from API
+  Future<void> searchRecipes(String query, {bool loadMore = false}) async {
+    if (query.isEmpty) return;
+
+    try {
+      isSearchLoading.value = true;
+
+      if (!loadMore) {
+        searchPage.value = 1;
+        searchResults.clear();
+      }
+
+      print("🔍 Searching recipes: $query (page: ${searchPage.value})");
+
+      final response = await RecipesSearchService.searchRecipes(
+        search: query,
+        page: searchPage.value,
+        limit: searchLimit.value,
+      );
+
+      if (response['success'] == true && response['data'] != null) {
+        final List<dynamic> recipesJson = response['data'];
+
+        final recipes = recipesJson
+            .map((json) => RecipeRecipeSearchModel.fromJson(json))
+            .toList();
+
+        if (loadMore) {
+          searchResults.addAll(recipes);
+        } else {
+          searchResults.value = recipes;
+        }
+
+        // Update total from meta
+        if (response['meta'] != null) {
+          totalSearchResults.value = response['meta']['totalDocument'] ?? 0;
+        }
+
+        print("✅ Search results: ${searchResults.length} / ${totalSearchResults.value}");
+
+        searchResults.refresh();
+      }
+    } catch (e) {
+      print("❌ Search error: $e");
+    } finally {
+      isSearchLoading.value = false;
+    }
+  }
+
+  /// Load more search results
+  Future<void> loadMoreSearchResults() async {
+    if (isSearchLoading.value) return;
+    if (searchResults.length >= totalSearchResults.value) return;
+
+    searchPage.value++;
+    await searchRecipes(searchQuery.value, loadMore: true);
+  }
+
+  /// Clear search
+  void clearSearch() {
+    searchController.clear();
+    searchQuery.value = '';
+    isSearching.value = false;
+    searchResults.clear();
+    searchPage.value = 1;
   }
 
   /// Fetch all recipes from API and organize by cooking mode

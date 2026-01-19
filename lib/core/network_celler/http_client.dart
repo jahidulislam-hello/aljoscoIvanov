@@ -6,6 +6,9 @@ import 'package:freshbite/routes/routes.dart';
 import 'package:get/get.dart';
 
 class HttpClient {
+  // Flag to prevent multiple simultaneous logout attempts
+  static bool _isLoggingOut = false;
+
   /// Handles HTTP responses and checks for token expiration
   static Future<void> _handleTokenExpiration(http.Response response) async {
     if (response.statusCode == 400 || response.statusCode == 401) {
@@ -19,6 +22,12 @@ class HttpClient {
             message.contains('unauthorized') ||
             response.statusCode == 401) {
 
+          // Prevent multiple simultaneous logout attempts
+          if (_isLoggingOut) {
+            return;
+          }
+
+          _isLoggingOut = true;
           debugPrint('🔒 Token expired. Logging out user...');
 
           // Clear all stored data
@@ -36,6 +45,10 @@ class HttpClient {
             snackPosition: SnackPosition.BOTTOM,
             duration: const Duration(seconds: 3),
           );
+
+          // Reset flag after a short delay to allow for future logout attempts
+          await Future.delayed(const Duration(seconds: 2));
+          _isLoggingOut = false;
         }
       } catch (e) {
         debugPrint('Error parsing response: $e');
