@@ -60,38 +60,47 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
                   _buildFilterChips(),
                   SizedBox(height: 24.h),
 
-                  // Loading indicator
+                  // Show search results or default content
                   Obx(() {
-                    if (controller.isLoading.value) {
-                      return Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(20.h),
-                          child: CircularProgressIndicator(
-                            color: AppColors.buttonColor,
-                          ),
-                        ),
-                      );
+                    if (controller.isSearching.value) {
+                      return _buildSearchResults();
                     }
-                    return SizedBox.shrink();
+
+                    // Default content when not searching
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Loading indicator
+                        if (controller.isLoading.value)
+                          Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(20.h),
+                              child: CircularProgressIndicator(
+                                color: AppColors.buttonColor,
+                              ),
+                            ),
+                          ),
+
+                        // Everyday Section
+                        _buildSectionHeader("EveryDay"),
+                        SizedBox(height: 12.h),
+                        _buildRecipeGrid(controller.everydayRecipes),
+                        SizedBox(height: 24.h),
+
+                        // Meal Prep Section
+                        _buildSectionHeader("Meal Prep"),
+                        SizedBox(height: 12.h),
+                        _buildRecipeGrid(controller.mealPrepRecipes),
+                        SizedBox(height: 24.h),
+
+                        // Emergency Section
+                        _buildSectionHeader("Emergency"),
+                        SizedBox(height: 12.h),
+                        _buildRecipeGrid(controller.emergencyRecipes),
+                        SizedBox(height: 24.h),
+                      ],
+                    );
                   }),
-
-                  // Everyday Section
-                  _buildSectionHeader("EveryDay"),
-                  SizedBox(height: 12.h),
-                  Obx(() => _buildRecipeGrid(controller.everydayRecipes)),
-                  SizedBox(height: 24.h),
-
-                  // Meal Prep Section
-                  _buildSectionHeader("Meal Prep"),
-                  SizedBox(height: 12.h),
-                  Obx(() => _buildRecipeGrid(controller.mealPrepRecipes)),
-                  SizedBox(height: 24.h),
-
-                  // Emergency Section
-                  _buildSectionHeader("Emergency"),
-                  SizedBox(height: 12.h),
-                  Obx(() => _buildRecipeGrid(controller.emergencyRecipes)),
-                  SizedBox(height: 24.h),
                   ],
                 ),
               ),
@@ -149,6 +158,7 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
                 ),
                 Expanded(
                   child: TextField(
+                    controller: controller.searchController,
                     decoration: InputDecoration(
                       hintText: "Search recipes",
                       border: InputBorder.none,
@@ -156,6 +166,22 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                Obx(() {
+                  if (controller.isSearching.value) {
+                    return GestureDetector(
+                      onTap: () => controller.clearSearch(),
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 12.w),
+                        child: Icon(
+                          Icons.close,
+                          size: 20.sp,
+                          color: AppColors.mainTextColor,
+                        ),
+                      ),
+                    );
+                  }
+                  return SizedBox.shrink();
+                }),
               ],
             ),
           ),
@@ -404,6 +430,220 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildSearchResults() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Search loading indicator
+        if (controller.isSearchLoading.value && controller.searchResults.isEmpty)
+          Center(
+            child: Padding(
+              padding: EdgeInsets.all(20.h),
+              child: CircularProgressIndicator(
+                color: AppColors.buttonColor,
+              ),
+            ),
+          ),
+
+        // Search results header
+        if (controller.searchResults.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.only(bottom: 12.h),
+            child: Text(
+              "Found ${controller.totalSearchResults.value} recipes for \"${controller.searchQuery.value}\"",
+              style: AppTextStyles.bioText.copyWith(
+                color: AppColors.mainTextColor.withOpacity(0.7),
+              ),
+            ),
+          ),
+
+        // No results message
+        if (!controller.isSearchLoading.value && controller.searchResults.isEmpty)
+          Center(
+            child: Padding(
+              padding: EdgeInsets.all(40.h),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.search_off,
+                    size: 48.sp,
+                    color: AppColors.mainTextColor.withOpacity(0.5),
+                  ),
+                  SizedBox(height: 16.h),
+                  Text(
+                    "No recipes found for \"${controller.searchQuery.value}\"",
+                    style: AppTextStyles.bioText.copyWith(
+                      color: AppColors.mainTextColor.withOpacity(0.7),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+        // Search results grid
+        if (controller.searchResults.isNotEmpty)
+          GridView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12.w,
+              mainAxisSpacing: 12.h,
+              childAspectRatio: 0.75,
+            ),
+            itemCount: controller.searchResults.length,
+            itemBuilder: (context, index) {
+              final recipe = controller.searchResults[index];
+              return GestureDetector(
+                onTap: () {
+                  Get.delete<RecipesDetailsRecipeController>();
+                  Get.put(RecipesDetailsRecipeController(recipeId: recipe.id));
+                  Get.to(() => RecipesDetailsRecipeScreen());
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
+                            child: recipe.image.startsWith('http')
+                                ? Image.network(
+                                    recipe.image,
+                                    height: 120.h,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        height: 120.h,
+                                        color: Colors.grey[200],
+                                        child: Icon(Icons.image_not_supported),
+                                      );
+                                    },
+                                  )
+                                : Image.asset(
+                                    recipe.image,
+                                    height: 120.h,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
+                          Positioned(
+                            right: 8.w,
+                            top: 8.h,
+                            child: GestureDetector(
+                              onTap: () => controller.toggleFavorite(recipe.id),
+                              child: Container(
+                                width: 28.w,
+                                height: 28.h,
+                                decoration: BoxDecoration(
+                                  color: AppColors.pureWhite,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    recipe.isFavorite ? Icons.favorite : Icons.favorite_border,
+                                    size: 16.sp,
+                                    color: AppColors.buttonColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(8.w),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                recipe.title,
+                                style: AppTextStyles.H5_Regular,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Row(
+                                children: [
+                                  SvgPicture.asset(
+                                    AppImages.outline_time,
+                                    width: 14.w,
+                                    height: 14.h,
+                                    color: AppColors.buttonColor,
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  Text(
+                                    "${recipe.timeMinutes} min",
+                                    style: AppTextStyles.bioText.copyWith(fontSize: 12.sp),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+
+        // Load more indicator
+        if (controller.isSearchLoading.value && controller.searchResults.isNotEmpty)
+          Center(
+            child: Padding(
+              padding: EdgeInsets.all(16.h),
+              child: CircularProgressIndicator(
+                color: AppColors.buttonColor,
+              ),
+            ),
+          ),
+
+        // Load more button
+        if (controller.searchResults.length < controller.totalSearchResults.value &&
+            !controller.isSearchLoading.value)
+          Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 16.h),
+              child: GestureDetector(
+                onTap: () => controller.loadMoreSearchResults(),
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                  decoration: BoxDecoration(
+                    color: AppColors.buttonColor,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Text(
+                    "Load More",
+                    style: AppTextStyles.buttonRegular.copyWith(color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+        SizedBox(height: 24.h),
+      ],
     );
   }
 }

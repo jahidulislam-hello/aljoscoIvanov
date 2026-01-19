@@ -138,8 +138,8 @@ class ProfileScreen extends StatelessWidget {
             onTap: () => controller.editProfile(),
             child: Text(
               'Edit Profile',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.borderSecondary,
               ),
             ),
           ),
@@ -220,7 +220,7 @@ class ProfileScreen extends StatelessWidget {
           child: Text(
             label,
             style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+              color: AppColors.mainTextColor,
             ),
           ),
         ),
@@ -266,7 +266,7 @@ class ProfileScreen extends StatelessWidget {
                     border: Border(
                       bottom: BorderSide(
                         color: controller.selectedTabIndex.value == 0
-                            ? AppColors.primary
+                            ? AppColors.defaultbackground
                             : Colors.transparent,
                         width: 2.w,
                       ),
@@ -278,7 +278,7 @@ class ProfileScreen extends StatelessWidget {
                     style: AppTextStyles.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
                       color: controller.selectedTabIndex.value == 0
-                          ? AppColors.primary
+                          ? AppColors.defaultbackground
                           : AppColors.textSecondary,
                     ),
                   ),
@@ -294,7 +294,7 @@ class ProfileScreen extends StatelessWidget {
                     border: Border(
                       bottom: BorderSide(
                         color: controller.selectedTabIndex.value == 1
-                            ? AppColors.primary
+                            ? AppColors.defaultbackground
                             : Colors.transparent,
                         width: 2.w,
                       ),
@@ -306,7 +306,7 @@ class ProfileScreen extends StatelessWidget {
                     style: AppTextStyles.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
                       color: controller.selectedTabIndex.value == 1
-                          ? AppColors.primary
+                          ? AppColors.defaultbackground
                           : AppColors.textSecondary,
                     ),
                   ),

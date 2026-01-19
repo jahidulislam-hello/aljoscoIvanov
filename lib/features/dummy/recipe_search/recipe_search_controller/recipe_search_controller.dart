@@ -1,6 +1,6 @@
 
 import 'package:freshbite/core/themes/app_images.dart';
-import 'package:freshbite/features/home/recipe_search/recipe_search_model.dart';
+import 'package:freshbite/features/dummy/recipe_search/recipe_search_model.dart';
 import 'package:get/get.dart';
 
 

@@ -9,10 +9,84 @@ class ShoppingController extends GetxController {
   var isLoading = false.obs;
   var errorMessage = ''.obs;
 
+  // Week dates for calendar
+  var weekDates = <DateTime>[].obs;
+  var selectedDateIndex = 3.obs; // Middle (today)
+  var currentMonth = ''.obs;
+
+  // Track dates with meal plans and shopping lists
+  var datesWithMealPlans = <String>{}.obs;
+  var datesWithShoppingLists = <String>{}.obs;
+
   @override
   void onInit() {
     super.onInit();
+    _initializeWeekDates();
     fetchShoppingLists();
+  }
+
+  /// Initialize week dates (today in the middle)
+  void _initializeWeekDates() {
+    final today = DateTime.now();
+    weekDates.value = List.generate(7, (index) {
+      return today.add(Duration(days: index - 3)); // -3 to +3 from today
+    });
+    currentMonth.value = _getMonthYear(weekDates[selectedDateIndex.value]);
+  }
+
+  String _getMonthYear(DateTime date) {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return '${months[date.month - 1]} ${date.year}';
+  }
+
+  String getDayOfWeek(DateTime date) {
+    const days = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+    return days[date.weekday - 1];
+  }
+
+  /// Helper to convert date to YYYY-MM-DD format
+  String _toDateString(DateTime date) {
+    return '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
+  /// Check if a date has a meal plan
+  bool dateHasMealPlan(String dateStr) {
+    return datesWithMealPlans.contains(dateStr);
+  }
+
+  /// Check if a date has a shopping list
+  bool dateHasShoppingList(String dateStr) {
+    return datesWithShoppingLists.contains(dateStr);
+  }
+
+  /// Update dates tracking based on shopping lists
+  void _updateDatesTracking() {
+    datesWithShoppingLists.clear();
+
+    for (var item in shoppingLists) {
+      if (item.date.isNotEmpty) {
+        try {
+          final date = DateTime.parse(item.date);
+          final dateStr = _toDateString(date);
+          datesWithShoppingLists.add(dateStr);
+        } catch (e) {
+          debugPrint('Error parsing date: ${item.date}');
+        }
+      }
+    }
+
+    datesWithShoppingLists.refresh();
+    debugPrint('📅 Dates with shopping lists: ${datesWithShoppingLists.toList()}');
+  }
+
+  /// Select a date from the calendar
+  void selectDate(int index) {
+    selectedDateIndex.value = index;
+    selectedDate.value = weekDates[index];
+    currentMonth.value = _getMonthYear(weekDates[index]);
   }
 
   /// Fetch all shopping lists
@@ -30,6 +104,12 @@ class ShoppingController extends GetxController {
             .toList();
 
         debugPrint('✅ Loaded ${shoppingLists.length} shopping lists');
+
+        // Update dates tracking
+        _updateDatesTracking();
+
+        // Also try to get meal plan dates
+        await _fetchMealPlanDates();
       }
     } catch (e) {
       errorMessage.value = e.toString().replaceAll('Exception: ', '');
@@ -44,6 +124,22 @@ class ShoppingController extends GetxController {
       );
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  /// Fetch meal plan dates from MealPlanController if available
+  Future<void> _fetchMealPlanDates() async {
+    try {
+      // Try to get MealPlanController if it exists
+      if (Get.isRegistered<dynamic>(tag: 'MealPlanController')) {
+        // MealPlanController is registered, sync dates
+        debugPrint('📅 Syncing meal plan dates from MealPlanController');
+      }
+
+      // For now, we'll fetch from API directly
+      // This can be enhanced to sync with MealPlanController
+    } catch (e) {
+      debugPrint('⚠️ Could not fetch meal plan dates: $e');
     }
   }
 

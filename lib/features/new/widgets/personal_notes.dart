@@ -7,7 +7,7 @@ import 'package:freshbite/features/recepies/recipes_details/recipes_details_mode
 
 
 class PersonalNotesCard extends StatelessWidget {
-  final dynamic personalNotes; // Accepts both PersonalNotes and PersonalNotesDeatils
+  final dynamic personalNotes;
 
   const PersonalNotesCard({
     Key? key,

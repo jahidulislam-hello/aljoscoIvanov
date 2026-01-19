@@ -34,6 +34,47 @@ class RecipesSearchService {
     }
   }
 
+  /// Search recipes with query, page and limit
+  static Future<Map<String, dynamic>> searchRecipes({
+    required String search,
+    int page = 1,
+    int limit = 10,
+  }) async {
+    try {
+      print("📤 Searching recipes with query: $search, page: $page, limit: $limit");
+
+      final queryParams = {
+        'search': search,
+        'page': page.toString(),
+        'limit': limit.toString(),
+      };
+
+      final uri = Uri.parse("${Urls.baseUrl}/recipe/get-all-recipe")
+          .replace(queryParameters: queryParams);
+
+      final response = await HttpClient.get(uri);
+
+      print("📥 Search recipes response (${response.statusCode})");
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+
+        if (responseData['success'] == true) {
+          final dataList = responseData['data'] as List? ?? [];
+          print("✅ Found ${dataList.length} recipes for search: $search");
+          return responseData;
+        } else {
+          throw Exception("Failed to search recipes: ${responseData['message']}");
+        }
+      } else {
+        throw Exception("Failed to search recipes");
+      }
+    } catch (e) {
+      print("❌ Search recipes error: $e");
+      rethrow;
+    }
+  }
+
   /// Toggle favorite status for a recipe
   static Future<bool> toggleFavoriteRecipe(String recipeId, bool isFavorite) async {
     try {

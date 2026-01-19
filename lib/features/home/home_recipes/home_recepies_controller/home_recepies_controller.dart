@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:freshbite/core/network_celler/endpoints.dart';
@@ -23,11 +24,135 @@ class HomeController extends GetxController {
 
   var assignedText = "".obs;
 
+  // Search functionality
+  final TextEditingController searchController = TextEditingController();
+  var isSearching = false.obs;
+  var isSearchLoading = false.obs;
+  var searchResults = <HomeRecepieModel>[].obs;
+  var searchQuery = ''.obs;
+  var searchPage = 1.obs;
+  var searchLimit = 10.obs;
+  var totalSearchResults = 0.obs;
+  Timer? _debounceTimer;
+
   @override
   void onInit() {
     super.onInit();
     setFeaturedRecipe(); // Set static data immediately
     _fetchAllData(); // Fetch all data in parallel
+
+    // Listen to search text changes with debounce
+    searchController.addListener(_onSearchChanged);
+  }
+
+  @override
+  void onClose() {
+    _debounceTimer?.cancel();
+    searchController.removeListener(_onSearchChanged);
+    searchController.dispose();
+    super.onClose();
+  }
+
+  /// Debounced search listener
+  void _onSearchChanged() {
+    final query = searchController.text.trim();
+
+    // Cancel previous timer
+    _debounceTimer?.cancel();
+
+    if (query.isEmpty) {
+      // Clear search results and show default view
+      isSearching.value = false;
+      searchResults.clear();
+      searchQuery.value = '';
+      return;
+    }
+
+    // Set debounce timer (500ms delay)
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      searchQuery.value = query;
+      isSearching.value = true;
+      searchPage.value = 1;
+      searchRecipes(query);
+    });
+  }
+
+  /// Search recipes from API
+  Future<void> searchRecipes(String query, {bool loadMore = false}) async {
+    if (query.isEmpty) return;
+
+    try {
+      isSearchLoading.value = true;
+
+      if (!loadMore) {
+        searchPage.value = 1;
+        searchResults.clear();
+      }
+
+      debugPrint("🔍 Searching recipes: $query (page: ${searchPage.value})");
+
+      final queryParams = {
+        'search': query,
+        'page': searchPage.value.toString(),
+        'limit': searchLimit.value.toString(),
+      };
+
+      final uri = Uri.parse("${Urls.baseUrl}/recipe/get-all-recipe")
+          .replace(queryParameters: queryParams);
+
+      final response = await HttpClient.get(uri);
+
+      debugPrint("📥 Search response: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+
+        if (responseData['success'] == true && responseData['data'] != null) {
+          final List<dynamic> recipesJson = responseData['data'];
+
+          final recipes = recipesJson
+              .map((json) => HomeRecepieModel.fromJson(json))
+              .toList();
+
+          if (loadMore) {
+            searchResults.addAll(recipes);
+          } else {
+            searchResults.value = recipes;
+          }
+
+          // Update total from meta
+          if (responseData['meta'] != null) {
+            totalSearchResults.value = responseData['meta']['totalDocument'] ?? 0;
+          }
+
+          debugPrint("✅ Search results: ${searchResults.length} / ${totalSearchResults.value}");
+
+          searchResults.refresh();
+        }
+      }
+    } catch (e) {
+      debugPrint("❌ Search error: $e");
+    } finally {
+      isSearchLoading.value = false;
+    }
+  }
+
+  /// Load more search results
+  Future<void> loadMoreSearchResults() async {
+    if (isSearchLoading.value) return;
+    if (searchResults.length >= totalSearchResults.value) return;
+
+    searchPage.value++;
+    await searchRecipes(searchQuery.value, loadMore: true);
+  }
+
+  /// Clear search
+  void clearSearch() {
+    searchController.clear();
+    searchQuery.value = '';
+    isSearching.value = false;
+    searchResults.clear();
+    searchPage.value = 1;
   }
 
   /// Fetch all data in parallel for faster loading

@@ -343,9 +343,15 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
               ),
             ] else ...[
               // PREP LIST Tab Content
-              _buildPrepListHeader(),
               Expanded(
-                child: _buildPrepListContent(),
+                child: Column(
+                  children: [
+                    _buildPrepListHeader(),
+                    Expanded(
+                      child: _buildPrepListContent(),
+                    ),
+                  ],
+                ),
               ),
             ],
           ],
@@ -695,14 +701,17 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                     )),
                   ],
 
-                  // Comment Icon
-                  GestureDetector(
-                    onTap: () => _showAddCommentPopup(),
-                    child: Image.asset(
-                      AppImages.chatIcon, // your asset path
-                      height: 24,
-                      width: 24,
-                      color: AppColors.buttonColor, // optional tint
+                  // Comment Icon (aligned to left)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: GestureDetector(
+                      onTap: () => _showAddCommentPopup(),
+                      child: Image.asset(
+                        AppImages.chatIcon, // your asset path
+                        height: 24,
+                        width: 24,
+                        color: AppColors.buttonColor, // optional tint
+                      ),
                     ),
                   )
 
@@ -830,7 +839,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
 
         SizedBox(width: 12.w),
 
-        // Add Button
+        // Add Button (smaller size)
         GestureDetector(
           onTap: () => showDialog(
             context: context,
@@ -846,13 +855,13 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
             ),
           ),
           child: Container(
-            width: 48.w,
-            height: 48.h,
+            width: 36.w,
+            height: 36.h,
             decoration: BoxDecoration(
               border: Border.all(color: AppColors.buttonColor, width: 1),
               borderRadius: BorderRadius.circular(8.r),
             ),
-            child: Icon(Icons.add, color: Color(0xFF757575), size: 24),
+            child: Icon(Icons.add, color: Color(0xFF757575), size: 20),
           ),
         ),
       ],
@@ -1125,7 +1134,8 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
         );
       }
 
-      final hasPrepList = _controller.prepListItems.isNotEmpty;
+      final hasPrepList = _controller.prepListItems.isNotEmpty &&
+                          _controller.prepListItems.first.recipes.isNotEmpty;
 
       return ListView(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
@@ -1169,30 +1179,34 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
             )),
           ],
 
-          // Comment Icon
-          GestureDetector(
-            onTap: () => _showAddCommentPopup(),
-            child: Image.asset(
-              AppImages.chatIcon,
-              height: 24,
-              width: 24,
-              color: AppColors.buttonColor,
+          // Comment Icon (aligned to left)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: GestureDetector(
+              onTap: () => _showAddCommentPopup(),
+              child: Image.asset(
+                AppImages.chatIcon,
+                height: 24,
+                width: 24,
+                color: AppColors.buttonColor,
+              ),
             ),
           ),
 
           SizedBox(height: 16.h),
 
-          // Create shopping list button
-          CustomButton(
-            text: 'Create shopping list for $formattedDate',
-            color: AppColors.buttonColor,
-            onTap: () {
-              // Handle create shopping list
-              final dateStr = selectedDate.toIso8601String().split('T')[0];
-              _controller.markDateWithShoppingList(dateStr);
-              print("✅ Shopping list created for $dateStr");
-            },
-          ),
+          // Create shopping list button (show only when there's prep list data)
+          if (hasPrepList)
+            CustomButton(
+              text: 'Create shopping list for $formattedDate',
+              color: AppColors.buttonColor,
+              onTap: () {
+                // Handle create shopping list
+                final dateStr = selectedDate.toIso8601String().split('T')[0];
+                _controller.markDateWithShoppingList(dateStr);
+                print("✅ Shopping list created for $dateStr");
+              },
+            ),
         ],
       );
     });
