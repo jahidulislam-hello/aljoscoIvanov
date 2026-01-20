@@ -289,7 +289,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF5F5F5),
+      backgroundColor: Color(0xFFE8EAE6),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: SafeArea(
@@ -627,7 +627,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
   Widget _buildMealSection(MealSection meal) {
     return Container(
       margin: EdgeInsets.only(bottom: 1),
-      color: Colors.white,
+      color: Color(0xFFE8EAE6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -874,7 +874,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
         context: context,
         barrierColor: Colors.black54,
         builder: (_) => Dialog(
-          backgroundColor: Colors.transparent,
+          backgroundColor: Colors.white,
           insetPadding: EdgeInsets.zero,
           child: SelectMealPopup(
             onRecipeSelected: (selectedRecipe) {
@@ -885,14 +885,23 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
       ),
       child: Container(
         height: 48,
+        width: 133,
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.buttonColor, width: 1),
+          color: Colors.white, // 👈 background color added
+          border: Border.all(
+            color: AppColors.buttonColor,
+            width: 1,
+          ),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.add, color: Color(0xFF757575), size: 20),
+          children: const [
+            Icon(
+              Icons.add,
+              color: Color(0xFF757575),
+              size: 20,
+            ),
             SizedBox(width: 8),
             Text(
               'Add Recipe',
@@ -906,6 +915,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
       ),
     );
   }
+
 
   Widget _buildCommentCard(Comment comment) {
     return Row(
@@ -981,7 +991,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
   Widget _buildNutritionalSection() {
     return Obx(() => Container(
       margin: EdgeInsets.only(top: 1),
-      color: Colors.white,
+      color: Color(0xFFE8EAE6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
