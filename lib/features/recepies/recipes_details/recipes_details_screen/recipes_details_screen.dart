@@ -19,6 +19,7 @@ import 'package:freshbite/features/new/widgets/title_chip.dart';
 import 'package:freshbite/features/recepies/recipes_details/recipes_details_controller/recipes_details_controller.dart';
 import 'package:freshbite/features/new/popup/popup_screen/personal_notes_popup.dart';
 import 'package:freshbite/features/new/popup/popup_screen/rating_popup.dart';
+import 'package:freshbite/features/video/instruction_video.dart';
 import 'package:get/get.dart';
 
 class RecipesDetailsRecipeScreen extends StatefulWidget {
@@ -302,7 +303,11 @@ class _RecipesDetailsRecipeScreenState extends State<RecipesDetailsRecipeScreen>
                             SizedBox(height: 20.h),
                             PrimaryButton(
                               text: 'Start Timer',
-                              onPressed: () {},
+                              onPressed: () {
+                                Get.to(() => RecipeInstructionsScreen(
+                                  skills: controller.skillsData,
+                                ));
+                              },
                             ),
                             SizedBox(height: 24.h),
                           ],
@@ -320,14 +325,23 @@ class _RecipesDetailsRecipeScreenState extends State<RecipesDetailsRecipeScreen>
                           () => setState(() => _expSkills = !_expSkills),
                     ),
                     if (_expSkills)
-                      Padding(
-                        padding: EdgeInsets.only(top: 12.h),
-                        child: Wrap(
-                          spacing: 8.w,
-                          runSpacing: 8.h,
-                          children: recipeDetails.skills
-                              .map((skills) => SkillsChip(skills: skills))
-                              .toList(),
+                      GestureDetector(
+                        onTap: () {
+                          if (controller.skillsData.isNotEmpty) {
+                            Get.to(() => RecipeInstructionsScreen(
+                              skills: controller.skillsData,
+                            ));
+                          }
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 12.h),
+                          child: Wrap(
+                            spacing: 8.w,
+                            runSpacing: 8.h,
+                            children: recipeDetails.skills
+                                .map((skills) => SkillsChip(skills: skills))
+                                .toList(),
+                          ),
                         ),
                       ),
                     SizedBox(height: 24.h),
@@ -353,7 +367,11 @@ class _RecipesDetailsRecipeScreenState extends State<RecipesDetailsRecipeScreen>
                           SizedBox(height: 12.h),
                           CustomTextButton(
                             text: 'START COOKING',
-                            onTap: () {},
+                            onTap: () {
+                              Get.to(() => RecipeInstructionsScreen(
+                                skills: controller.skillsData,
+                              ));
+                            },
                           ),
                         ],
                       ),

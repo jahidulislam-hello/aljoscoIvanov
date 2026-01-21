@@ -1,67 +1,237 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:freshbite/core/appbar/custom_appbar.dart';
+import 'package:freshbite/core/themes/app_colors.dart';
+import 'package:freshbite/features/new/popup/popup_screen/timer_popup.dart';
+import 'package:get/get.dart';
+import 'package:video_player/video_player.dart';
 
+/// Model class for Skill data
+class SkillData {
+  final String id;
+  final String title;
+  final String description;
+  final String videoUrl;
+  final String coverUrl;
+
+  SkillData({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.videoUrl,
+    required this.coverUrl,
+  });
+
+  factory SkillData.fromJson(Map<String, dynamic> json) {
+    return SkillData(
+      id: json['_id'] ?? '',
+      title: json['skillTitle'] ?? json['title'] ?? '',
+      description: json['description'] ?? '',
+      videoUrl: json['video'] ?? '',
+      coverUrl: json['cover'] ?? '',
+    );
+  }
+}
 
 class RecipeInstructionsScreen extends StatefulWidget {
-  const RecipeInstructionsScreen({super.key});
+  final List<SkillData> skills;
+
+  const RecipeInstructionsScreen({
+    super.key,
+    required this.skills,
+  });
 
   @override
   State<RecipeInstructionsScreen> createState() => _RecipeInstructionsScreenState();
 }
 
 class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
-  int selectedStep = 1;
-  final List<int> steps = [1, 2, 3, 6];
+  int selectedStep = 0;
+  VideoPlayerController? _videoController;
+  bool _isVideoInitialized = false;
+  bool _isPlaying = false;
+  bool _isMuted = false;
+  double _currentPosition = 0;
+  double _totalDuration = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.skills.isNotEmpty) {
+      _initializeVideo(widget.skills[0].videoUrl);
+    }
+  }
+
+  @override
+  void dispose() {
+    _videoController?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _initializeVideo(String videoUrl) async {
+    if (videoUrl.isEmpty) return;
+
+    _videoController?.dispose();
+    setState(() {
+      _isVideoInitialized = false;
+      _isPlaying = false;
+    });
+
+    try {
+      _videoController = VideoPlayerController.networkUrl(Uri.parse(videoUrl));
+      await _videoController!.initialize();
+
+      _videoController!.addListener(() {
+        if (mounted) {
+          setState(() {
+            _currentPosition = _videoController!.value.position.inMilliseconds.toDouble();
+            _totalDuration = _videoController!.value.duration.inMilliseconds.toDouble();
+            _isPlaying = _videoController!.value.isPlaying;
+          });
+        }
+      });
+
+      setState(() {
+        _isVideoInitialized = true;
+      });
+    } catch (e) {
+      print("Error initializing video: $e");
+    }
+  }
+
+  void _togglePlayPause() {
+    if (_videoController == null) return;
+
+    setState(() {
+      if (_isPlaying) {
+        _videoController!.pause();
+      } else {
+        _videoController!.play();
+      }
+      _isPlaying = !_isPlaying;
+    });
+  }
+
+  void _toggleMute() {
+    if (_videoController == null) return;
+
+    setState(() {
+      _isMuted = !_isMuted;
+      _videoController!.setVolume(_isMuted ? 0 : 1);
+    });
+  }
+
+  void _seekBackward() {
+    if (_videoController == null) return;
+
+    final currentPosition = _videoController!.value.position;
+    final newPosition = currentPosition - const Duration(seconds: 10);
+    _videoController!.seekTo(newPosition > Duration.zero ? newPosition : Duration.zero);
+  }
+
+  void _seekForward() {
+    if (_videoController == null) return;
+
+    final currentPosition = _videoController!.value.position;
+    final duration = _videoController!.value.duration;
+    final newPosition = currentPosition + const Duration(seconds: 10);
+    _videoController!.seekTo(newPosition < duration ? newPosition : duration);
+  }
+
+  void _enterFullScreen() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => _FullScreenVideoPlayer(
+          videoController: _videoController!,
+          onTogglePlayPause: _togglePlayPause,
+          onToggleMute: _toggleMute,
+          onSeekBackward: _seekBackward,
+          onSeekForward: _seekForward,
+          isPlaying: _isPlaying,
+          isMuted: _isMuted,
+        ),
+      ),
+    );
+  }
+
+  void _onStepSelected(int index) {
+    if (index >= 0 && index < widget.skills.length) {
+      setState(() {
+        selectedStep = index;
+      });
+      _initializeVideo(widget.skills[index].videoUrl);
+    }
+  }
+
+  SkillData get currentSkill => widget.skills.isNotEmpty
+      ? widget.skills[selectedStep]
+      : SkillData(id: '', title: '', description: '', videoUrl: '', coverUrl: '');
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black, size: 24.sp),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Instructions',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.replay, color: Colors.black, size: 24.sp),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(16.w),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Video Player Section
-              _buildVideoPlayer(),
-
-              SizedBox(height: 20.h),
-
-              // Instruction Text
-              _buildInstructionText(),
-
-              SizedBox(height: 24.h),
-
-              // Step Navigation
-              _buildStepNavigation(),
+      backgroundColor: const Color(0xFFE8EAE6),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: SafeArea(
+          child: CustomAppBar(
+            title: 'Instructions',
+            titleAlignment: AppBarTitleAlignment.center,
+            showBackButton: true,
+            actionButtons: [
+              AppBarAction(
+                imagePath: 'assets/icons/timer.png',
+                onPressed: () {
+                  Get.to(() => const TimerScreen());
+                },
+              ),
             ],
           ),
         ),
       ),
+      body: widget.skills.isEmpty
+          ? Center(
+              child: Text(
+                'No skills available',
+                style: TextStyle(fontSize: 16.sp, color: Colors.grey),
+              ),
+            )
+          : SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(16.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Video Player Section
+                    _buildVideoPlayer(),
+
+                    SizedBox(height: 20.h),
+
+                    // Skill Title
+                    if (currentSkill.title.isNotEmpty) ...[
+                      Text(
+                        currentSkill.title,
+                        style: TextStyle(
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                    ],
+
+                    // Instruction Text / Description
+                    _buildInstructionText(),
+
+                    SizedBox(height: 24.h),
+
+                    // Step Navigation
+                    if (widget.skills.length > 1) _buildStepNavigation(),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 
@@ -77,30 +247,45 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
         borderRadius: BorderRadius.circular(16.r),
         child: Stack(
           children: [
-            // Video Thumbnail
-            Image.network(
-              'https://via.placeholder.com/400x240',
-              width: double.infinity,
-              height: double.infinity,
-              fit: BoxFit.cover,
-            ),
-
-            // Play Button Overlay
-            Center(
-              child: Container(
-                width: 64.w,
-                height: 64.w,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
+            // Video or Cover Image
+            if (_isVideoInitialized && _videoController != null)
+              Center(
+                child: AspectRatio(
+                  aspectRatio: _videoController!.value.aspectRatio,
+                  child: VideoPlayer(_videoController!),
                 ),
-                child: Icon(
-                  Icons.play_arrow,
-                  color: Colors.black,
-                  size: 36.sp,
+              )
+
+            else
+              Container(
+                color: Colors.grey[800],
+                child: Center(
+                  child: _isVideoInitialized
+                      ? const SizedBox()
+                      : CircularProgressIndicator(color: AppColors.buttonColor),
                 ),
               ),
-            ),
+
+            // Play Button Overlay (shown when paused)
+            if (!_isPlaying)
+              Center(
+                child: GestureDetector(
+                  onTap: _togglePlayPause,
+                  child: Container(
+                    width: 64.w,
+                    height: 64.w,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.9),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.play_arrow,
+                      color: Colors.black,
+                      size: 36.sp,
+                    ),
+                  ),
+                ),
+              ),
 
             // Bottom Controls
             Positioned(
@@ -114,54 +299,94 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.6),
+                      Colors.black.withOpacity(0.7),
                     ],
+                  ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(16.r),
+                    bottomRight: Radius.circular(16.r),
                   ),
                 ),
                 padding: EdgeInsets.all(12.w),
                 child: Column(
                   children: [
                     // Progress Bar
-                    Container(
-                      height: 4.h,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(2.r),
+                    SliderTheme(
+                      data: SliderThemeData(
+                        trackHeight: 4.h,
+                        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.r),
+                        overlayShape: RoundSliderOverlayShape(overlayRadius: 12.r),
+                        activeTrackColor: AppColors.buttonColor,
+                        inactiveTrackColor: Colors.white.withOpacity(0.3),
+                        thumbColor: AppColors.buttonColor,
                       ),
-                      child: FractionallySizedBox(
-                        alignment: Alignment.centerLeft,
-                        widthFactor: 0.33,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEF4444),
-                            borderRadius: BorderRadius.circular(2.r),
-                          ),
-                        ),
+                      child: Slider(
+                        value: _currentPosition.clamp(0, _totalDuration),
+                        max: _totalDuration > 0 ? _totalDuration : 1,
+                        onChanged: (value) {
+                          _videoController?.seekTo(Duration(milliseconds: value.toInt()));
+                        },
                       ),
                     ),
 
-                    SizedBox(height: 12.h),
+                    SizedBox(height: 8.h),
 
-                    // Control Buttons
+                    // Control Buttons Row
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildControlButton(Icons.replay_10, Colors.white),
-                        Container(
-                          width: 40.w,
-                          height: 40.w,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.play_arrow,
-                            color: Colors.black,
-                            size: 24.sp,
+                        // Volume Button (Left)
+                        _buildControlButton(
+                          _isMuted ? Icons.volume_off : Icons.volume_up,
+                          Colors.white,
+                          _toggleMute,
+                        ),
+
+                        const Spacer(),
+
+                        // Replay 10 sec (Left of center)
+                        _buildControlButton(
+                          Icons.replay_10,
+                          Colors.white,
+                          _seekBackward,
+                        ),
+
+                        SizedBox(width: 16.w),
+
+                        // Play/Pause Button (Center)
+                        GestureDetector(
+                          onTap: _togglePlayPause,
+                          child: Container(
+                            width: 40.w,
+                            height: 40.w,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              _isPlaying ? Icons.pause : Icons.play_arrow,
+                              color: Colors.black,
+                              size: 24.sp,
+                            ),
                           ),
                         ),
-                        _buildControlButton(Icons.forward_10, Colors.white),
-                        _buildControlButton(Icons.fullscreen, Colors.white),
+
+                        SizedBox(width: 16.w),
+
+                        // Forward 10 sec (Right of center)
+                        _buildControlButton(
+                          Icons.forward_10,
+                          Colors.white,
+                          _seekForward,
+                        ),
+
+                        const Spacer(),
+
+                        // Fullscreen Button (Right)
+                        _buildControlButton(
+                          Icons.fullscreen,
+                          Colors.white,
+                          _isVideoInitialized ? _enterFullScreen : null,
+                        ),
                       ],
                     ),
                   ],
@@ -174,10 +399,10 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
     );
   }
 
-  Widget _buildControlButton(IconData icon, Color color) {
+  Widget _buildControlButton(IconData icon, Color color, VoidCallback? onPressed) {
     return IconButton(
-      icon: Icon(icon, color: color, size: 20.sp),
-      onPressed: () {},
+      icon: Icon(icon, color: color, size: 24.sp),
+      onPressed: onPressed,
       padding: EdgeInsets.zero,
       constraints: const BoxConstraints(),
     );
@@ -197,7 +422,7 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
           ),
           child: Center(
             child: Text(
-              '1',
+              '${selectedStep + 1}',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14.sp,
@@ -209,10 +434,12 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
 
         SizedBox(width: 12.w),
 
-        // Instruction Text
+        // Description Text
         Expanded(
           child: Text(
-            'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.',
+            currentSkill.description.isNotEmpty
+                ? currentSkill.description
+                : 'No description available',
             style: TextStyle(
               color: const Color(0xFF6B7280),
               fontSize: 14.sp,
@@ -228,60 +455,76 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
     return Row(
       children: [
         // Previous Button
-        _buildNavButton(Icons.chevron_left, false),
+        GestureDetector(
+          onTap: selectedStep > 0 ? () => _onStepSelected(selectedStep - 1) : null,
+          child: _buildNavButton(Icons.chevron_left, false, selectedStep > 0),
+        ),
 
         SizedBox(width: 8.w),
 
         // Step Buttons
-        ...steps.map((step) => Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(right: step != steps.last ? 8.w : 0),
-            child: _buildStepButton(step),
-          ),
-        )).toList(),
+        ...List.generate(widget.skills.length, (index) {
+          return Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(right: index != widget.skills.length - 1 ? 8.w : 0),
+              child: _buildStepButton(index),
+            ),
+          );
+        }),
 
         SizedBox(width: 8.w),
 
         // Next Button
-        _buildNavButton(Icons.chevron_right, true),
+        GestureDetector(
+          onTap: selectedStep < widget.skills.length - 1
+              ? () => _onStepSelected(selectedStep + 1)
+              : null,
+          child: _buildNavButton(
+            Icons.chevron_right,
+            true,
+            selectedStep < widget.skills.length - 1,
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildNavButton(IconData icon, bool isNext) {
+  Widget _buildNavButton(IconData icon, bool isNext, bool isEnabled) {
     return Container(
       width: 40.w,
       height: 40.h,
       decoration: BoxDecoration(
-        color: isNext ? Colors.black : const Color(0xFFE5E7EB),
+        color: isNext && isEnabled ? Colors.black : const Color(0xFFE5E7EB),
         borderRadius: BorderRadius.circular(8.r),
       ),
       child: Icon(
         icon,
-        color: isNext ? Colors.white : const Color(0xFF6B7280),
+        color: isNext && isEnabled ? Colors.white : const Color(0xFF6B7280),
         size: 20.sp,
       ),
     );
   }
 
-  Widget _buildStepButton(int step) {
-    final bool isSelected = selectedStep == step;
+  Widget _buildStepButton(int index) {
+    final bool isSelected = selectedStep == index;
 
     return GestureDetector(
-      onTap: () => setState(() => selectedStep = step),
+      onTap: () => _onStepSelected(index),
       child: Container(
         height: 40.h,
         decoration: BoxDecoration(
           color: isSelected ? Colors.black : Colors.white,
-          border: isSelected ? null : Border.all(
-            color: const Color(0xFFE5E7EB),
-            width: 2,
-          ),
+          border: isSelected
+              ? null
+              : Border.all(
+                  color: const Color(0xFFE5E7EB),
+                  width: 2,
+                ),
           borderRadius: BorderRadius.circular(8.r),
         ),
         child: Center(
           child: Text(
-            step.toString().padLeft(2, '0'),
+            (index + 1).toString().padLeft(2, '0'),
             style: TextStyle(
               color: isSelected ? Colors.white : const Color(0xFF374151),
               fontSize: 14.sp,
@@ -289,6 +532,213 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Full Screen Video Player
+class _FullScreenVideoPlayer extends StatefulWidget {
+  final VideoPlayerController videoController;
+  final VoidCallback onTogglePlayPause;
+  final VoidCallback onToggleMute;
+  final VoidCallback onSeekBackward;
+  final VoidCallback onSeekForward;
+  final bool isPlaying;
+  final bool isMuted;
+
+  const _FullScreenVideoPlayer({
+    required this.videoController,
+    required this.onTogglePlayPause,
+    required this.onToggleMute,
+    required this.onSeekBackward,
+    required this.onSeekForward,
+    required this.isPlaying,
+    required this.isMuted,
+  });
+
+  @override
+  State<_FullScreenVideoPlayer> createState() => _FullScreenVideoPlayerState();
+}
+
+class _FullScreenVideoPlayerState extends State<_FullScreenVideoPlayer> {
+  late bool _isPlaying;
+  late bool _isMuted;
+
+  @override
+  void initState() {
+    super.initState();
+    _isPlaying = widget.isPlaying;
+    _isMuted = widget.isMuted;
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    super.dispose();
+  }
+
+  void _togglePlayPause() {
+    widget.onTogglePlayPause();
+    setState(() {
+      _isPlaying = !_isPlaying;
+    });
+  }
+
+  void _toggleMute() {
+    widget.onToggleMute();
+    setState(() {
+      _isMuted = !_isMuted;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        alignment: Alignment.center,
+        children: [
+          // Video Player
+          Center(
+            child: AspectRatio(
+              aspectRatio: widget.videoController.value.aspectRatio,
+              child: VideoPlayer(widget.videoController),
+            ),
+          ),
+
+          // Center play button (shown when paused)
+          if (!_isPlaying)
+            GestureDetector(
+              onTap: _togglePlayPause,
+              child: CircleAvatar(
+                radius: 40.r,
+                backgroundColor: Colors.white.withOpacity(0.8),
+                child: Icon(
+                  Icons.play_arrow,
+                  color: Colors.black,
+                  size: 48.sp,
+                ),
+              ),
+            ),
+
+          // Bottom Controls
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.7),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Progress bar
+                  VideoProgressIndicator(
+                    widget.videoController,
+                    allowScrubbing: true,
+                    colors: VideoProgressColors(
+                      playedColor: AppColors.buttonColor,
+                      backgroundColor: Colors.grey.shade400,
+                    ),
+                  ),
+
+                  SizedBox(height: 8.h),
+
+                  // Control buttons row
+                  Row(
+                    children: [
+                      // Volume button (left)
+                      IconButton(
+                        icon: Icon(
+                          _isMuted ? Icons.volume_off : Icons.volume_up,
+                          color: Colors.white,
+                          size: 24.sp,
+                        ),
+                        onPressed: _toggleMute,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+
+                      const Spacer(),
+
+                      // 10 sec back button
+                      IconButton(
+                        icon: Icon(
+                          Icons.replay_10,
+                          color: Colors.white,
+                          size: 32.sp,
+                        ),
+                        onPressed: widget.onSeekBackward,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                      SizedBox(width: 24.w),
+
+                      // Play/Pause button
+                      IconButton(
+                        icon: Icon(
+                          _isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
+                          color: Colors.white,
+                          size: 40.sp,
+                        ),
+                        onPressed: _togglePlayPause,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                      SizedBox(width: 24.w),
+
+                      // 10 sec forward button
+                      IconButton(
+                        icon: Icon(
+                          Icons.forward_10,
+                          color: Colors.white,
+                          size: 32.sp,
+                        ),
+                        onPressed: widget.onSeekForward,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+
+                      const Spacer(),
+
+                      // Exit fullscreen button (right)
+                      IconButton(
+                        icon: Icon(
+                          Icons.fullscreen_exit,
+                          color: Colors.white,
+                          size: 24.sp,
+                        ),
+                        onPressed: () => Navigator.of(context).pop(),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8.h),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

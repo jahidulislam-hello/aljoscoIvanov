@@ -61,12 +61,12 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Validation Error'),
-        content: Text(message),
+        title: Text('Validation Error', style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w700)),
+        content: Text(message, style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w700)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+            child: Text('OK', style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -107,8 +107,9 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                           'Adjust Planning Details',
                           style: TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
                             color: Color(0xFF1A1A1A),
+                            fontFamily: 'Rubik',
                           ),
                         ),
                         SizedBox(height: 2),
@@ -116,7 +117,9 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                           'for "${widget.recipeName}"',
                           style: TextStyle(
                             fontSize: 12,
+                            fontWeight: FontWeight.w700,
                             color: Color(0xFF757575),
+                            fontFamily: 'Rubik',
                           ),
                         ),
                       ],
@@ -151,8 +154,9 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                       'When will you eat this and how much?',
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                         color: Color(0xFF1A1A1A),
+                        fontFamily: 'Rubik',
                       ),
                     ),
                     SizedBox(height: 12),
@@ -214,8 +218,9 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                       'When are you going to prepare this?',
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                         color: Color(0xFF1A1A1A),
+                        fontFamily: 'Rubik',
                       ),
                     ),
                     SizedBox(height: 12),
@@ -251,8 +256,9 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                       'Who will cook this?',
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                         color: Color(0xFF1A1A1A),
+                        fontFamily: 'Rubik',
                       ),
                     ),
                     SizedBox(height: 12),
@@ -295,14 +301,15 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                title: Text('Failed to Add Meal Plan'),
+                                title: Text('Failed to Add Meal Plan', style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w700)),
                                 content: Text(
                                   'This recipe already exists in the meal plan for the selected date. Please choose a different date or recipe.',
+                                  style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w700),
                                 ),
                                 actions: [
                                   TextButton(
                                     onPressed: () => Navigator.pop(context),
-                                    child: Text('OK'),
+                                    child: Text('OK', style: TextStyle(fontFamily: 'Rubik', fontWeight: FontWeight.w700)),
                                   ),
                                 ],
                               ),
@@ -330,9 +337,10 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                           'ADD TO MEAL PLAN',
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
                             color: Colors.white,
                             letterSpacing: 0.5,
+                            fontFamily: 'Rubik',
                           ),
                         ),
                       ),
@@ -354,7 +362,9 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                             'Delete this recipe from Meal Plan, Prep List and Shopping List',
                             style: TextStyle(
                               fontSize: 11,
+                              fontWeight: FontWeight.w700,
                               color: Color(0xFFFF5252),
+                              fontFamily: 'Rubik',
                             ),
                           ),
                         ],
@@ -378,8 +388,9 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
           label,
           style: TextStyle(
             fontSize: 11,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w700,
             color: Color(0xFF757575),
+            fontFamily: 'Rubik',
           ),
         ),
         SizedBox(height: 6),
@@ -387,10 +398,10 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
           height: 40,
           child: TextField(
             onChanged: onChanged,
-            style: TextStyle(fontSize: 13, color: Color(0xFF1A1A1A)),
+            style: TextStyle(fontSize: 13, color: Color(0xFF1A1A1A), fontFamily: 'Rubik', fontWeight: FontWeight.w700),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: TextStyle(fontSize: 12, color: Color(0xFFBDBDBD)),
+              hintStyle: TextStyle(fontSize: 12, color: Color(0xFFBDBDBD), fontFamily: 'Rubik', fontWeight: FontWeight.w700),
               filled: true,
               fillColor: Colors.white,
               contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),

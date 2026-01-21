@@ -18,6 +18,7 @@ import 'package:freshbite/features/new/widgets/time_info_chip.dart';
 import 'package:freshbite/features/new/widgets/title_chip.dart';
 import 'package:freshbite/features/new/popup/popup_screen/personal_notes_popup.dart';
 import 'package:freshbite/features/new/popup/popup_screen/rating_popup.dart';
+import 'package:freshbite/features/video/instruction_video.dart';
 import 'package:get/get.dart';
 
 class NewRecipeDetailScreen extends StatefulWidget {
@@ -250,7 +251,11 @@ class _NewRecipeDetailScreenState extends State<NewRecipeDetailScreen> {
                           SizedBox(height: 20.h),
                           PrimaryButton(
                             text: 'Start Timer',
-                            onPressed: () {},
+                            onPressed: () {
+                              Get.to(() => RecipeInstructionsScreen(
+                                skills: [], // TODO: Add skills data from recipe
+                              ));
+                            },
                           ),
                           SizedBox(height: 24.h),
                         ],
