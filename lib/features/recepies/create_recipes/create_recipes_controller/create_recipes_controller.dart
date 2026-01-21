@@ -18,7 +18,7 @@ class RecipeController extends ChangeNotifier {
   String cookTime = '';
 
   List<InstructionStep> instructions = [InstructionStep()];
-  List<Ingredient> ingredients = [Ingredient(), Ingredient()];
+  List<Ingredient> ingredients = [Ingredient()];
   List<NutritionalValue> nutritionalValues = [
     NutritionalValue(name: '', quantity: '', unit: 'kcal'),
     NutritionalValue(name: '', quantity: '', unit: 'g'),
@@ -86,7 +86,7 @@ class RecipeController extends ChangeNotifier {
   }
 
   void removeIngredient(int index) {
-    if (ingredients.length > 2) {
+    if (ingredients.length > 1) {
       ingredients.removeAt(index);
       notifyListeners();
     }

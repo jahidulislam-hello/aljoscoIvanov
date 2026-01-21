@@ -12,26 +12,37 @@ class CreateRecipesService {
     required List<String> allergens,
     required List<String> tags,
     required int serving,
+    required String cookingMode,
     required List<Map<String, dynamic>> ingredients,
     required List<Map<String, dynamic>> nutritionValue,
     required List<String> requiredSkill,
     required List<Map<String, dynamic>> instruction,
     required Map<String, String> time,
-    required String cookingMode,
     required List<File> images,
   }) async {
     try {
       final token = await SharedPreferencesHelper.getAccessToken();
 
-      print("📤 Creating recipe...");
-      print("   Title: $title");
-      print("   Cooking Mode: $cookingMode");
-      print("   Images count: ${images.length}");
+      print("======================================");
+      print("Creating recipe...");
+      print("Title: $title");
+      print("Description: $description");
+      print("Cooking Mode: $cookingMode");
+      print("Serving: $serving");
+      print("Allergens: $allergens");
+      print("Tags: $tags");
+      print("Ingredients: $ingredients");
+      print("Nutrition Value: $nutritionValue");
+      print("Required Skill: $requiredSkill");
+      print("Instructions: $instruction");
+      print("Time: $time");
+      print("Images count: ${images.length}");
+      print("======================================");
 
       // Create multipart request for image upload
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse("${Urls.baseUrl}/recipe/create-recipe"),
+        Uri.parse(Urls.createUserRecipe),
       );
 
       // Add headers
@@ -40,18 +51,18 @@ class CreateRecipesService {
         request.headers['Authorization'] = 'Bearer $token';
       }
 
-      // Add text fields
+      // Add text fields matching the API structure
       request.fields['title'] = title;
       request.fields['description'] = description;
       request.fields['allergens'] = jsonEncode(allergens);
       request.fields['tags'] = jsonEncode(tags);
       request.fields['serving'] = serving.toString();
+      request.fields['coocking_mode'] = cookingMode.toLowerCase();
       request.fields['ingredients'] = jsonEncode(ingredients);
       request.fields['nutritionValue'] = jsonEncode(nutritionValue);
       request.fields['required_skill'] = jsonEncode(requiredSkill);
       request.fields['instruction'] = jsonEncode(instruction);
       request.fields['time'] = jsonEncode(time);
-      request.fields['coocking_mode'] = cookingMode.toLowerCase();
 
       // Add images
       for (int i = 0; i < images.length; i++) {
@@ -61,20 +72,20 @@ class CreateRecipesService {
           image.path,
         );
         request.files.add(multipartFile);
-        print("   Added image ${i + 1}: ${image.path.split('/').last}");
+        print("Added image ${i + 1}: ${image.path.split('/').last}");
       }
 
       // Send request
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      print("📥 Create recipe response (${response.statusCode})");
-      print("   Response: ${response.body}");
+      print("Create recipe response (${response.statusCode})");
+      print("Response: ${response.body}");
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
         if (responseData['success'] == true) {
-          print("✅ Recipe created successfully");
+          print("Recipe created successfully");
           return responseData;
         } else {
           throw Exception("Failed to create recipe: ${responseData['message']}");
@@ -84,7 +95,7 @@ class CreateRecipesService {
         throw Exception("Failed to create recipe: ${errorResponse['message'] ?? 'Unknown error'}");
       }
     } catch (e) {
-      print("❌ Create recipe error: $e");
+      print("Create recipe error: $e");
       rethrow;
     }
   }

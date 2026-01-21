@@ -9,6 +9,7 @@ class RecipesDetailsModel {
   final int reviewCount;
   final Duration prepTime;
   final Duration cookTime;
+  final Duration totalTime;
   final int servings;
   final List<String> skills;
   final List<String> allergens;
@@ -28,6 +29,7 @@ class RecipesDetailsModel {
     required this.reviewCount,
     required this.prepTime,
     required this.cookTime,
+    required this.totalTime,
     required this.servings,
     required this.allergens,
     required this.ingredients,
@@ -37,7 +39,8 @@ class RecipesDetailsModel {
     required this.personalNotes,
   });
 
-  Duration get totalTime => prepTime + cookTime;
+  // totalTime is now a field, not a getter
+  // Duration get totalTime => prepTime + cookTime;
 
   /// Factory constructor to create from API response
   factory RecipesDetailsModel.fromJson(Map<String, dynamic> json) {
@@ -153,9 +156,11 @@ class RecipesDetailsModel {
     // Extract time
     int prepTimeMinutes = 0;
     int cookTimeMinutes = 0;
+    int totalTimeMinutes = 0;
     if (json['time'] != null) {
       prepTimeMinutes = int.tryParse(json['time']['prepTime']?.toString() ?? '0') ?? 0;
       cookTimeMinutes = int.tryParse(json['time']['cookTime']?.toString() ?? '0') ?? 0;
+      totalTimeMinutes = int.tryParse(json['time']['totalTime']?.toString() ?? '0') ?? 0;
     }
 
     // Extract notes as personal notes
@@ -197,6 +202,7 @@ class RecipesDetailsModel {
       reviewCount: reviewCount,
       prepTime: Duration(minutes: prepTimeMinutes),
       cookTime: Duration(minutes: cookTimeMinutes),
+      totalTime: Duration(minutes: totalTimeMinutes),
       servings: json['serving'] ?? 1,
       allergens: allergensList,
       ingredients: ingredientsList,
@@ -210,13 +216,71 @@ class RecipesDetailsModel {
 
 class IngredientDetails {
   final String name;
-  final String quantity;
+  final String quantity; // For backward compatibility
+  final String metricValue; // e.g., "200"
+  final String metricUnit; // e.g., "g", "ml", "pcs"
+  final String householdValue; // e.g., "560"
+  final String householdUnit; // e.g., "cup", "tbsp"
 
-
-  IngredientDetails ({
+  IngredientDetails({
     required this.name,
     required this.quantity,
+    this.metricValue = '',
+    this.metricUnit = '',
+    this.householdValue = '',
+    this.householdUnit = '',
   });
+
+  /// Get metric quantity string (e.g., "200 g")
+  String get metricQuantity {
+    if (metricValue.isNotEmpty && metricUnit.isNotEmpty) {
+      return '$metricValue $metricUnit';
+    } else if (metricValue.isNotEmpty) {
+      return metricValue;
+    }
+    return quantity;
+  }
+
+  /// Get household quantity string (e.g., "560 cup")
+  String get householdQuantity {
+    if (householdValue.isNotEmpty && householdUnit.isNotEmpty) {
+      return '$householdValue $householdUnit';
+    }
+    return metricQuantity; // Fallback to metric if no household data
+  }
+
+  /// Create a copy with updated values for serving adjustments
+  IngredientDetails copyWithMultiplier(double multiplier) {
+    String newMetricValue = metricValue;
+    String newHouseholdValue = householdValue;
+
+    // Update metric value
+    final metricNum = double.tryParse(metricValue);
+    if (metricNum != null) {
+      final result = (metricNum * multiplier);
+      newMetricValue = result == result.roundToDouble()
+          ? result.toInt().toString()
+          : result.toStringAsFixed(1);
+    }
+
+    // Update household value
+    final householdNum = double.tryParse(householdValue);
+    if (householdNum != null) {
+      final result = (householdNum * multiplier);
+      newHouseholdValue = result == result.roundToDouble()
+          ? result.toInt().toString()
+          : result.toStringAsFixed(1);
+    }
+
+    return IngredientDetails(
+      name: name,
+      quantity: '$newMetricValue $metricUnit',
+      metricValue: newMetricValue,
+      metricUnit: metricUnit,
+      householdValue: newHouseholdValue,
+      householdUnit: householdUnit,
+    );
+  }
 }
 
 class NutritionInfoDetails {

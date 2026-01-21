@@ -310,6 +310,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
         child: Column(
           children: [
             // Calendar Header Section
+
             _buildCalendarHeader(),
 
             // Tab Buttons
@@ -764,18 +765,23 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                         topLeft: Radius.circular(8.r),
                         topRight: Radius.circular(8.r),
                       ),
-                      child: Image.asset(
-                        recipe.imageUrl ?? '',
-                        fit: BoxFit.cover,
-                        width: 100.w,
-                        height: 72.h,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Color(0xFFFF8C42),
-                            child: Icon(Icons.restaurant, color: Colors.white, size: 28),
-                          );
-                        },
-                      ),
+                      child: recipe.imageUrl != null && recipe.imageUrl!.isNotEmpty
+                          ? Image.network(
+                              recipe.imageUrl!,
+                              fit: BoxFit.cover,
+                              width: 100.w,
+                              height: 72.h,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Color(0xFFFF8C42),
+                                  child: Icon(Icons.restaurant, color: Colors.white, size: 28),
+                                );
+                              },
+                            )
+                          : Container(
+                              color: Color(0xFFFF8C42),
+                              child: Icon(Icons.restaurant, color: Colors.white, size: 28),
+                            ),
                     ),
                   ),
                   // Edit icon
@@ -874,7 +880,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
         context: context,
         barrierColor: Colors.black54,
         builder: (_) => Dialog(
-          backgroundColor: Colors.white,
+
           insetPadding: EdgeInsets.zero,
           child: SelectMealPopup(
             onRecipeSelected: (selectedRecipe) {
@@ -1229,7 +1235,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Placeholder image (since API doesn't return image)
+        // Recipe image and details
         Container(
           width: 100.w,
           height: 109.h,
@@ -1247,7 +1253,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Image placeholder
+              // Recipe image
               Container(
                 width: 100.w,
                 height: 72.h,
@@ -1256,9 +1262,31 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                     topLeft: Radius.circular(8.r),
                     topRight: Radius.circular(8.r),
                   ),
-                  color: Color(0xFFFF8C42),
+                  color: Color(0xFFE0E0E0),
                 ),
-                child: Icon(Icons.restaurant, color: Colors.white, size: 28),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(8.r),
+                    topRight: Radius.circular(8.r),
+                  ),
+                  child: recipeItem.recipeImage != null && recipeItem.recipeImage!.isNotEmpty
+                      ? Image.network(
+                          recipeItem.recipeImage!,
+                          fit: BoxFit.cover,
+                          width: 100.w,
+                          height: 72.h,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Color(0xFFFF8C42),
+                              child: Icon(Icons.restaurant, color: Colors.white, size: 28),
+                            );
+                          },
+                        )
+                      : Container(
+                          color: Color(0xFFFF8C42),
+                          child: Icon(Icons.restaurant, color: Colors.white, size: 28),
+                        ),
+                ),
               ),
               // Title and Servings
               Expanded(
@@ -1269,7 +1297,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        recipeItem.recipeId ?? 'Recipe',
+                        recipeItem.recipeTitle ?? recipeItem.recipeId ?? 'Recipe',
                         style: TextStyle(
                           fontSize: 11.sp,
                           fontWeight: FontWeight.w600,

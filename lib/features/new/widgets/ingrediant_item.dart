@@ -34,9 +34,11 @@ class IngredientItem extends StatelessWidget {
         ? Get.find<RecipesDetailsRecipeController>()
         : null;
 
-    // Local Rx for selected dropdown values
-    final selectedUnit = "g/ml".obs;
-    final selectedHousehold = "HouseHold".obs;
+    // Get the unit mode from controller if available
+    RxBool? isMetricUnit;
+    if (recipeDetailsController != null) {
+      isMetricUnit = recipeDetailsController.isMetricUnit;
+    }
 
     // Determine if we should show servings controls (for first ingredient only)
     bool showServingsControls = false;
@@ -105,27 +107,48 @@ class IngredientItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end, // align to the right
             children: [
               SizedBox(
-                width: 100.w, // fixed width
-                child: Obx(() => DropdownButtonFormField<String>(
-                  value: selectedUnit.value,
-                  items: ["g/ml", "HouseHold"]
-                      .map((e) => DropdownMenuItem(
-                    value: e,
-                    child: Text(e, textAlign: TextAlign.center),
-                  ))
-                      .toList(),
-                  onChanged: (val) {
-                    if (val != null) selectedUnit.value = val;
-                  },
-                  decoration: InputDecoration(
-                    contentPadding:
-                    EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                  ),
-                  isExpanded: true, // ensures text uses full width
-                )),
+                width: 110.w, // fixed width
+                child: isMetricUnit != null
+                    ? Obx(() => DropdownButtonFormField<String>(
+                        value: isMetricUnit!.value ? "g/ml" : "Household",
+                        items: ["g/ml", "Household"]
+                            .map((e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(e, textAlign: TextAlign.center),
+                                ))
+                            .toList(),
+                        onChanged: (val) {
+                          if (val != null && recipeDetailsController != null) {
+                            recipeDetailsController.toggleUnitMode(val == "g/ml");
+                          }
+                        },
+                        decoration: InputDecoration(
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                        ),
+                        isExpanded: true, // ensures text uses full width
+                      ))
+                    : DropdownButtonFormField<String>(
+                        value: "g/ml",
+                        items: ["g/ml", "Household"]
+                            .map((e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(e, textAlign: TextAlign.center),
+                                ))
+                            .toList(),
+                        onChanged: (val) {},
+                        decoration: InputDecoration(
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                        ),
+                        isExpanded: true,
+                      ),
               ),
             ],
           ),
@@ -142,10 +165,28 @@ class IngredientItem extends StatelessWidget {
                 ingredient.name,
                 style: AppTextStyles.buttonText.copyWith(fontSize: 13.sp),
               ),
-              Text(
-                ingredient.quantity,
-                style: AppTextStyles.buttonRegular.copyWith(fontSize: 13.sp),
-              ),
+              // Display quantity based on unit mode
+              isMetricUnit != null
+                  ? Obx(() {
+                      // Check if ingredient has metric/household getters (IngredientDetails type)
+                      if (ingredient is IngredientDetails) {
+                        return Text(
+                          isMetricUnit!.value
+                              ? ingredient.metricQuantity
+                              : ingredient.householdQuantity,
+                          style: AppTextStyles.buttonRegular.copyWith(fontSize: 13.sp),
+                        );
+                      }
+                      // Fallback for other ingredient types
+                      return Text(
+                        ingredient.quantity,
+                        style: AppTextStyles.buttonRegular.copyWith(fontSize: 13.sp),
+                      );
+                    })
+                  : Text(
+                      ingredient.quantity,
+                      style: AppTextStyles.buttonRegular.copyWith(fontSize: 13.sp),
+                    ),
             ],
           ),
         ),

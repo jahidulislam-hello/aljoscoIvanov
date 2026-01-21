@@ -30,45 +30,52 @@ class MealPlanController extends GetxController {
     super.onInit();
     _initializeMeals();
     // Load meal plans from local storage first
-    loadMealPlansFromLocalStorage();
+    loadMealPlansFromLocalStorage().then((_) {
+      // After loading from storage, refresh the UI with the stored data
+      // Load the current date's meal plans to update the UI
+      final today = _toDateString(DateTime.now().toIso8601String());
+      loadMealPlansForDate(today);
+    });
     // Don't auto-fetch on init to avoid unnecessary API calls
     // Meal plans will be fetched when specific dates are requested
   }
 
   void _initializeMeals() {
-    // Initialize with default meal sections
-    meals.value = [
-      MealSection(
-        id: 'breakfast',
-        title: 'Breakfast',
-        tags: ['Base', 'Vegetable', 'Protein', 'Connector', 'Topping'],
-        isExpanded: true,
-      ),
-      MealSection(
-        id: 'snack1',
-        title: 'Snack',
-        tags: ['Base', 'Vegetable', 'Protein', 'Connector', 'Topping'],
-        isExpanded: true,
-      ),
-      MealSection(
-        id: 'lunch',
-        title: 'Lunch',
-        tags: ['Base', 'Vegetable', 'Protein', 'Connector', 'Topping'],
-        isExpanded: true,
-      ),
-      MealSection(
-        id: 'snack2',
-        title: 'Snack',
-        tags: ['Base', 'Vegetable', 'Protein', 'Connector', 'Topping'],
-        isExpanded: false,
-      ),
-      MealSection(
-        id: 'dinner',
-        title: 'Dinner',
-        tags: ['Base', 'Vegetable', 'Protein', 'Connector', 'Topping'],
-        isExpanded: true,
-      ),
-    ];
+    // Initialize with default meal sections only if meals list is empty
+    if (meals.isEmpty) {
+      meals.value = [
+        MealSection(
+          id: 'breakfast',
+          title: 'Breakfast',
+          tags: ['Base', 'Vegetable', 'Protein', 'Connector', 'Topping'],
+          isExpanded: true,
+        ),
+        MealSection(
+          id: 'snack1',
+          title: 'Snack',
+          tags: ['Base', 'Vegetable', 'Protein', 'Connector', 'Topping'],
+          isExpanded: true,
+        ),
+        MealSection(
+          id: 'lunch',
+          title: 'Lunch',
+          tags: ['Base', 'Vegetable', 'Protein', 'Connector', 'Topping'],
+          isExpanded: true,
+        ),
+        MealSection(
+          id: 'snack2',
+          title: 'Snack',
+          tags: ['Base', 'Vegetable', 'Protein', 'Connector', 'Topping'],
+          isExpanded: false,
+        ),
+        MealSection(
+          id: 'dinner',
+          title: 'Dinner',
+          tags: ['Base', 'Vegetable', 'Protein', 'Connector', 'Topping'],
+          isExpanded: true,
+        ),
+      ];
+    }
   }
 
   /// Helper to convert any date to YYYY-MM-DD format
@@ -197,11 +204,16 @@ class MealPlanController extends GetxController {
     final normalizedDateStr = _toDateString(dateStr);
     print("📅 Loading meal plans for date: $normalizedDateStr");
 
-    // Reset all meal sections
+    // Initialize meal sections if they're empty
     _initializeMeals();
 
     // Get meal plans for this date
     final plansForDate = mealPlansByDate[normalizedDateStr] ?? [];
+
+    // Clear existing recipes from meal sections for this date
+    for (var meal in meals) {
+      meal.recipe = null;
+    }
 
     if (plansForDate.isEmpty) {
       print("ℹ️ No meal plans for $normalizedDateStr");
@@ -227,9 +239,24 @@ class MealPlanController extends GetxController {
         if (mealPlan.recipes.isNotEmpty) {
           final recipe = mealPlan.recipes[0];
           if (recipe is Map<String, dynamic>) {
-            recipeName = recipe['title'] ?? 'Recipe';
-            if (recipe['images'] != null && (recipe['images'] as List).isNotEmpty) {
-              imageUrl = recipe['images'][0];
+            // Handle different possible field names for recipe title
+            recipeName = recipe['title'] ??
+                         recipe['name'] ??
+                         recipe['recipeName'] ??
+                         recipe['recipe_title'] ??
+                         'Recipe';
+
+            // Handle different possible structures for images
+            if (recipe['images'] != null) {
+              if (recipe['images'] is List && (recipe['images'] as List).isNotEmpty) {
+                imageUrl = recipe['images'][0];
+              } else if (recipe['images'] is String) {
+                imageUrl = recipe['images'];
+              }
+            } else if (recipe['image'] != null) {
+              imageUrl = recipe['image'];
+            } else if (recipe['imageUrl'] != null) {
+              imageUrl = recipe['imageUrl'];
             }
           } else if (recipe is String) {
             // Just an ID, keep default name
@@ -427,6 +454,10 @@ class MealPlanController extends GetxController {
         if (mealItems.isNotEmpty && mealItems[0].day.isNotEmpty) {
           final firstDateStr = _parseToIso8601(mealItems[0].day);
           loadMealPlansForDate(firstDateStr);
+
+          // Also update the UI for the current selected date if it's different
+          // This ensures the UI reflects the changes immediately
+          loadMealPlansForDate(_toDateString(DateTime.now().toIso8601String()));
         }
 
         return true;
@@ -548,6 +579,10 @@ class MealPlanController extends GetxController {
 
       mealPlansByDate.refresh();
       datesWithMealPlans.refresh();
+
+      // Refresh the UI with the loaded data
+      final today = _toDateString(DateTime.now().toIso8601String());
+      loadMealPlansForDate(today);
     } catch (e) {
       print("❌ Error loading meal plans from local storage: $e");
     }

@@ -30,13 +30,13 @@ class SelectMealPopup extends StatelessWidget {
           children: [
             _buildSearchBar(),
             SizedBox(height: 20.h),
-            Text("Recent Favorites", style: AppTextStyles.H5_Regular),
+            Text("My Recipes", style: AppTextStyles.H5_Regular),
             SizedBox(height: 12.h),
-            _buildHorizontalList(controller.recentFavorites),
+            _buildHorizontalList(controller.myRecipes),
             SizedBox(height: 24.h),
-            Text("Collections", style: AppTextStyles.H5_Regular),
+            Text("Popular Recipes", style: AppTextStyles.H5_Regular),
             SizedBox(height: 12.h),
-            _buildHorizontalList(controller.recentFavorites),
+            _buildHorizontalList(controller.popularRecipes),
             SizedBox(height: 16.h),
           ],
         ),
@@ -53,7 +53,7 @@ class SelectMealPopup extends StatelessWidget {
             height: 45.h,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(25.r),
-              color: Colors.white,
+              color: Colors.white, // Keep white for contrast in search field
             ),
             child: Row(
               children: [
@@ -95,7 +95,8 @@ class SelectMealPopup extends StatelessWidget {
       height: 180.h,
       child: Obx(
         () {
-          if (controller.isLoading.value) {
+          // Show loading indicator only if the specific list is empty AND loading
+          if (controller.isLoading.value && list.isEmpty) {
             return Center(
               child: CircularProgressIndicator(
                 color: AppColors.buttonColor,
@@ -138,15 +139,8 @@ class SelectMealPopup extends StatelessWidget {
       child: Container(
         width: 150.w,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.transparent, // Changed from white to transparent
           borderRadius: BorderRadius.circular(12.r),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 4,
-              offset: Offset(0, 2),
-            )
-          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -237,29 +231,40 @@ class SelectMealPopup extends StatelessWidget {
               ],
             ),
 
-            // Title + Time
-            Padding(
-              padding: EdgeInsets.all(8.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(recipe.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.H5_Regular),
-                  SizedBox(height: 4.h),
-                  Row(
-                    children: [
-                      SvgPicture.asset(AppImages.outline_time,
-                          width: 14.w, height: 14.h),
-                      SizedBox(width: 4.w),
-                      Text("${recipe.timeMinutes} min",
-                          style: AppTextStyles.bioText),
-                    ],
-                  )
-                ],
+            // Title + Time - with white background for readability
+            Container(
+              width: 150.w,
+              decoration: BoxDecoration(
+                color: Colors.white, // Keep white for readability
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(12.r),
+                  bottomRight: Radius.circular(12.r),
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(8.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(recipe.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.H5_Regular),
+                    SizedBox(height: 4.h),
+                    Row(
+                      children: [
+                        SvgPicture.asset(AppImages.outline_time,
+                            width: 14.w, height: 14.h),
+                        SizedBox(width: 4.w),
+                        Text("${recipe.timeMinutes} min",
+                            style: AppTextStyles.bioText),
+                      ],
+                    )
+                  ],
+                ),
               ),
             )
+
           ],
         ),
       ),

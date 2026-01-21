@@ -17,6 +17,7 @@ import 'package:freshbite/features/new/widgets/skills_chip.dart';
 import 'package:freshbite/features/new/widgets/time_info_chip.dart';
 import 'package:freshbite/features/new/widgets/title_chip.dart';
 import 'package:freshbite/features/recepies/my_recipes_details/my_recipes_details_controller/my_recipes_details_controller.dart';
+import 'package:freshbite/features/video/instruction_video.dart';
 import 'package:get/get.dart';
 
 class MyRecipesDetailsScreen extends StatefulWidget {
@@ -249,7 +250,11 @@ class _MyRecipesDetailsScreenState extends State<MyRecipesDetailsScreen> {
                             SizedBox(height: 20.h),
                             PrimaryButton(
                               text: 'Start Timer',
-                              onPressed: () {},
+                              onPressed: () {
+                                Get.to(() => RecipeInstructionsScreen(
+                                  skills: [], // TODO: Add skills data from recipe
+                                ));
+                              },
                             ),
                             SizedBox(height: 24.h),
                           ],
