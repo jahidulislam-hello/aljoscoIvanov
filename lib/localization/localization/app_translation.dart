@@ -102,6 +102,122 @@ class AppTranslations extends Translations {
 
 
 
+
+      //for meal planner
+
+      'Meal Planner': 'Meal Planner',
+      'MEAL PLAN': 'MEAL PLAN',
+      'PREP LIST ': 'PREP LIST ',
+      'Apply Saved Meal Plan': 'Apply Saved Meal Plan',
+      'Create Meal Plan': 'Create Meal Plan',
+      'Invite Family': 'Invite Family',
+      'Breakfast': 'Breakfast',
+      'Snack': 'Snack',
+      'Lunch': 'Lunch',
+      'Dinner': 'Dinner',
+      'Nutritional Values': 'Nutritional Values',
+      'Base, Vegetable, Protein, Connector, Topping': 'Base, Vegetable, Protein, Connector, Topping',
+      'Add a comment to your planned Meal.': 'Add a comment to your planned Meal.',
+      'Comment': 'Comment',
+      'e.g. "Please eat leftovers first"': 'e.g. "Please eat leftovers first"',
+      'Post': 'Post',
+      'Your comment will be visible to all family members. Only you can remove it.': 'Your comment will be visible to all family members. Only you can remove it.',
+      'Search Recipes': 'Search Recipes',
+      'My Recipes': 'My Recipes',
+      'Popular Recipes': 'Popular Recipes',
+      'Adjust Planning Details': 'Adjust Planning Details',
+      'When will you eat this and how much?': 'When will you eat this and how much?',
+      'Day': 'Day',
+      'Meal': 'Meal',
+      'Servings': 'Servings',
+      'When are you going to prepare this?': 'When are you going to prepare this?',
+      'Who will cook this?': 'Who will cook this?',
+      'Person': 'Person',
+      'ADD TO MEAL Plan': 'ADD TO MEAL Plan',
+      'Delete this recipe from Meal Plan, Prep List and Shopping List': 'Delete this recipe from Meal Plan, Prep List and Shopping List',
+      'View shopping list': 'View shopping list',
+      'Create Meal Plan': 'Create Meal Plan',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+
+
+
+
+
+
+
+
+
+
+
+
+      //for Profile Section
+
+      'My Profile': 'My Profile',
+      'Edit Profile': 'Edit Profile',
+      'Premium': 'Premium',
+      'Profile Information': 'Profile Information',
+      'User id': 'User id',
+      'Email': 'Email',
+      'Phone number': 'Phone number',
+      'My Recipes': 'My Recipes',
+      'Activities': 'Activities',
+      'See recipe': 'See recipe',
+      'Update': 'Update',
+      'Change Password': 'Change Password',
+      'Your password must be at least 6 characters and should include a combination of numbers, letters and special characters (!\$@%)': 'Your password must be at least 6 characters and should include a combination of numbers, letters and special characters (!\$@%)',
+      'Current password': 'Current password',
+      'New password': 'New password',
+      'Re-type new password': 'Re-type new password',
+      'Change Password': 'Change Password',
+      'Account Settings': 'Account Settings',
+      'My Profile': 'My Profile',
+      'Language': 'Language',
+      'FAQ': 'FAQ',
+      'Privacy Policy': 'Privacy Policy',
+      'Terms & Conditions': 'Terms & Conditions',
+      'Change Password': 'Change Password',
+      'Delete Account': 'Delete Account',
+      'Select your preferred language for the app interface:': 'Select your preferred language for the app interface:',
+      'German ': 'German ',
+      'English': 'English',
+      'This will change the default app language. Please note, that recipes are only available in german.': 'This will change the default app language. Please note, that recipes are only available in german.',
+      'CONFIRM': 'CONFIRM',
+      'Delete Account': 'Delete Account',
+      'Please enter your password to confirm account removal': 'Please enter your password to confirm account removal',
+      'This will permanently delete your account and all personal data from our system. This action cannot be undone.': 'This will permanently delete your account and all personal data from our system. This action cannot be undone.',
+      'Delete account and all personal data permanently from the system?': 'Delete account and all personal data permanently from the system?',
+      'Cancel': 'Cancel',
+      'Delete': 'Delete',
+      'Family Members': 'Family Members',
+      'Manage Linked Accounts': 'Manage Linked Accounts',
+      'Add Member ': 'Add Member',
+      'Please enter your email and password to add a family member.': 'Please enter your email and password to add a family member.',
+      'This will add family member in the system.': 'This will add family member in the system.',
+      'Linked Accounts': 'Linked Accounts',
+      'Please enter your password to confirm."': 'Please enter your password to confirm."',
+      'This will delete your personal data permanently from your system. This action can not be undone.': 'This will delete your personal data permanently from your system. This action can not be undone.',
+
+
+
+
+
+
+
+
+
+
     },
     'de_DE': {
       'language_title': 'Sprache',
@@ -198,6 +314,100 @@ class AppTranslations extends Translations {
       'Cracking Eggs Cleanly': 'Cracking Eggs Cleanly',
       'Poaching Eggs in Sauce': 'Poaching Eggs in Sauce',
       'Toasting Bread or Pita': 'Toasting Bread or Pita',
+      'Instructions': 'Instructions',
+
+
+
+
+      // for Profile Section
+
+      'My Profile': 'Mein Profil',
+      'Edit Profile': 'Profil bearbeiten',
+      'Premium': 'Premium',
+      'Profile Information': 'Profilinformationen',
+      'User id': 'Benutzer-ID',
+      'Email': 'E-Mail',
+      'Phone number': 'Telefonnummer',
+      'My Recipes': 'Meine Rezepte',
+      'Activities': 'Aktivitäten',
+      'See recipe': 'Rezept ansehen',
+      'Update': 'AKTUALISIEREN',
+      'Change Password': 'Passwort ändern',
+      'Your password must be at least 6 characters and should include a combination of numbers, letters and special characters (!\$@%)': 'Dein Passwort muss mindestens 6 Zeichen lang sein und eine Kombination aus Zahlen, Buchstaben und Sonderzeichen enthalten (z.B. !\$@%).',
+      'Current password': 'Aktuelles Passwort',
+      'New password': 'Neues Passwort',
+      'Re-type new password': 'Neues Passwort bestätigen',
+      'Change Password': 'PASSWORT ÄNDERN',
+      'Account Settings': 'Accounteinstellungen',
+      'My Profile': 'Mein Profil',
+      'Language': 'Sprache',
+      'FAQ': 'FAQ',
+      'Privacy Policy': 'Datenschutzerklärung',
+      'Terms & Conditions': 'AGB',
+      'Change Password': 'Passwort ändern',
+      'Delete Account': 'Account löschen',
+      'Select your preferred language for the app interface:': 'Wähle deine bevorzugte Sprache für die App-Oberfläche aus:',
+      'German ': 'Deutsch ',
+      'English': 'Englisch',
+      'This will change the default app language. Please note, that recipes are only available in german.': 'Diese Einstellung ändert die Standardsprache der App. Bitte beachte, dass die Rezepte nur auf Deutsch verfügbar sind.',
+      'CONFIRM': 'BESTÄTIGEN',
+      'Delete Account': 'Account löschen',
+      'Please enter your password to confirm account removal': 'Gib dein Passwort ein, um das Löschen deines Accounts zu bestätigen.',
+      'This will permanently delete your account and all personal data from our system. This action cannot be undone.': 'Das Löschen ist dauerhaft. Dein Account und alle persönlichen Daten werden vollständig aus unserem System entfernt und können nicht wiederhergestellt werden.',
+      'Delete account and all personal data permanently from the system?': 'Account und alle persönlichen Daten dauerhaft löschen?',
+      'Cancel': 'Abbrechen',
+      'Delete': 'Löschen',
+      'Family Members': 'Familienmitglieder',
+      'Manage Linked Accounts': 'Verwalte deine verknüpften Accounts',
+      'Add Member ': 'Mitglied hinzufügen',
+      'Please enter your email and password to add a family member.': 'Gib bitte deine E-Mail-Adresse und das Passwort ein, um ein Familienmitglied hinzuzufügen',
+      'This will add family member in the system.': 'Dies fügt ein Familienmitglied deinem Account hinzu.',
+      'Linked Accounts': 'MITGLIED HINZUFÜGEN',
+      'Please enter your password to confirm.': 'Gib dein Passwort ein, um das Löschen deines Accounts zu bestätigen.',
+      'This will delete your personal data permanently from your system. This action can not be undone.': 'Das Löschen ist dauerhaft. Dein Account und alle persönlichen Daten werden vollständig aus unserem System entfernt und können nicht wiederhergestellt werden.',
+
+
+
+
+      //for meal planner
+
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+
+
+
+
+
+
+
+
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
       'Instructions': 'Instructions',
 
     },
