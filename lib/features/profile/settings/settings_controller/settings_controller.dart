@@ -1,11 +1,8 @@
-import 'dart:convert';
-import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:freshbite/features/profile/profile_settings/profile_settings_screen/profile_settings_screen.dart';
-import 'package:freshbite/features/profile/settings/settings_screen/settings_screen.dart';
 import 'package:freshbite/features/profile/profile/profile_service/profile_service.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
 class SettingsController extends GetxController {

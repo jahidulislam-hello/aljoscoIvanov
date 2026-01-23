@@ -7,9 +7,8 @@ import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/core/widgets/custom_text_field.dart';
 import 'package:freshbite/features/profile/settings/settings_controller/settings_controller.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import '../../../../core/appbar/custom_appbar.dart';
-import '../../../../core/widgets/button.dart';
+
 
 
 class SettingsScreen extends StatelessWidget {

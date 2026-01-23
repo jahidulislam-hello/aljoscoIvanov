@@ -11,7 +11,7 @@ class CreateShoppingController extends GetxController {
     RecipeSection(
       title: "Ingredients",
       items: [
-        ShoppingItemModel(name: "Olive oil", amount: "2", unit: "tbsp"),
+        ShoppingItemModel(name: "Rice", amount: "2", unit: "kg"),
         ShoppingItemModel(name: "Onion", amount: "1", unit: "ps"),
         ShoppingItemModel(name: "Red bell pepper", amount: "1", unit: "ps"),
         ShoppingItemModel(name: "Garlic cloves", amount: "3", unit: "Cloves"),

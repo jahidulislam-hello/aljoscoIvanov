@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/features/recepies/recipes_search/recipe_search_model.dart';
 import 'package:freshbite/features/recepies/recipes_search/recipes_search_service.dart';
 import 'package:get/get.dart';

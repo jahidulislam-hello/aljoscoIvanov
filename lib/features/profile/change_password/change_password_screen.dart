@@ -1,4 +1,4 @@
-import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
@@ -6,11 +6,9 @@ import 'package:freshbite/core/themes/text_styles.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/core/widgets/custom_text_field.dart';
 import 'package:freshbite/features/profile/change_password/chnage_password_controller.dart';
-import 'package:freshbite/features/profile/settings/settings_controller/settings_controller.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import '../../../../core/appbar/custom_appbar.dart';
-import '../../../../core/widgets/button.dart';
+
 
 
 class ChangePasswordScreen extends StatelessWidget {

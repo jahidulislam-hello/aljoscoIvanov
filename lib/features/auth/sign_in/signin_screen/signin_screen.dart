@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:freshbite/core/navbar/navbar/navbar_screen.dart';
-import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/core/widgets/custom_text_field.dart';
 import 'package:freshbite/features/auth/forget_password/forget_password_Screen/forget_email_screen.dart';
 import 'package:freshbite/features/auth/sign_in/signin_controller/signin_controller.dart';
-import 'package:freshbite/routes/routes.dart';
 import 'package:get/get.dart';
 import '../../../../core/themes/app_colors.dart';
-import '../../../../core/widgets/button.dart';
-
 import '../../sign_up/signup_screen/signup_screen.dart';
+
+
 
 
 class LoginScreen extends StatefulWidget {

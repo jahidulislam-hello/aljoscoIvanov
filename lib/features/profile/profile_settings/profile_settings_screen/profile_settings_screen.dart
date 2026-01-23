@@ -14,9 +14,10 @@ import 'package:freshbite/features/profile/delete_account/delete_account_screen/
 import 'package:freshbite/features/profile/family_members/family_member_screen/family_members_screen.dart';
 import 'package:freshbite/features/profile/language_select/language_select/language_select_screen.dart';
 import 'package:freshbite/features/profile/profile_settings/profile_settings_controller/profile_settings_controller.dart';
-import 'package:freshbite/features/profile/settings/settings_controller/settings_controller.dart';
 import 'package:freshbite/features/profile/settings/settings_screen/settings_screen.dart';
 import 'package:get/get.dart';
+
+
 
 class ProfileSettingsScreen extends StatelessWidget {
   final controller = Get.put(ProfileSettingsController());

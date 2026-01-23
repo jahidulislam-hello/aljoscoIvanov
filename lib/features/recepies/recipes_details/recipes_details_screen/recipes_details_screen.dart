@@ -12,7 +12,6 @@ import 'package:freshbite/features/new/widgets/instruction_step.dart';
 import 'package:freshbite/features/new/widgets/nutrition_info_card.dart';
 import 'package:freshbite/features/new/widgets/primary_button.dart';
 import 'package:freshbite/features/new/widgets/personal_notes.dart';
-import 'package:freshbite/features/new/controller/new_recipe_controller.dart';
 import 'package:freshbite/features/new/widgets/skills_chip.dart';
 import 'package:freshbite/features/new/widgets/time_info_chip.dart';
 import 'package:freshbite/features/new/widgets/title_chip.dart';

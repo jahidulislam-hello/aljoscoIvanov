@@ -1,7 +1,7 @@
 // ==================== RICH TEXT EDITOR ====================
 import 'package:flutter/material.dart';
 import 'package:freshbite/features/recepies/create_recipes/create_recipes_controller/create_recipes_controller.dart';
-import 'package:freshbite/features/recepies/create_recipes/create_recipes_screen/create_recipes_screen.dart';
+
 
 class RichTextEditor extends StatefulWidget {
   final int index;

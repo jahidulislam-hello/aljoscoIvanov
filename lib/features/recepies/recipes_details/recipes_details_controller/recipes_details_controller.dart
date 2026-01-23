@@ -3,7 +3,7 @@ import 'package:freshbite/features/recepies/recipes_details/recipes_details_serv
 import 'package:freshbite/core/utils/shared_preference_helper.dart';
 import 'package:freshbite/features/video/instruction_video.dart';
 import 'package:get/get.dart';
-import 'package:freshbite/features/new/model/new_recipe_model.dart';
+
 
 class RecipesDetailsRecipeController extends GetxController {
   /// Recipe ID to fetch

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:freshbite/core/network_celler/endpoints.dart';
 import 'package:freshbite/features/auth/forget_password/forget_password_Screen/forget_setup_screen.dart';
 import 'package:get/get.dart';

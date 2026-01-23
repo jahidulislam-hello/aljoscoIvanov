@@ -103,6 +103,130 @@ class AppTranslations extends Translations {
 
 
 
+
+
+
+      //for Recipe Section
+
+      'Recipe Search': 'Recipe Search',
+      'Search recipes': 'Search recipes',
+      'Gluten-free': 'Gluten-free',
+      'Meal Type': 'Meal Type',
+      'Savory': 'Savory',
+      'Traditional': 'Traditional',
+      'Everyday': 'Everyday',
+      'Meal Prep': 'Meal Prep',
+      'See all': 'See all',
+      'Emergency': 'Emergency',
+      'Produce': 'Produce',
+      'Bakery': 'Bakery',
+      'Dairy, Eggs, Alternatives': 'Dairy, Eggs, Alternatives',
+      'Meat, Fish, Tofu, Alternatives': 'Meat, Fish, Tofu, Alternatives',
+      'Grains & Dry Legumes': 'Grains & Dry Legumes`',
+      'Pantry & Canned': 'Pantry & Canned',
+      'Frozen': 'Frozen',
+      'Beverages': 'Beverages',
+      'Snacks & Sweets': 'Snacks & Sweets',
+      'Convenience': 'Convenience',
+      'Others': 'Others',
+      'Create Recipe': 'Create Recipe',
+      'Recipe name': 'Recipe name',
+      'Recipe images': 'Recipe images',
+      'Upload image': 'Upload image',
+      'Description': 'Description',
+      'Servings': 'Servings',
+      'Recipe Components': 'Recipe Components',
+      'Cooking Mode': 'Cooking Mode',
+      'Everyday': 'Everyday',
+      'Emergency': 'Emergency',
+      'Meal Prep': 'Meal Prep',
+      'Total Time': 'Total Time',
+      'Prep Time': 'Prep Time',
+      'Cook Time': 'Cook Time',
+      'Instructions': 'Instructions',
+      'Add another step': 'Add another step',
+      'Ingredient Name': 'Ingredient Name',
+      'Add ingredient': 'Add ingredient',
+      'Nutritional Values for 1 serving': 'Nutritional Values for 1 serving',
+      'Add Nutritional Value': 'Add Nutritional Value',
+      'Allergens (Include)': 'Allergens (Include)',
+      'select allergens contained in this recipe': 'select allergens contained in this recipe',
+      'Suggested': 'Suggested',
+      'Tags (Maximum 20)': 'Tags (Maximum 20)',
+      'Add keywords': 'Add keywords',
+      'Save Recipe': 'Save Recipe',
+      'Recipe': 'Recipe',
+      'Description': 'Description',
+      'Allergens (Include)': 'Allergens (Include)',
+      'Ingredients': 'Ingredients',
+      'Time Overview': 'Time Overview',
+      'Skills Required': 'Skills Required',
+      'Instructions': 'Instructions',
+      'Nutritional Values': 'Nutritional Values',
+      'Personal Notes': 'Personal Notes',
+      'Note': 'Note',
+      'Review': 'Review',
+      'Adjust Planning Details': 'Adjust Planning Details',
+      'When will you eat this and how much?': 'When will you eat this and how much?',
+      'Day': 'Day',
+      'Meal': 'Meal',
+      'Servings': 'Servings',
+      'When are you going to prepare this?': 'When are you going to prepare this?',
+      'Who will cook this?': 'Who will cook this?',
+      'Person': 'Person',
+      'ADD TO MEAL Plan': 'ADD TO MEAL Plan',
+      'Delete this recipe from Meal Plan, Prep List and Shopping List': 'Delete this recipe from Meal Plan, Prep List and Shopping List',
+      'start': 'start',
+      'RESET': 'RESET',
+      'pause ': 'pause ',
+      'Restart': 'Restart',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+
+
+
+
+
+
+
+
+
+
+
+
+      // for Shopping List
+      'Shopping': 'Shopping',
+      'Title of Shopping List': 'Title of Shopping List',
+      'How would you like to create your shopping list?': 'How would you like to create your shopping list?',
+      'FROM PREP LIST': 'FROM PREP LIST',
+      'CUSTOM': 'CUSTOM',
+      'Cancel': 'Cancel',
+      'create Shopping List': 'create Shopping List',
+      'Select prep Lists': 'Select prep Lists',
+      'Save': 'Save',
+      'Next': 'Next',
+      'Edit Shopping List': 'Edit Shopping List',
+      'By Recipe': 'By Recipe',
+      'By Category ': 'By Category ',
+      'Add custom item': 'Add custom item',
+      'Amount': 'Amount',
+      'Unit': 'Unit',
+      'Description': 'Description',
+      'Add a short description about this shopping list': 'Add a short description about this shopping list',
+      'Plan your shopping': 'Plan your shopping',
+      'Save': 'Save',
+      'Cancel': 'Cancel',
+      'Edit': 'Edit',
+      'Print': 'Print',
+      'Mark as complete': 'Mark as complete',
+
+
+
+
+
+
+
+
       //for meal planner
 
       'Meal Planner': 'Meal Planner',
@@ -137,11 +261,19 @@ class AppTranslations extends Translations {
       'Delete this recipe from Meal Plan, Prep List and Shopping List': 'Delete this recipe from Meal Plan, Prep List and Shopping List',
       'View shopping list': 'View shopping list',
       'Create Meal Plan': 'Create Meal Plan',
-      'Instructions': 'Instructions',
-      'Instructions': 'Instructions',
-      'Instructions': 'Instructions',
-      'Instructions': 'Instructions',
-      'Instructions': 'Instructions',
+      'Please add a title and description for your new meal plan': 'Please add a title and description for your new meal plan',
+      'Add Title': 'Add Title',
+      'Add Description': 'Add Description',
+      'SAVE MEAL PLAN': 'SAVE MEAL PLAN',
+      'Meal Plan will be saved with connected Prep Lists, but without assigned Chef, Comments or Shopping Lists.': 'Meal Plan will be saved with connected Prep Lists, but without assigned Chef, Comments or Shopping Lists.',
+      'e.g. "My Monday Menu"': 'e.g. "My Monday Menu"',
+      'e.g. "Usual Breakfast and family dinner"': 'e.g. "Usual Breakfast and family dinner"',
+      'Apply Saved Meal Plan': 'Apply Saved Meal Plan',
+      'Saved Meal Plans': 'Saved Meal Plans',
+      'My Monday Menu': 'My Monday Menu',
+      'Please select the start date': 'Please select the start date',
+      'Apply to the Meal Planer': 'Apply to the Meal Planer',
+      'Your saved meal plan will start on the chosen date.': 'Your saved meal plan will start on the chosen date.',
       'Instructions': 'Instructions',
       'Instructions': 'Instructions',
       'Instructions': 'Instructions',
@@ -386,6 +518,69 @@ class AppTranslations extends Translations {
       'Instructions': 'Instructions',
       'Instructions': 'Instructions',
       'Instructions': 'Instructions',
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      // for Shopping List
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
