@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'package:freshbite/core/network_celler/endpoints.dart';
-import 'package:freshbite/core/utils/shared_preference_helper.dart';
-import 'package:http/http.dart' as http;
 import 'package:freshbite/core/network_celler/http_client.dart';
 
 class MealPlannerService {

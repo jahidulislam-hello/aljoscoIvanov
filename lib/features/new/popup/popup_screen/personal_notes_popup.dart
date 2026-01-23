@@ -1,6 +1,5 @@
 // personal_notes_modal.dart
 import 'package:flutter/material.dart';
-import 'package:freshbite/core/widgets/button.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/features/new/popup/popup_controller/personal_notes_popup_controller.dart';
 

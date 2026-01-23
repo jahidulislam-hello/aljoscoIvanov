@@ -6,9 +6,8 @@ import 'package:get/get.dart';
 
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
-import '../model/new_recipe_model.dart';
 import '../../recepies/recipes_details/recipes_details_model/recipes_details_model.dart';
-import '../../recepies/dummy_code/new_controller.dart';
+
 
 class IngredientItem extends StatelessWidget {
   final dynamic ingredient; // Accepts both Ingredient and IngredientDetails

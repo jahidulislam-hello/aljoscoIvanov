@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
-import 'package:freshbite/features/new/model/new_recipe_model.dart';
-import 'package:freshbite/features/recepies/recipes_details/recipes_details_model/recipes_details_model.dart';
+
 
 
 class NutritionInfoCard extends StatelessWidget {

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:freshbite/core/navbar/navbar/navbar_screen.dart';
 import 'package:freshbite/core/utils/shared_preference_helper.dart';
 import 'package:freshbite/features/subscription/subscription_screen.dart';
 import 'package:get/get.dart';

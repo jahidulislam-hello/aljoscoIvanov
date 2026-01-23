@@ -4,10 +4,9 @@ import 'package:freshbite/core/appbar/custom_appbar.dart';
 import 'package:freshbite/features/profile/family_members/Add_member_screen.dart';
 import 'package:freshbite/features/profile/family_members/family_members_controller/family_members_controller.dart';
 import 'package:get/get.dart';
-
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
 
 class FamilyMemberScreen extends StatelessWidget {
   final controller = Get.put(FamilyMemberController());

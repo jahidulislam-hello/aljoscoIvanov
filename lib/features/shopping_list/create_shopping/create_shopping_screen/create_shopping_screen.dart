@@ -1,16 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/appbar/custom_appbar.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
-import 'package:freshbite/core/themes/text_styles.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/features/shopping_list/create_shopping/create_shopping_controller/create_shopping_controller.dart';
-import 'package:freshbite/features/shopping_list/edit_shopping_list/edit_shopping_list_controller/edit_shopping_list_controller.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
 import '../create_shopping_model/create_shopping_model.dart';
+
 
 
 class CreateShoppingScreen extends StatelessWidget {
@@ -45,32 +45,46 @@ class CreateShoppingScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            /// Title
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                /// Title Text
-                Text(
-                  "Custom Shopping List",
-                  style: TextStyle(fontSize: 12.sp, color: Colors.black87),
-                ),
+            /// Cover Image Section
+            _buildCoverImageSection(controller),
 
-                /// Edit Icon
-                GestureDetector(
-                  onTap: () {
-                    // your edit action here
-                  },
-                  child: Image.asset(
+            SizedBox(height: 16.h),
+
+            /// Title (Editable)
+            Text("Title", style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600)),
+            SizedBox(height: 6.h),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              decoration: BoxDecoration(
+                color: AppColors.pureWhite,
+                borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                children: [
+                  /// Title TextField
+                  Expanded(
+                    child: TextField(
+                      controller: controller.titleController,
+                      style: TextStyle(fontSize: 14.sp, color: Colors.black87),
+                      decoration: InputDecoration(
+                        hintText: "Enter shopping list title",
+                        hintStyle: TextStyle(fontSize: 14.sp, color: Colors.grey),
+                        border: InputBorder.none,
+                      ),
+                    ),
+                  ),
+
+                  /// Edit Icon (visual indicator)
+                  Image.asset(
                     AppImages.edit_icon,
-                    height: 24,
-                    width: 24,
+                    height: 20,
+                    width: 20,
                     color: Colors.grey,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-
-
 
             SizedBox(height: 20.h),
 
@@ -410,5 +424,113 @@ class CreateShoppingScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  // ------------------------------------------------------------
+  // COVER IMAGE SECTION
+  // ------------------------------------------------------------
+  Widget _buildCoverImageSection(CreateShoppingController controller) {
+    return Obx(() {
+      final hasImage = controller.coverImage.value != null;
+
+      return GestureDetector(
+        onTap: controller.pickCoverImage,
+        child: Container(
+          width: double.infinity,
+          height: 180.h,
+          decoration: BoxDecoration(
+            color: AppColors.pureWhite,
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: hasImage
+              ? Stack(
+                  children: [
+                    /// Selected Image
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12.r),
+                      child: Image.file(
+                        controller.coverImage.value!,
+                        width: double.infinity,
+                        height: 180.h,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+
+                    /// Remove Button
+                    Positioned(
+                      top: 8.h,
+                      right: 8.w,
+                      child: GestureDetector(
+                        onTap: controller.removeCoverImage,
+                        child: Container(
+                          padding: EdgeInsets.all(6.w),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 18.sp,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    /// Change Image Hint
+                    Positioned(
+                      bottom: 8.h,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: Text(
+                            "Tap to change",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12.sp,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.add_photo_alternate_outlined,
+                      size: 48.sp,
+                      color: Colors.grey,
+                    ),
+                    SizedBox(height: 8.h),
+                    Text(
+                      "Add Cover Image",
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      "Tap to select an image",
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        color: Colors.grey.shade400,
+                      ),
+                    ),
+                  ],
+                ),
+        ),
+      );
+    });
   }
 }

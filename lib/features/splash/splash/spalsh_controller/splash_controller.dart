@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:freshbite/core/utils/shared_preference_helper.dart';
-import 'package:freshbite/features/splash/onboarding/onboarding_screen/onboarding_screen.dart';
 import 'package:freshbite/routes/routes.dart';
 import 'package:get/get.dart';
 

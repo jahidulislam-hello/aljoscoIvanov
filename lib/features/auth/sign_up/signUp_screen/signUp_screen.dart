@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:freshbite/core/navbar/navbar/navbar_screen.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/core/widgets/custom_text_field.dart';
 import 'package:freshbite/features/auth/sign_in/signin_screen/signin_screen.dart';
-import 'package:freshbite/routes/routes.dart';
 import 'package:get/get.dart';
 import '../../../../core/themes/app_colors.dart';
-import '../../../../core/widgets/button.dart';
 
 import '../signUp_controller/signUp_controller.dart';
 
