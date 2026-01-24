@@ -20,4 +20,8 @@ class Urls {
   // Family Member endpoints
   static const String getChild = '$baseUrl/user/get-child';
   static const String createChild = '$baseUrl/user/create-child';
+
+  // Skill endpoints
+  static const String getAllSkills = '$baseUrl/skill/get-all-skill';
+  static String getSkillById(String id) => '$baseUrl/skill/get-skill/$id';
 }
