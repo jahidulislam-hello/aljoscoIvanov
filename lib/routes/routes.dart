@@ -1,7 +1,7 @@
 import 'package:freshbite/core/navbar/navbar/navbar_screen.dart';
 import 'package:freshbite/features/auth/sign_in/signin_screen/signin_screen.dart';
 import 'package:freshbite/features/auth/sign_up/signUp_screen/signUp_screen.dart';
-import 'package:freshbite/features/home/home_new/screen/recipe_screen.dart';
+import 'package:freshbite/features/home/cooking_skill/cooking_skill_Screen.dart';
 import 'package:freshbite/features/new/controller/new_recipe_controller.dart';
 import 'package:freshbite/features/new/screen/new_recipe.dart';
 import 'package:freshbite/features/recepies/cooking/cooking_details_screen/cooking_details_screen.dart';
@@ -10,6 +10,7 @@ import 'package:freshbite/features/recepies/recipes_details/recipes_details_scre
 import 'package:freshbite/features/splash/onboarding/onboarding_screen/onboarding_screen.dart';
 import 'package:freshbite/features/splash/splash/splash_screen/spalsh_screen.dart';
 import 'package:get/get.dart';
+
 
 
 
@@ -49,8 +50,7 @@ class AppRoute {
     GetPage(name: signInScreen, page: () => LoginScreen()),
     GetPage(name: signUpScreen, page: () => SignUpScreen()),
     GetPage(name: bottomNavbar, page: () =>  BottomNavbar()),
-    GetPage(name: homeScreen, page: () => RecipeDetailScreen()),
-    GetPage(name: recipeDetailScreen, page: () => CookingDetailsScreen()),
+    GetPage(name: recipeDetailScreen, page: () => CookingSkillsScreen()),
     GetPage(
       name: newRecipeDetailScreen,
       page: () {

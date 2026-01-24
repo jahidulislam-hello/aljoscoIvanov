@@ -106,6 +106,67 @@ class AppTranslations extends Translations {
 
 
 
+
+
+
+       // For Home Section
+
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+      'Instructions': 'Instructions',
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       //for Recipe Section
 
       'Recipe Search': 'Recipe Search',

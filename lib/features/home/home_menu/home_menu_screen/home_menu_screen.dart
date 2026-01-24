@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'dart:ui';
 import 'package:freshbite/core/themes/app_colors.dart';
+import 'package:freshbite/features/home/cooking_skill/cooking_skill_Screen.dart';
 import 'package:freshbite/features/home/favourites/favourites_screen/favourite_screen.dart';
 import 'package:get/get.dart';
 
@@ -172,7 +173,16 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
 
 
                 _buildMenuItem(Icons.bar_chart, 'Preferences'),
-                _buildMenuItem(Icons.history, 'Cooking Skills'),
+                _buildMenuItem(Icons.history, 'Cooking Skills',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>  CookingSkillsScreen(),
+                      ),
+                    );
+                  },
+                ),
 
                 SizedBox(height: 26.h),
 
