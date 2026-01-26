@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/appbar/custom_appbar.dart';
+import 'package:freshbite/core/themes/app_colors.dart';
+import 'package:freshbite/core/themes/text_styles.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/features/profile/language_select/language_select_controller/language_select_controller.dart';
 import 'package:freshbite/features/profile/language_select/language_tile.dart';
@@ -15,21 +17,29 @@ class LanguageScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE8EAE6),
-      appBar: CustomAppBar(
-        title: 'Language',
-        showBackButton: true,
+      backgroundColor: AppColors.background,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60.h),
+        child: SafeArea(
+          top: true,
+          child: CustomAppBar(
+            title: 'Language'.tr,
+            titleStyle: AppTextStyles.heading2,
+            showShadow: false,
+
+          ),
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        children: [
             SizedBox(height: 16.h),
 
             /// Subtitle
             Text(
-              'Select your preferred language for the app interface:',
+              'Select your preferred language for the app interface:'.tr,
               style: TextStyle(
                 fontSize: 14.sp,
                 color: Colors.black.withOpacity(0.6),
@@ -41,7 +51,7 @@ class LanguageScreen extends StatelessWidget {
             /// German
             Obx(() => LanguageTile(
               flag: '🇩🇪',
-              title: 'German',
+              title: 'German '.tr,
               isSelected: controller.selectedLanguage.value == 'de',
               onTap: () => controller.selectLanguage('de'),
             )),
@@ -51,7 +61,7 @@ class LanguageScreen extends StatelessWidget {
             /// English
             Obx(() => LanguageTile(
               flag: '🇺🇸',
-              title: 'English',
+              title: 'English'.tr,
               isSelected: controller.selectedLanguage.value == 'en',
               onTap: () => controller.selectLanguage('en'),
             )),
@@ -60,8 +70,7 @@ class LanguageScreen extends StatelessWidget {
 
             /// Info text
             Text(
-              'This will change the default app language. '
-                  'Please note, that recipes are only available in german.',
+              'This will change the default app language. Please note, that recipes are only available in german.'.tr,
               style: TextStyle(
                 fontSize: 12.sp,
                 color: Colors.black.withOpacity(0.5),
@@ -72,7 +81,7 @@ class LanguageScreen extends StatelessWidget {
 
             /// Confirm Button
             CustomTextButton(
-              text: 'CONFIRM',
+              text: 'CONFIRM'.tr,
               onTap: controller.confirmLanguage,
             ),
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:freshbite/core/utils/shared_preference_helper.dart';
+import 'package:freshbite/localization/localization/localization_controller.dart';
 import 'package:freshbite/routes/routes.dart';
 import 'package:get/get.dart';
 
@@ -10,6 +11,8 @@ class SplashController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Apply saved language when app starts
+    Get.find<LocalizationController>().applyLocale();
     startSplashSequence();
   }
 

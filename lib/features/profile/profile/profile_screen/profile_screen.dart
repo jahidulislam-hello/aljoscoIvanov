@@ -57,7 +57,7 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildAppBar() {
     return CustomAppBar(
-      title: 'My Profile',
+      title: 'My Profile'.tr,
       titleStyle: AppTextStyles.heading2,
       // padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       showShadow: false,
@@ -137,7 +137,7 @@ class ProfileScreen extends StatelessWidget {
           GestureDetector(
             onTap: () => controller.editProfile(),
             child: Text(
-              'Edit Profile',
+              'Edit Profile'.tr,
               style: AppTextStyles.caption.copyWith(
                 color: AppColors.borderSecondary,
               ),
@@ -197,15 +197,15 @@ class ProfileScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Profile Information',
+              'Profile Information'.tr,
               style: AppTextStyles.heading3,
             ),
             SizedBox(height: 16.h),
-            _buildInfoRow('User id', user.userId),
+            _buildInfoRow('User id'.tr, user.userId),
             SizedBox(height: 12.h),
-            _buildInfoRow('Email', user.email),
+            _buildInfoRow('Email'.tr, user.email),
             SizedBox(height: 12.h),
-            _buildInfoRow('Phone number', user.phoneNumber),
+            _buildInfoRow('Phone number'.tr, user.phoneNumber),
           ],
         ),
       );
@@ -273,7 +273,7 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'My Recipes',
+                    'My Recipes'.tr,
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
@@ -301,7 +301,7 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'Activities',
+                    'Activities'.tr,
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
@@ -464,7 +464,7 @@ class ProfileScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       Text(
-                        showTimeAgo ? recipe.getTimeAgo() : 'See recipe',
+                        showTimeAgo ? recipe.getTimeAgo() : 'See recipe'.tr,
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.textSecondary,
                         ),

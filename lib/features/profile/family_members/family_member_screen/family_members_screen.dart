@@ -21,7 +21,7 @@ class FamilyMemberScreen extends StatelessWidget {
         preferredSize: Size.fromHeight(60.h),
         child: SafeArea(
           child: CustomAppBar(
-            title: 'Family Members',
+            title: 'Family Members'.tr,
             titleStyle: AppTextStyles.heading2,
             showShadow: false,
 
@@ -44,7 +44,7 @@ class FamilyMemberScreen extends StatelessWidget {
             children: [
               /// Title
               Text(
-                "Manage Linked Accounts",
+                "Manage Linked Accounts".tr,
                 style: AppTextStyles.heading3.copyWith(
                   fontSize: 20.sp,
                   fontWeight: FontWeight.w600,
@@ -160,7 +160,7 @@ class FamilyMemberScreen extends StatelessWidget {
                         Icon(Icons.add, size: 20.sp),
                         SizedBox(width: 6.w),
                         Text(
-                          "Add Member",
+                          "Add Member ".tr,
                           style: TextStyle(
                             fontFamily: "Rubik",
                             fontWeight: FontWeight.w500,

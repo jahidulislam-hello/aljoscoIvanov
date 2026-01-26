@@ -16,6 +16,7 @@ import 'package:freshbite/features/profile/language_select/language_select/langu
 import 'package:freshbite/features/profile/profile_settings/profile_settings_controller/profile_settings_controller.dart';
 import 'package:freshbite/features/profile/settings/settings_screen/settings_screen.dart';
 import 'package:get/get.dart';
+// Translations are accessed via .tr extension
 
 
 
@@ -40,7 +41,7 @@ class ProfileSettingsScreen extends StatelessWidget {
         child: SafeArea(
           top: true,
           child: CustomAppBar(
-            title: 'Account Settings',
+            title: 'Account Settings'.tr,
             titleStyle: AppTextStyles.heading2,
             showShadow: false,
 
@@ -75,7 +76,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        title: "My Profile",
+                        title: "My Profile".tr,
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
                           width: 24,
@@ -91,7 +92,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        title: "Family Members",
+                        title: "Family Members".tr,
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
                           width: 24,
@@ -107,7 +108,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        title: "Language",
+                        title: "Language".tr,
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
                           width: 24,
@@ -122,7 +123,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        title: "FAQ",
+                        title: "FAQ".tr,
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
                           width: 24,
@@ -137,7 +138,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        title: "Privacy Policy",
+                        title: "Privacy Policy".tr,
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
                           width: 24,
@@ -152,7 +153,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        title: "Terms & Conditions",
+                        title: "Terms & Conditions".tr,
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
                           width: 24,
@@ -167,7 +168,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        title: "Change Password",
+                        title: "Change Password".tr,
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
                           width: 24,
@@ -183,7 +184,7 @@ class ProfileSettingsScreen extends StatelessWidget {
                           width: 24,
                           height: 24,
                         ),
-                        title: "Delete Account",
+                        title: "Delete Account".tr,
                         trailingIcon: SvgPicture.asset(
                           AppImages.arrow,
                           width: 24,

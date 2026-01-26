@@ -32,7 +32,7 @@ class ChangePasswordScreen extends StatelessWidget {
         child: SafeArea(
           top: true,
           child: CustomAppBar(
-            title: "Change Password",
+            title: "Change Password".tr,
             titleStyle: AppTextStyles.heading2,
             showShadow: false,
             actionButtons: [
@@ -61,13 +61,13 @@ class ChangePasswordScreen extends StatelessWidget {
                 SizedBox(height: 24),
 
 
-                const Text("Old Password",
+                Text("Current password".tr,
                     style: TextStyle(color: Colors.black54, fontSize: 14)),
                 SizedBox(height: 6),
 
                 CustomTextField(
                   controller: controller.fullNameController,
-                  hintText: "Enter your Old Password",
+                  hintText: "Current password".tr,
                   isEnabled: controller.isEditing.value,
                 ),
 
@@ -75,26 +75,26 @@ class ChangePasswordScreen extends StatelessWidget {
                 SizedBox(height: 16),
 
 
-                const Text("New Password",
+                Text("New password".tr,
                     style: TextStyle(color: Colors.black54, fontSize: 14)),
                 SizedBox(height: 6),
 
                 CustomTextField(
                   controller: controller.phoneController,
-                  hintText: "Enter your New Password",
+                  hintText: "New password".tr,
                   isEnabled: controller.isEditing.value,
                 ),
 
                 SizedBox(height: 16),
 
 
-                const Text(" Confirm New Password",
+                Text("Re-type new password".tr,
                     style: TextStyle(color: Colors.black45, fontSize: 14)),
                 SizedBox(height: 6),
 
                 CustomTextField(
                   controller: controller.emailController,
-                  hintText: "Enter your Confirm New Password",
+                  hintText: "Re-type new password".tr,
                   isEnabled: false,
                   readOnly: true,
                 ),
@@ -104,8 +104,8 @@ class ChangePasswordScreen extends StatelessWidget {
 
                 Obx(() => CustomTextButton(
                   text: controller.isEditing.value
-                      ? "Update Password"
-                      : "Edit Password",
+                      ? "Change Password".tr
+                      : "Change Password".tr,
                   onTap: () {
                     if (controller.isEditing.value) {
                       controller.updateProfile();

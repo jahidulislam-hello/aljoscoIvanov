@@ -24,7 +24,7 @@ class AddMemberScreen extends StatelessWidget {
         preferredSize: Size.fromHeight(60.h),
         child: SafeArea(
           child: CustomAppBar(
-            title: 'Add Member',
+            title: 'Add Member '.tr,
             titleStyle: AppTextStyles.heading2,
             showShadow: false,
           ),
@@ -38,7 +38,7 @@ class AddMemberScreen extends StatelessWidget {
           children: [
             /// Description Text
             Text(
-              "Please enter your email and password to add a family member.",
+              "Please enter your email and password to add a family member.".tr,
               style: TextStyle(
                 fontSize: 16.sp,
                 color: Colors.black87,
@@ -50,7 +50,7 @@ class AddMemberScreen extends StatelessWidget {
             /// Email Field
             CustomTextField(
               controller: emailController,
-              hintText: "Email",
+              hintText: "Email".tr,
               keyboardType: "email",
 
             ),
@@ -68,7 +68,7 @@ class AddMemberScreen extends StatelessWidget {
             SizedBox(height: 20.h),
 
             Text(
-              "This will add family member in the system.",
+              "This will add family member in the system.".tr,
               style: TextStyle(
                 fontSize: 15.sp,
                 color: Colors.grey.shade600,
@@ -79,7 +79,7 @@ class AddMemberScreen extends StatelessWidget {
 
             /// Add Member Button
             Obx(() => CustomTextButton(
-              text: controller.isLoading.value ? "Adding..." : "Add Member",
+              text: controller.isLoading.value ? "Adding..." : "Add Member ".tr,
               onTap: controller.isLoading.value
                   ? null
                   : () {
