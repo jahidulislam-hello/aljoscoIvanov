@@ -32,7 +32,7 @@ class SettingsScreen extends StatelessWidget {
         child: SafeArea(
           top: true,
           child: CustomAppBar(
-            title: 'My Profile',
+            title: 'My Profile'.tr,
             titleStyle: AppTextStyles.heading2,
             showShadow: false,
             actionButtons: [
@@ -111,13 +111,13 @@ class SettingsScreen extends StatelessWidget {
                 // ============================
                 // NAME FIELD
                 // ============================
-                const Text("Name",
+                Text("Full Name".tr,
                     style: TextStyle(color: Colors.black54, fontSize: 14)),
                 SizedBox(height: 6),
 
                 CustomTextField(
                   controller: controller.fullNameController,
-                  hintText: "Enter your name",
+                  hintText: "Full Name".tr,
                   isEnabled: controller.isEditing.value,
                 ),
 
@@ -127,13 +127,13 @@ class SettingsScreen extends StatelessWidget {
                 // ============================
                 // PHONE FIELD
                 // ============================
-                const Text("Phone",
+                Text("Phone number".tr,
                     style: TextStyle(color: Colors.black54, fontSize: 14)),
                 SizedBox(height: 6),
 
                 CustomTextField(
                   controller: controller.phoneController,
-                  hintText: "Enter your phone number",
+                  hintText: "Phone Number".tr,
                   isEnabled: controller.isEditing.value,
                 ),
 
@@ -142,13 +142,13 @@ class SettingsScreen extends StatelessWidget {
                 // ============================
                 // EMAIL FIELD (READ ONLY)
                 // ============================
-                const Text("Email",
+                Text("Email".tr,
                     style: TextStyle(color: Colors.black45, fontSize: 14)),
                 SizedBox(height: 6),
 
                 CustomTextField(
                   controller: controller.emailController,
-                  hintText: "Enter your email",
+                  hintText: "Email".tr,
                   isEnabled: false,
                   readOnly: true,
                 ),
@@ -169,8 +169,8 @@ class SettingsScreen extends StatelessWidget {
 
                   return CustomTextButton(
                     text: controller.isEditing.value
-                        ? "Update Profile"
-                        : "Edit Profile",
+                        ? "Update".tr
+                        : "Edit Profile".tr,
                     onTap: () {
                       if (controller.isEditing.value) {
                         controller.updateProfile();

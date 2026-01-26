@@ -22,7 +22,7 @@ class DeleteAccountScreen extends StatelessWidget {
         child: SafeArea(
           top: true,
           child: CustomAppBar(
-            title: "Delete Account",
+            title: "Delete Account".tr,
             titleStyle: AppTextStyles.heading2,
             showShadow: false,
             actionButtons: [
@@ -80,7 +80,7 @@ class DeleteAccountScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 4.h),
                             Text(
-                              "This will permanently delete your account and all personal data from our system. This action cannot be undone.",
+                              "This will permanently delete your account and all personal data from our system. This action cannot be undone.".tr,
                               style: TextStyle(
                                 color: Colors.red.shade700,
                                 fontSize: 12.sp,
@@ -97,7 +97,7 @@ class DeleteAccountScreen extends StatelessWidget {
 
                 // Instruction text
                 Text(
-                  "Please enter your password to confirm account removal",
+                  "Please enter your password to confirm account removal".tr,
                   style: TextStyle(
                     color: Colors.black87,
                     fontSize: 14.sp,
@@ -160,7 +160,7 @@ class DeleteAccountScreen extends StatelessWidget {
 
                 // Delete Account Button
                 CustomTextButton(
-                  text: "Delete Account",
+                  text: "Delete Account".tr,
                   color: Colors.red,
                   onTap: controller.showDeletePopup,
                 ),
@@ -172,7 +172,7 @@ class DeleteAccountScreen extends StatelessWidget {
                   child: TextButton(
                     onPressed: () => Get.back(),
                     child: Text(
-                      "Cancel",
+                      "Cancel".tr,
                       style: TextStyle(
                         color: Colors.black54,
                         fontSize: 14.sp,
@@ -266,7 +266,7 @@ class DeleteAccountPopUp extends StatelessWidget {
                       padding: EdgeInsets.symmetric(vertical: 12.h),
                     ),
                     child: Text(
-                      "Cancel",
+                      "Cancel".tr,
                       style: TextStyle(
                         color: Colors.black87,
                         fontSize: 14.sp,
@@ -287,7 +287,7 @@ class DeleteAccountPopUp extends StatelessWidget {
                       padding: EdgeInsets.symmetric(vertical: 12.h),
                     ),
                     child: Text(
-                      "Delete",
+                      "Delete".tr,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14.sp,

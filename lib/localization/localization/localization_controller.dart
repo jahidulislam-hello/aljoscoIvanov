@@ -19,24 +19,36 @@ class LocalizationController extends GetxController implements GetxService {
   Locale get locale => _locale;
   bool get isLtr => _isLtr;
 
-  void setLanguage(Locale locale) {
-    Get.updateLocale(locale);
+  Future<void> setLanguage(Locale locale) async {
     _locale = locale;
     _isLtr = _locale.languageCode == 'en';
-    saveLanguage(_locale);
+    await saveLanguage(_locale);
+    Get.updateLocale(locale);
     update();
+    debugPrint('🌐 Language changed to: ${locale.languageCode}_${locale.countryCode}');
   }
 
   void loadCurrentLanguage() {
-    String languageCode = sharedPreferences.getString(LanguageSelect.LANGUAGE_CODE) ?? 'en';
-    String countryCode = sharedPreferences.getString(LanguageSelect.COUNTRY_CODE) ?? 'US';
-    _locale = Locale(languageCode, countryCode);
+    String? languageCode = sharedPreferences.getString(LanguageSelect.LANGUAGE_CODE);
+    String? countryCode = sharedPreferences.getString(LanguageSelect.COUNTRY_CODE);
+
+    debugPrint('🌐 Raw loaded values - languageCode: $languageCode, countryCode: $countryCode');
+
+    _locale = Locale(languageCode ?? 'en', countryCode ?? 'US');
     _isLtr = _locale.languageCode == 'en';
+    debugPrint('🌐 Loaded language: ${_locale.languageCode}_${_locale.countryCode}');
     update();
   }
 
-  void saveLanguage(Locale locale) async {
-    await sharedPreferences.setString(LanguageSelect.LANGUAGE_CODE, locale.languageCode);
-    await sharedPreferences.setString(LanguageSelect.COUNTRY_CODE, locale.countryCode ?? "");
+  /// Call this after GetMaterialApp is ready to apply saved locale
+  void applyLocale() {
+    Get.updateLocale(_locale);
+    debugPrint('🌐 Applied locale: ${_locale.languageCode}_${_locale.countryCode}');
+  }
+
+  Future<void> saveLanguage(Locale locale) async {
+    bool langSaved = await sharedPreferences.setString(LanguageSelect.LANGUAGE_CODE, locale.languageCode);
+    bool countrySaved = await sharedPreferences.setString(LanguageSelect.COUNTRY_CODE, locale.countryCode ?? "");
+    debugPrint('🌐 Saved language: ${locale.languageCode}_${locale.countryCode} (langSaved: $langSaved, countrySaved: $countrySaved)');
   }
 }

@@ -18,14 +18,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int currentPage = 0;
   final PageController _pageController = PageController();
 
-  final List<Map<String, String>> onboardingData = [
-    {
-      "title": "Welcome to freshbite!".tr,
-      "description": "Log in to start cooking!".tr,
-      "onboardImage": "assets/images/onboard.png",
-    },
-  ];
-
   final _localizationController = Get.find<LocalizationController>();
   String selectedLang = 'EN'; // Default
 
@@ -57,13 +49,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Column(
                 children: [
                   Image.asset(
-                    onboardingData[0]['onboardImage']!,
+                    'assets/images/onboard.png',
                     height: 400.h,
                     width: 593.w,
                   ),
                   SizedBox(height: 10.h),
                   Text(
-                    onboardingData[0]['title']!,
+                    'Wellcome to FreshBite !'.tr,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Baste B', // your custom font
@@ -78,7 +70,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                   SizedBox(height: 10.h),
                   Text(
-                    onboardingData[0]['description']!,
+                    'Log in to start cooking!'.tr,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 20.sp,
@@ -129,12 +121,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("or", style: TextStyle(fontSize: 14.sp, color: Colors.black54)),
+                  Text('or'.tr, style: TextStyle(fontSize: 14.sp, color: Colors.black54)),
                   SizedBox(width: 8.w),
                   InkWell(
                     onTap: () {},
                     child: Text(
-                      "Continue as Guest",
+                      'Continue as Guest'.tr,
                       style: TextStyle(
                         fontSize: 14.sp,
                         color: AppColors.buttonColor,
