@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
-import 'package:freshbite/features/home/filter/filter_controller/filter_controller.dart';
+import 'package:freshbite/features/dummy/filter/filter_controller/filter_controller.dart';
 import 'package:get/get.dart';
 
 

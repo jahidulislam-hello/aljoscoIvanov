@@ -17,6 +17,8 @@ class AppImages {
   static String passwordOn = "$baseUrlImage/password_on.png";
   static String sashuka = "$baseUrlImage/image.png";
   static String poutine = "$baseUrlImage/pautine.png";
+  static String herbs = "$baseUrlImage/Herbs.png";
+  static String herbss = "$baseUrlImage/herbss.png";
   static String emergency = "$baseUrlImage/emergency.png";
   static String everyday = "$baseUrlImage/everyday.jpg";
   static String meal = "$baseUrlImage/meal.png";
