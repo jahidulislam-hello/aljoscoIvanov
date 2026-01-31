@@ -1,4 +1,4 @@
-import 'package:freshbite/features/home/filter/filter_model.dart';
+import 'package:freshbite/features/dummy/filter/filter_model.dart';
 import 'package:get/get.dart';
 
 

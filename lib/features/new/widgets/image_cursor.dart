@@ -15,6 +15,8 @@ class ImageCarousel extends StatefulWidget {
 }
 
 class _ImageCarouselState extends State<ImageCarousel> {
+  int _selectedIndex = 0;
+
   /// Helper method to check if image is a network URL
   bool _isNetworkImage(String imagePath) {
     return imagePath.startsWith('http://') || imagePath.startsWith('https://');
@@ -96,60 +98,72 @@ class _ImageCarouselState extends State<ImageCarousel> {
       );
     }
 
-    // Get cover image (first image) and other images
-    final coverImage = widget.images.first;
-    final otherImages = widget.images.length > 1
-        ? widget.images.sublist(1)
-        : <String>[];
+    // Ensure selected index is valid
+    if (_selectedIndex >= widget.images.length) {
+      _selectedIndex = 0;
+    }
+
+    // Get currently selected image for main display
+    final mainImage = widget.images[_selectedIndex];
 
     return Column(
       children: [
-        // MAIN COVER IMAGE (First image only)
+        // MAIN COVER IMAGE (Selected image)
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 10.w),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16.r),
-            child: _buildImage(
-              coverImage,
-              width: double.infinity,
-              height: 244.h,
-              fit: BoxFit.cover,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: _buildImage(
+                mainImage,
+                width: double.infinity,
+                height: 244.h,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
         ),
 
-        // THUMBNAIL ROW (Other images if available)
-        if (otherImages.isNotEmpty) ...[
+        // THUMBNAIL ROW (All images)
+        if (widget.images.length > 1) ...[
           SizedBox(height: 12.h),
           SizedBox(
             height: 60.h,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: otherImages.length,
+              itemCount: widget.images.length,
               padding: EdgeInsets.symmetric(horizontal: 16.w),
               itemBuilder: (context, index) {
+                final isSelected = index == _selectedIndex;
                 return GestureDetector(
                   onTap: () {
-                    // Optional: You can add functionality to view full image
+                    setState(() {
+                      _selectedIndex = index;
+                    });
                   },
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
                     margin: EdgeInsets.only(right: 10.w),
                     width: 75.w,
                     height: 51.h,
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: Colors.grey[400]!,
-                        width: 1.w,
+                        color: isSelected ? AppColors.buttonColor : Colors.grey[400]!,
+                        width: isSelected ? 2.w : 1.w,
                       ),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.r),
-                      child: _buildImage(
-                        otherImages[index],
-                        width: 75.w,
-                        height: 51.h,
-                        fit: BoxFit.cover,
+                      borderRadius: BorderRadius.circular(7.r),
+                      child: Opacity(
+                        opacity: isSelected ? 1.0 : 0.7,
+                        child: _buildImage(
+                          widget.images[index],
+                          width: 75.w,
+                          height: 51.h,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ),

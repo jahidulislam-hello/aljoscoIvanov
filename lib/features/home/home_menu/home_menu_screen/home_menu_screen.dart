@@ -6,6 +6,12 @@ import 'dart:ui';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/features/home/cooking_skill/cooking_skill_Screen.dart';
 import 'package:freshbite/features/home/favourites/favourites_screen/favourite_screen.dart';
+import 'package:freshbite/features/home/home_menu/home_menu_screen/preferences/preferences.dart' show PreferencesScreen;
+import 'package:freshbite/features/home/terms_condition/about_freshbite.dart';
+import 'package:freshbite/features/home/terms_condition/frequently_ask_question.dart';
+import 'package:freshbite/features/home/terms_condition/privacy_policy.dart';
+import 'package:freshbite/features/home/terms_condition/terms_conditions.dart';
+import 'package:freshbite/features/subscription/subscription_screen.dart';
 import 'package:get/get.dart';
 
 
@@ -156,29 +162,53 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
               children: [
                 SizedBox(height: 4.h),
 
-                _buildMenuItem(Icons.person_outline, 'My Profile'),
-                _buildMenuItem(Icons.subway, 'Subscription'),
+                _buildMenuItem('assets/icons/menu1.png', 'My Profile',onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AboutUs(),
+                    ),
+                  );
+                },),
+                _buildMenuItem('assets/icons/menu2.png', 'Subscription',onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => SubscriptionScreen(),
+                    ),
+                  );
+                },),
                 _buildMenuItem(
-                  Icons.sports_soccer,
+                  'assets/icons/menu3.png',
                   'Favourites',
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>  FavoritesScreen(),
+                        builder: (_) => FavoritesScreen(),
                       ),
                     );
                   },
                 ),
 
-
-                _buildMenuItem(Icons.bar_chart, 'Preferences'),
-                _buildMenuItem(Icons.history, 'Cooking Skills',
+                _buildMenuItem('assets/icons/menu4.png', 'Preferences',
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>  CookingSkillsScreen(),
+                        builder: (_) => PreferencesScreen(),
+                      ),
+                    );
+                  },
+                ),
+                _buildMenuItem(
+                  'assets/icons/menu5.png',
+                  'Cooking Skills',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CookingSkillsScreen(),
                       ),
                     );
                   },
@@ -195,14 +225,42 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
 
                 SizedBox(height: 26.h),
 
-                _buildMenuItem(Icons.card_giftcard, 'About freshbite'),
-                _buildMenuItem(Icons.history, 'FAQ'),
-                _buildMenuItem(Icons.chat_bubble_outline, 'Privacy Policy'),
-                _buildMenuItem(Icons.sports_esports, 'Terms & Conditions'),
+                _buildMenuItem('assets/icons/menu6.png', 'About freshbite',onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AboutUs(),
+                    ),
+                  );
+                },),
+                _buildMenuItem('assets/icons/menu7.png', 'FAQ',onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => FrequentlyAskQuestion(),
+                    ),
+                  );
+                },),
+                _buildMenuItem('assets/icons/menu8.png', 'Privacy Policy',onTap: () {
+          Navigator.push(
+          context,
+          MaterialPageRoute(
+          builder: (_) => PrivacyPolicy(),
+          ),
+          );
+          },),
+                _buildMenuItem('assets/icons/menu9.png', 'Terms & Conditions',onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TermsConditions(),
+                    ),
+                  );
+                },),
 
                 SizedBox(height: 16.h),
 
-                _buildMenuItem(Icons.logout, 'Sign Out', isLogout: true),
+                _buildMenuItem('assets/icons/menu10.png', 'Sign Out', isLogout: true),
               ],
             ),
           ),
@@ -215,7 +273,7 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
 
 
   Widget _buildMenuItem(
-      IconData icon,
+      dynamic icon, // Changed from IconData to dynamic
       String title, {
         bool hasArrow = false,
         bool isLogout = false,
@@ -232,10 +290,22 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
         padding: EdgeInsets.symmetric(vertical: 12.h),
         child: Row(
           children: [
-            Icon(
-              icon,
-              size: 20.sp,
-              color: isLogout ? Colors.red : Colors.black,
+            // Handle both Image assets and IconData
+            SizedBox(
+              width: 20.w,
+              height: 20.h,
+              child: icon is String
+                  ? Image.asset(
+                icon,
+                width: 20.w,
+                height: 20.h,
+                color: isLogout ? Colors.red : Colors.black,
+              )
+                  : Icon(
+                icon as IconData,
+                size: 20.sp,
+                color: isLogout ? Colors.red : Colors.black,
+              ),
             ),
             SizedBox(width: 16.w),
             Expanded(

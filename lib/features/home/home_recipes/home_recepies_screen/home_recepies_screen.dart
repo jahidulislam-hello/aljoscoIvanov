@@ -135,6 +135,7 @@ class HomeScreen extends StatelessWidget {
               ),
               SizedBox(height: 16.h),
 
+
               // Search bar
               Row(
                 children: [
@@ -194,19 +195,19 @@ class HomeScreen extends StatelessWidget {
                       width: 36.w,
                       height: 36.h,
                       decoration: BoxDecoration(
-                        color: Colors.black,
+                        color: AppColors.buttonColor,
                         borderRadius: BorderRadius.circular(5.r),
                       ),
                       child: Center(
-                        child: Icon(
-                          Icons.tune,
+                        child: Image.asset(
+                          AppImages.filter,
+                          width: 24.w,
+                          height: 24.h,
                           color: AppColors.pureWhite,
-                          size: 24.sp,
                         ),
                       ),
                     ),
                   ),
-
                 ],
               ),
               SizedBox(height: 20.h),
@@ -221,65 +222,99 @@ class HomeScreen extends StatelessWidget {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Featured recipe card
-                    if (controller.featuredRecipe.value != null)
-                      Builder(builder: (context) {
-                        final item = controller.featuredRecipe.value!;
-                        return Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16.r),
-                                color: AppColors.pureWhite,
-                              ),
-                              padding: EdgeInsets.all(12.w),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(item.category,
-                                            style: AppTextStyles.bodySmall.copyWith(
-                                                color: AppColors.mainTextColor)),
-                                        SizedBox(height: 4.h),
-                                        Text(item.title,
-                                            style: AppTextStyles.HeadBold.copyWith(
-                                                color: AppColors.mainTextColor)),
-                                        SizedBox(height: 6.h),
-                                        Text(item.description,
-                                            softWrap: true,
-                                            overflow: TextOverflow.visible,
-                                            style: AppTextStyles.bodySmall.copyWith(
-                                                color: AppColors.mainTextColor,
-                                                height: 1.4)),
-                                      ],
-                                    ),
+                    // Featured recipe carousel with auto-swipe
+                    if (controller.featuredRecipes.isNotEmpty)
+                      Column(
+                        children: [
+                          SizedBox(
+                            height: 160.h,
+                            child: PageView.builder(
+                              controller: controller.featuredPageController,
+                              onPageChanged: controller.onFeaturedPageChanged,
+                              itemCount: controller.featuredRecipes.length,
+                              itemBuilder: (context, index) {
+                                final item = controller.featuredRecipes[index];
+                                return Padding(
+                                  padding: EdgeInsets.only(bottom: 20.h),
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      Container(
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(16.r),
+                                          color: AppColors.pureWhite,
+                                        ),
+                                        padding: EdgeInsets.all(12.w),
+                                        child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(item.category,
+                                                      style: AppTextStyles.bodySmall.copyWith(
+                                                          color: AppColors.mainTextColor)),
+                                                  SizedBox(height: 4.h),
+                                                  Text(item.title,
+                                                      style: AppTextStyles.HeadBold.copyWith(
+                                                          color: AppColors.mainTextColor)),
+                                                  SizedBox(height: 6.h),
+                                                  Text(item.description,
+                                                      softWrap: true,
+                                                      overflow: TextOverflow.visible,
+                                                      style: AppTextStyles.bodySmall.copyWith(
+                                                          color: AppColors.mainTextColor,
+                                                          height: 1.4)),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(width: 10.w),
+                                            SizedBox(width: 100.w),
+                                          ],
+                                        ),
+                                      ),
+                                      Positioned(
+                                        right: 2.w,
+                                        bottom: -20.h,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(12.r),
+                                          child: _buildImage(
+                                            item.image,
+                                            width: 140.w,
+                                            height: 150.h,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(width: 10.w),
-                                  SizedBox(width: 100.w),
-                                ],
-                              ),
+                                );
+                              },
                             ),
-                            Positioned(
-                              right: 2.w,
-                              bottom: -20.h,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12.r),
-                                child: _buildImage(
-                                  item.image,
-                                  width: 140.w,
-                                  height: 150.h,
-                                  fit: BoxFit.cover,
+                          ),
+                          // Page indicator dots
+                          Obx(() => Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: List.generate(
+                              controller.featuredRecipes.length,
+                              (index) => AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                width: controller.currentFeaturedIndex.value == index ? 20.w : 8.w,
+                                height: 8.h,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4.r),
+                                  color: controller.currentFeaturedIndex.value == index
+                                      ? AppColors.buttonColor
+                                      : AppColors.mainTextColor.withOpacity(0.3),
                                 ),
                               ),
                             ),
-                          ],
-                        );
-                      }),
+                          )),
+                        ],
+                      ),
 
                     SizedBox(height: 20.h),
 

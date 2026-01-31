@@ -20,9 +20,9 @@ class SubscriptionScreen extends StatelessWidget{
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight ),
+        preferredSize: Size.fromHeight(kToolbarHeight),
         child: Padding(
-          padding: EdgeInsets.only(top: 20.h),
+          padding: EdgeInsets.only(top: 40.h),
           child: CustomAppBar(
             title: "Subscription",
             height: kToolbarHeight,

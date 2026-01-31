@@ -12,8 +12,10 @@ class HomeController extends GetxController {
   var userName = 'User'.obs;
   var userProfileImage = ''.obs;
 
-  // Featured recipe (static Poutine card)
-  var featuredRecipe = Rx<HomeRecepieModel?>(null);
+  // Featured recipes list for carousel
+  var featuredRecipes = <HomeRecepieModel>[].obs;
+  var currentFeaturedIndex = 0.obs;
+  PageController? featuredPageController;
 
   // API recipes for "Let's cook!" section
   var recipes = <HomeRecepieModel>[].obs;
@@ -33,11 +35,14 @@ class HomeController extends GetxController {
   var searchLimit = 10.obs;
   var totalSearchResults = 0.obs;
   Timer? _debounceTimer;
+  Timer? _autoSwipeTimer;
 
   @override
   void onInit() {
     super.onInit();
+    featuredPageController = PageController();
     setFeaturedRecipe(); // Set static data immediately
+    _startAutoSwipe(); // Start auto-swipe for featured cards
     _fetchAllData(); // Fetch all data in parallel
 
     // Listen to search text changes with debounce
@@ -47,9 +52,30 @@ class HomeController extends GetxController {
   @override
   void onClose() {
     _debounceTimer?.cancel();
+    _autoSwipeTimer?.cancel();
+    featuredPageController?.dispose();
     searchController.removeListener(_onSearchChanged);
     searchController.dispose();
     super.onClose();
+  }
+
+  /// Start auto-swipe timer for featured recipes
+  void _startAutoSwipe() {
+    _autoSwipeTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      if (featuredRecipes.isNotEmpty && featuredPageController != null) {
+        int nextIndex = (currentFeaturedIndex.value + 1) % featuredRecipes.length;
+        featuredPageController!.animateToPage(
+          nextIndex,
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  /// Update current featured index when page changes
+  void onFeaturedPageChanged(int index) {
+    currentFeaturedIndex.value = index;
   }
 
   /// Debounced search listener
@@ -201,15 +227,24 @@ class HomeController extends GetxController {
     }
   }
 
-  // Set static featured recipe (Poutine)
+  // Set static featured recipes for carousel
   void setFeaturedRecipe() {
-    featuredRecipe.value = HomeRecepieModel(
-      title: "Poutine",
-      category: "Newly added",
-      image: AppImages.poutine,
-      description:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum.",
-    );
+    featuredRecipes.value = [
+      HomeRecepieModel(
+        title: "Poutine",
+        category: "Newly added",
+        image: AppImages.poutine,
+        description:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum.",
+      ),
+      HomeRecepieModel(
+        title: "Sasuka",
+        category: "Newly added",
+        image: AppImages.herbss,
+        description:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+      ),
+    ];
   }
 
   Future<void> fetchRecipes() async {

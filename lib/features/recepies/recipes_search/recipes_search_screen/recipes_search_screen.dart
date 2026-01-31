@@ -5,6 +5,7 @@ import 'package:freshbite/core/appbar/custom_appbar.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
+import 'package:freshbite/features/home/search_filter/search_filter_screen/search_filter_screen.dart';
 import 'package:freshbite/features/recepies/create_recipes/create_recipes_screen/create_recipes_screen.dart';
 import 'package:freshbite/features/recepies/recipes_details/recipes_details_screen/recipes_details_screen.dart';
 import 'package:freshbite/features/recepies/recipes_details/recipes_details_controller/recipes_details_controller.dart';
@@ -187,19 +188,24 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
           ),
         ),
         SizedBox(width: 10.w),
-        Container(
-          width: 36.w,
-          height: 36.h,
-          decoration: BoxDecoration(
-            color: AppColors.buttonColor,
-            borderRadius: BorderRadius.circular(5.r),
-          ),
-          child: Center(
-            child: Image.asset(
-              AppImages.filter,
-              width: 24.w,
-              height: 24.h,
-              color: AppColors.pureWhite,
+        GestureDetector(
+          onTap: () {
+            Get.to(() => SearchFilterScreen());
+          },
+          child: Container(
+            width: 36.w,
+            height: 36.h,
+            decoration: BoxDecoration(
+              color: AppColors.buttonColor,
+              borderRadius: BorderRadius.circular(5.r),
+            ),
+            child: Center(
+              child: Image.asset(
+                AppImages.filter,
+                width: 24.w,
+                height: 24.h,
+                color: AppColors.pureWhite,
+              ),
             ),
           ),
         ),
