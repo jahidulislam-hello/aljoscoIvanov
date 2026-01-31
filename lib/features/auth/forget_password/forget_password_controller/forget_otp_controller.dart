@@ -13,6 +13,14 @@ class ForgotPasswordOtpController extends GetxController {
   var isLoading = false.obs;
   Timer? _timer;
 
+  // Error message observable for user-friendly feedback
+  RxString otpError = ''.obs;
+
+  // Clear errors
+  void clearErrors() {
+    otpError.value = '';
+  }
+
   // Constructor to accept email and token
   ForgotPasswordOtpController({String? userEmail, String? token}) {
     if (userEmail != null) email.value = userEmail;
@@ -54,8 +62,10 @@ class ForgotPasswordOtpController extends GetxController {
 
   /// Verify OTP API
   Future<void> verifyOtp() async {
+    clearErrors();
+
     if (!isOtpComplete()) {
-      print("❌ Please enter complete OTP");
+      otpError.value = 'Please enter the complete 6-digit code';
       return;
     }
 
@@ -98,9 +108,21 @@ class ForgotPasswordOtpController extends GetxController {
       } else {
         final errorMessage = responseData["message"] ?? "Invalid OTP.";
         print("❌ OTP verification failed: $errorMessage");
+
+        // Show user-friendly error based on backend response
+        if (errorMessage.toLowerCase().contains('invalid') ||
+            errorMessage.toLowerCase().contains('incorrect') ||
+            errorMessage.toLowerCase().contains('wrong')) {
+          otpError.value = 'Invalid code. Please check and try again.';
+        } else if (errorMessage.toLowerCase().contains('expired')) {
+          otpError.value = 'Code has expired. Please request a new one.';
+        } else {
+          otpError.value = 'Verification failed. Please try again.';
+        }
       }
     } catch (e) {
       print("❌ Verify OTP error: $e");
+      otpError.value = 'Unable to connect. Please check your internet connection.';
     } finally {
       isLoading.value = false;
     }
@@ -108,8 +130,10 @@ class ForgotPasswordOtpController extends GetxController {
 
   /// Resend OTP by calling forget-password API again
   Future<void> resendCode() async {
+    clearErrors();
+
     if (email.value.isEmpty) {
-      print("❌ Email not found");
+      otpError.value = 'Email not found. Please go back and try again.';
       return;
     }
 
@@ -141,9 +165,11 @@ class ForgotPasswordOtpController extends GetxController {
       } else {
         final errorMessage = responseData["message"] ?? "Failed to resend OTP.";
         print("❌ Resend OTP failed: $errorMessage");
+        otpError.value = 'Failed to resend code. Please try again.';
       }
     } catch (e) {
       print("❌ Resend OTP error: $e");
+      otpError.value = 'Unable to connect. Please check your internet connection.';
     } finally {
       isLoading.value = false;
     }

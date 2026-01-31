@@ -44,6 +44,7 @@ class CustomTextField extends StatefulWidget {
   final Color? cursorColor;
   final bool? showFocusedBorder;
   final VoidCallback? onTap;
+  final String? errorText;
 
   const CustomTextField({
     super.key,
@@ -83,6 +84,7 @@ class CustomTextField extends StatefulWidget {
     this.dropdownHintTextColor,
     this.cursorColor,
     this.onTap,
+    this.errorText,
   });
 
   @override
@@ -144,56 +146,74 @@ class _CustomTextFieldState extends State<CustomTextField> {
       );
     }
 
-    return TextFormField(
-      controller: widget.controller,
-      autofocus: widget.autofocus,
-      focusNode: widget.focusNode,
-      enabled: widget.isEnabled,
-      readOnly: widget.readOnly,
-      onTap: widget.onTap,
-      onChanged: widget.isEnabled && !widget.readOnly ? widget.onChanged : null, // Updated
-      onSaved: widget.onSaved,
-      cursorColor: widget.cursorColor ?? AppColors. mainTextColor,
-      onFieldSubmitted: widget.onFieldSubmitted,
-      validator: (value) {
-        final customError = widget.validator?.call(value);
-        if (customError != null) return customError;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextFormField(
+          controller: widget.controller,
+          autofocus: widget.autofocus,
+          focusNode: widget.focusNode,
+          enabled: widget.isEnabled,
+          readOnly: widget.readOnly,
+          onTap: widget.onTap,
+          onChanged: widget.isEnabled && !widget.readOnly ? widget.onChanged : null, // Updated
+          onSaved: widget.onSaved,
+          cursorColor: widget.cursorColor ?? AppColors. mainTextColor,
+          onFieldSubmitted: widget.onFieldSubmitted,
+          validator: (value) {
+            final customError = widget.validator?.call(value);
+            if (customError != null) return customError;
 
-        if (widget.keyboardType == 'email') {
-          const emailRegex = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
-          final allowedDomains = [
-            'gmail.com',
-            'yahoo.com',
-            'outlook.com',
-            'icloud.com',
-            'hotmail.com',
-            'live.com',
-            'protonmail.com'
-          ];
+            if (widget.keyboardType == 'email') {
+              const emailRegex = r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$';
+              final allowedDomains = [
+                'gmail.com',
+                'yahoo.com',
+                'outlook.com',
+                'icloud.com',
+                'hotmail.com',
+                'live.com',
+                'protonmail.com'
+              ];
 
-          if (value == null || value.trim().isEmpty) {
-            return 'Email is required';
-          } else if (!RegExp(emailRegex).hasMatch(value.trim())) {
-            return 'Enter a valid email address';
-          } else {
-            final domain = value.trim().split('@').last.toLowerCase();
-            if (!allowedDomains.contains(domain)) {
-              return 'Please use a valid email provider (e.g. gmail.com)';
+              if (value == null || value.trim().isEmpty) {
+                return 'Email is required';
+              } else if (!RegExp(emailRegex).hasMatch(value.trim())) {
+                return 'Enter a valid email address';
+              } else {
+                final domain = value.trim().split('@').last.toLowerCase();
+                if (!allowedDomains.contains(domain)) {
+                  return 'Please use a valid email provider (e.g. gmail.com)';
+                }
+              }
+              return null;
             }
-          }
-          return null;
-        }
 
-        return null;
-      },
-      maxLength: widget.maxlength,
-      obscureText: _isPasswordField ? _obscureText : false,
-      keyboardType: _getKeyboardType(widget.keyboardType),
-      minLines: widget.keyboardType == 'multiline' ? 5 : 1,
-      maxLines: widget.keyboardType == 'multiline' ? null : 1,
-      decoration: _inputDecoration(context),
-      style: AppTextStyles.buttonRegular,
-
+            return null;
+          },
+          maxLength: widget.maxlength,
+          obscureText: _isPasswordField ? _obscureText : false,
+          keyboardType: _getKeyboardType(widget.keyboardType),
+          minLines: widget.keyboardType == 'multiline' ? 5 : 1,
+          maxLines: widget.keyboardType == 'multiline' ? null : 1,
+          decoration: _inputDecoration(context),
+          style: AppTextStyles.buttonRegular,
+        ),
+        // Error text display
+        if (widget.errorText != null && widget.errorText!.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.only(left: 12.w, top: 6.h),
+            child: Text(
+              widget.errorText!,
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ),
+      ],
     );
   }
 

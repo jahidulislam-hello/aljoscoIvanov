@@ -82,6 +82,7 @@ class ResetPasswordScreen extends StatelessWidget {
                      ? AppImages.passwordOff
                      : AppImages.passwordOff,
                  onTapSuffix: controller.toggleNewPasswordVisibility,
+                 errorText: controller.newPasswordError.value,
                )),
 
                SizedBox(height: size.height * 0.025), // ✅ fixed
@@ -96,6 +97,7 @@ class ResetPasswordScreen extends StatelessWidget {
                      ? AppImages.passwordOff
                      : AppImages.passwordOff,
                  onTapSuffix: controller.toggleConfirmPasswordVisibility,
+                 errorText: controller.confirmPasswordError.value,
                )),
 
                const Spacer(),

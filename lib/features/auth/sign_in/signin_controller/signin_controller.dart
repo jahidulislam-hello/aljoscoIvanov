@@ -13,12 +13,44 @@ class LoginController extends GetxController {
   RxBool isEmailValid = false.obs;
   RxBool isLoading = false.obs;
 
+  // Error message observables for user-friendly feedback
+  RxString emailError = ''.obs;
+  RxString passwordError = ''.obs;
+
+  // Clear all errors
+  void clearErrors() {
+    emailError.value = '';
+    passwordError.value = '';
+  }
+
+  // Validate email format
+  bool _isValidEmail(String email) {
+    return RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
+  }
 
   Future<void> login() async {
+    clearErrors();
+
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
+    // Validate email
+    if (email.isEmpty) {
+      emailError.value = 'Please enter your email address';
+      return;
+    }
+    if (!_isValidEmail(email)) {
+      emailError.value = 'Please enter a valid email address';
+      return;
+    }
+
+    // Validate password
+    if (password.isEmpty) {
+      passwordError.value = 'Please enter your password';
+      return;
+    }
+    if (password.length < 6) {
+      passwordError.value = 'Password must be at least 6 characters';
       return;
     }
 
@@ -61,13 +93,25 @@ class LoginController extends GetxController {
         // ✅ Navigate to home
         Get.offAll(() => BottomNavbar());
       } else {
-        final errorMessage =
-            responseData["message"] ?? "Invalid email or password.";
+        final errorMessage = responseData["message"] ?? "Invalid email or password.";
         print("❌ Login failed: $errorMessage");
+
+        // Show user-friendly error based on backend response
+        if (errorMessage.toLowerCase().contains('email') ||
+            errorMessage.toLowerCase().contains('user not found') ||
+            errorMessage.toLowerCase().contains('not exist')) {
+          emailError.value = 'No account found with this email. Please check or sign up.';
+        } else if (errorMessage.toLowerCase().contains('password') ||
+                   errorMessage.toLowerCase().contains('incorrect') ||
+                   errorMessage.toLowerCase().contains('invalid')) {
+          passwordError.value = 'Incorrect password. Please try again.';
+        } else {
+          passwordError.value = 'Login failed. Please check your credentials and try again.';
+        }
       }
     } catch (e) {
       print("❌ Login error: $e");
-
+      passwordError.value = 'Unable to connect. Please check your internet connection.';
     } finally {
       isLoading.value = false;
     }
