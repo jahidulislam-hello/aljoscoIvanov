@@ -4,6 +4,46 @@ class AppTranslations extends Translations {
   @override
   Map<String, Map<String, String>> get keys => {
     'en_US': {
+
+
+      //fOR Full English Calender
+
+      'January': 'January',
+      'February': 'February',
+      'March': 'March',
+      'April ': 'April ',
+      'May': 'May',
+      'June': 'June',
+      'July': 'July',
+      'August': 'August',
+      'September': 'September',
+      'October ': 'October ',
+      'November': 'November',
+      'December': 'December',
+
+
+      //fOR Abbr English Calender
+
+      'Jan': 'Jan',
+      'Feb': 'Feb',
+      'Mar': 'Mar',
+      'Apr': 'Apr',
+      'May': 'May',
+      'Jun': 'Jun',
+      'Jul': 'Jul',
+      'Aug': 'Aug',
+      'Sep': 'Sep',
+      'Oct': 'Oct',
+      'Nov': 'Nov',
+      'Dec': 'Dec',
+
+
+
+
+
+
+
+
       'language_title': 'Language',
       'LOGIN': 'Login',
       'SIGN UP': 'Sign Up',
@@ -413,6 +453,51 @@ class AppTranslations extends Translations {
 
     },
     'de_DE': {
+
+
+      //fOR Full German Calender
+
+      'January': 'Januar',
+      'February': 'Februar',
+      'March': 'März',
+      'April ': 'April',
+      'May': 'Mai',
+      'June': 'Juni',
+      'July': 'Juli',
+      'August': 'August',
+      'September': 'September',
+      'October ': 'Oktober',
+      'November': 'November',
+      'December': 'Dezember',
+
+
+      //fOR Abbr German Calender
+
+      'Jan': 'Jan ',
+      'Feb': 'Feb',
+      'Mar': 'Mär',
+      'Apr': 'Apr',
+      'May': 'Mai',
+      'Jun': 'Jun',
+      'Jul': 'Jul',
+      'Aug': 'Aug',
+      'Sep': 'Sep',
+      'Oct': 'Okt',
+      'Nov': 'Nov',
+      'Dec': 'Dez',
+
+
+
+
+
+
+
+
+
+
+
+
+
       'language_title': 'Sprache',
       'LOGIN': 'Anmelden',
       'SIGN UP': 'Registrieren',
@@ -422,6 +507,7 @@ class AppTranslations extends Translations {
       'Log in to start cooking!': 'Anmelden und loslegen!',
       'Create your account to get started': 'Create your account to get started',
       'Full Name': 'Full Name',
+
       'Email': 'Email',
       'Phone Number': 'Phone Number',
       'Create Password': 'Create Password',

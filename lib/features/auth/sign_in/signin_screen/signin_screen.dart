@@ -87,21 +87,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
             /// Email Field
-            CustomTextField(
+            Obx(() => CustomTextField(
               controller: _controller.emailController,
               hintText: "Email",
               keyboardType: "email",
-
-            ),
+              errorText: _controller.emailError.value,
+            )),
             const SizedBox(height: 16),
 
             /// Password Field
-            CustomTextField(
+            Obx(() => CustomTextField(
               controller: _controller.passwordController,
               hintText: "Password",
               keyboardType: "visiblePassword",
-
-            ),
+              errorText: _controller.passwordError.value,
+            )),
             const SizedBox(height: 16),
 
             /// Remember Me + Forgot Password

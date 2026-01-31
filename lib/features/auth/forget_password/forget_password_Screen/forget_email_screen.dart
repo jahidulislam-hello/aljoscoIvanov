@@ -85,10 +85,11 @@ class ForgotPasswordScreen extends StatelessWidget {
                     const SizedBox(height: 32),
 
                     /// Email input
-                    CustomTextField(
+                    Obx(() => CustomTextField(
                       controller: controller.emailController,
                       hintText: "Email",
                       keyboardType: 'email',
+                      errorText: controller.emailError.value,
                       prefixSvg: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: SvgPicture.asset(
@@ -98,7 +99,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                           color: Colors.grey,
                         ),
                       ),
-                    ),
+                    )),
 
                     const SizedBox(height: 24),
 

@@ -124,7 +124,24 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 8),
+
+              /// OTP Error message
+              Obx(() => controller.otpError.value.isNotEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        controller.otpError.value,
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontSize: 13,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : const SizedBox.shrink()),
+
+              const SizedBox(height: 16),
 
               /// Resend OTP section
               Align(

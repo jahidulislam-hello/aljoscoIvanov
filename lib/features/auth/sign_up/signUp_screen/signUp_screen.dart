@@ -44,27 +44,29 @@ class SignUpScreen extends StatelessWidget {
               Column(
                 children: [
                   /// Name
-                  CustomTextField(
+                  Obx(() => CustomTextField(
                     controller: controller.nameController,
                     hintText: "Name",
-                  ),
+                    errorText: controller.nameError.value,
+                  )),
                   const SizedBox(height: 16),
 
                   /// Email
-                  CustomTextField(
+                  Obx(() => CustomTextField(
                     controller: controller.emailController,
                     hintText: "Email",
                     keyboardType: "email",
-                  ),
+                    errorText: controller.emailError.value,
+                  )),
                   const SizedBox(height: 16),
 
                   /// Phone
-                  CustomTextField(
+                  Obx(() => CustomTextField(
                     controller: controller.phoneController,
                     hintText: "Phone Number",
                     keyboardType: "phone",
-
-                  ),
+                    errorText: controller.phoneError.value,
+                  )),
                   const SizedBox(height: 16),
 
 
@@ -74,11 +76,11 @@ class SignUpScreen extends StatelessWidget {
                       controller: controller.passwordController,
                       hintText: "Password",
                       keyboardType: "visiblePassword",
-
                       suffixSvg: controller.isPasswordHidden.value
                           ? AppImages.passwordOn
                           : AppImages.passwordOff,
                       readOnly: false,
+                      errorText: controller.passwordError.value,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -89,11 +91,11 @@ class SignUpScreen extends StatelessWidget {
                       controller: controller.confirmPasswordController,
                       hintText: "Confirm Password",
                       keyboardType: "visiblePassword",
-
                       suffixSvg: controller.isPasswordHidden.value
                           ? AppImages.passwordOn
                           : AppImages.passwordOff,
                       readOnly: false,
+                      errorText: controller.confirmPasswordError.value,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -104,28 +106,44 @@ class SignUpScreen extends StatelessWidget {
                       unselectedWidgetColor: Colors.black, // border visible on black bg
                     ),
                     child: Obx(
-                          () => CheckboxListTile(
-                        value: controller.isTermsAccepted.value,
-                        onChanged: controller.toggleTerms,
-                        controlAffinity: ListTileControlAffinity.leading,
-                        contentPadding: const EdgeInsets.all(0),
-                        checkboxShape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        activeColor: AppColors.borderSecondary,
-                        checkColor: Colors.white,
-                        title: RichText(
-                          text: const TextSpan(
-                            style: TextStyle(color: AppColors.defaultTextColor, fontSize: 14),
-                            children: [
-                              TextSpan(text: "By creating an account, I accept the", ),
-                              TextSpan(
-                                text: "Terms & Conditions and Privacy Policy.",
-                                style: TextStyle(color: AppColors.mainTextColor),
+                          () => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CheckboxListTile(
+                            value: controller.isTermsAccepted.value,
+                            onChanged: controller.toggleTerms,
+                            controlAffinity: ListTileControlAffinity.leading,
+                            contentPadding: const EdgeInsets.all(0),
+                            checkboxShape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            activeColor: AppColors.borderSecondary,
+                            checkColor: Colors.white,
+                            title: RichText(
+                              text: const TextSpan(
+                                style: TextStyle(color: AppColors.defaultTextColor, fontSize: 14),
+                                children: [
+                                  TextSpan(text: "By creating an account, I accept the", ),
+                                  TextSpan(
+                                    text: "Terms & Conditions and Privacy Policy.",
+                                    style: TextStyle(color: AppColors.mainTextColor),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
+                          if (controller.termsError.value.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 12),
+                              child: Text(
+                                controller.termsError.value,
+                                style: const TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ),

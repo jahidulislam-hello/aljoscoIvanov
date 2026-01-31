@@ -19,46 +19,109 @@ class SignUpController extends GetxController {
   var isTermsAccepted = false.obs;
   var isLoading = false.obs;
 
+  // Error message observables for user-friendly feedback
+  RxString nameError = ''.obs;
+  RxString emailError = ''.obs;
+  RxString phoneError = ''.obs;
+  RxString passwordError = ''.obs;
+  RxString confirmPasswordError = ''.obs;
+  RxString termsError = ''.obs;
+
+  // Clear all errors
+  void clearErrors() {
+    nameError.value = '';
+    emailError.value = '';
+    phoneError.value = '';
+    passwordError.value = '';
+    confirmPasswordError.value = '';
+    termsError.value = '';
+  }
+
+  // Validate email format
+  bool _isValidEmail(String email) {
+    return RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
+  }
+
+  // Validate phone number
+  bool _isValidPhone(String phone) {
+    return RegExp(r"^[0-9]{10,15}$").hasMatch(phone);
+  }
+
   void toggleTerms(bool? value) {
     isTermsAccepted.value = value ?? false;
+    if (isTermsAccepted.value) {
+      termsError.value = '';
+    }
   }
 
   void togglePasswordVisibility() {
     isPasswordHidden.value = !isPasswordHidden.value;
   }
 
-
-
-
   /// 🚀 Register API
   Future<void> registerUser() async {
+    clearErrors();
+
     final name = nameController.text.trim();
     final email = emailController.text.trim();
     final phone = phoneController.text.trim();
     final password = passwordController.text.trim();
     final confirmPassword = confirmPasswordController.text.trim();
 
-    // Validate all fields
-    if (name.isEmpty ||
-        email.isEmpty ||
-        phone.isEmpty ||
-        password.isEmpty ||
-        confirmPassword.isEmpty) {
-      print("❌ All fields are required");
-      return;
+    bool hasError = false;
+
+    // Validate name
+    if (name.isEmpty) {
+      nameError.value = 'Please enter your full name';
+      hasError = true;
+    } else if (name.length < 2) {
+      nameError.value = 'Name must be at least 2 characters';
+      hasError = true;
     }
 
-    // Validate password match
-    if (password != confirmPassword) {
-      print("❌ Password and Confirm Password do not match");
-      return;
+    // Validate email
+    if (email.isEmpty) {
+      emailError.value = 'Please enter your email address';
+      hasError = true;
+    } else if (!_isValidEmail(email)) {
+      emailError.value = 'Please enter a valid email address';
+      hasError = true;
+    }
+
+    // Validate phone
+    if (phone.isEmpty) {
+      phoneError.value = 'Please enter your phone number';
+      hasError = true;
+    } else if (!_isValidPhone(phone)) {
+      phoneError.value = 'Please enter a valid phone number (10-15 digits)';
+      hasError = true;
+    }
+
+    // Validate password
+    if (password.isEmpty) {
+      passwordError.value = 'Please create a password';
+      hasError = true;
+    } else if (password.length < 6) {
+      passwordError.value = 'Password must be at least 6 characters';
+      hasError = true;
+    }
+
+    // Validate confirm password
+    if (confirmPassword.isEmpty) {
+      confirmPasswordError.value = 'Please confirm your password';
+      hasError = true;
+    } else if (password != confirmPassword) {
+      confirmPasswordError.value = 'Passwords do not match. Please try again.';
+      hasError = true;
     }
 
     // Validate terms acceptance
     if (!isTermsAccepted.value) {
-      print("❌ Please accept terms and conditions");
-      return;
+      termsError.value = 'Please accept Terms & Conditions to continue';
+      hasError = true;
     }
+
+    if (hasError) return;
 
     isLoading.value = true;
 
@@ -103,9 +166,30 @@ class SignUpController extends GetxController {
       } else {
         final errorMessage = responseData["message"] ?? "Registration failed.";
         print("❌ Registration failed: $errorMessage");
+
+        // Show user-friendly error based on backend response
+        if (errorMessage.toLowerCase().contains('email') &&
+            (errorMessage.toLowerCase().contains('exist') ||
+             errorMessage.toLowerCase().contains('already') ||
+             errorMessage.toLowerCase().contains('taken'))) {
+          emailError.value = 'This email is already registered. Please use a different email or login.';
+        } else if (errorMessage.toLowerCase().contains('phone') &&
+                   (errorMessage.toLowerCase().contains('exist') ||
+                    errorMessage.toLowerCase().contains('already'))) {
+          phoneError.value = 'This phone number is already registered.';
+        } else if (errorMessage.toLowerCase().contains('password')) {
+          passwordError.value = errorMessage;
+        } else {
+          emailError.value = 'Registration failed. Please try again later.';
+        }
       }
     } catch (e) {
       print("❌ Register error: $e");
+      if (e.toString().contains('FormatException')) {
+        phoneError.value = 'Please enter a valid phone number (digits only)';
+      } else {
+        emailError.value = 'Unable to connect. Please check your internet connection.';
+      }
     } finally {
       isLoading.value = false;
     }

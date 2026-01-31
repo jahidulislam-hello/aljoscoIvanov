@@ -16,6 +16,16 @@ class ResetPasswordController extends GetxController {
   var verificationToken = '';
   var userId = '';
 
+  // Error message observables for user-friendly feedback
+  RxString newPasswordError = ''.obs;
+  RxString confirmPasswordError = ''.obs;
+
+  // Clear all errors
+  void clearErrors() {
+    newPasswordError.value = '';
+    confirmPasswordError.value = '';
+  }
+
   // Constructor to accept token and userId
   ResetPasswordController({String? token, String? uid}) {
     if (token != null) verificationToken = token;
@@ -39,21 +49,35 @@ class ResetPasswordController extends GetxController {
 
   /// Reset password API
   Future<void> resetPassword() async {
+    clearErrors();
+
     final newPass = newPasswordController.text.trim();
     final confirmPass = confirmPasswordController.text.trim();
 
-    if (newPass.isEmpty || confirmPass.isEmpty) {
-      print("❌ Please fill all fields");
-      return;
+    bool hasError = false;
+
+    // Validate new password
+    if (newPass.isEmpty) {
+      newPasswordError.value = 'Please enter a new password';
+      hasError = true;
+    } else if (newPass.length < 6) {
+      newPasswordError.value = 'Password must be at least 6 characters';
+      hasError = true;
     }
 
-    if (newPass != confirmPass) {
-      print("❌ Passwords do not match");
-      return;
+    // Validate confirm password
+    if (confirmPass.isEmpty) {
+      confirmPasswordError.value = 'Please confirm your new password';
+      hasError = true;
+    } else if (newPass != confirmPass) {
+      confirmPasswordError.value = 'Passwords do not match. Please try again.';
+      hasError = true;
     }
+
+    if (hasError) return;
 
     if (userId.isEmpty) {
-      print("❌ User ID not found");
+      newPasswordError.value = 'Session expired. Please start over.';
       return;
     }
 
@@ -88,9 +112,25 @@ class ResetPasswordController extends GetxController {
       } else {
         final errorMessage = responseData["message"] ?? "Failed to reset password.";
         print("❌ Reset password failed: $errorMessage");
+
+        // Show user-friendly error based on backend response
+        if (errorMessage.toLowerCase().contains('weak') ||
+            errorMessage.toLowerCase().contains('strength')) {
+          newPasswordError.value = 'Password is too weak. Please use a stronger password.';
+        } else if (errorMessage.toLowerCase().contains('same') ||
+                   errorMessage.toLowerCase().contains('previous')) {
+          newPasswordError.value = 'New password cannot be the same as your previous password.';
+        } else if (errorMessage.toLowerCase().contains('expired') ||
+                   errorMessage.toLowerCase().contains('session') ||
+                   errorMessage.toLowerCase().contains('token')) {
+          newPasswordError.value = 'Session expired. Please start the reset process again.';
+        } else {
+          newPasswordError.value = 'Failed to reset password. Please try again.';
+        }
       }
     } catch (e) {
       print("❌ Reset password error: $e");
+      newPasswordError.value = 'Unable to connect. Please check your internet connection.';
     } finally {
       isLoading.value = false;
     }
