@@ -25,12 +25,7 @@ class DeleteAccountScreen extends StatelessWidget {
             title: "Delete Account".tr,
             titleStyle: AppTextStyles.heading2,
             showShadow: false,
-            actionButtons: [
-              AppBarAction(
-                icon: Icons.settings_outlined,
-                onPressed: () => controller.openSettings(),
-              ),
-            ],
+
           ),
         ),
       ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/features/meal_planner/meal_planner_new/meal_planner_all_model/meal_planner_all_model.dart';
 
 // ============================================
@@ -77,10 +79,14 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: EdgeInsets.symmetric(horizontal: 20),
+      insetPadding: EdgeInsets.symmetric(horizontal: 12.w),
       child: Container(
+        width: MediaQuery.of(context).size.width * 0.95,
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.of(context).size.height * 0.7,
+        ),
         decoration: BoxDecoration(
-          color: Color(0xFFE8E8E8),
+          color: AppColors.background,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -90,14 +96,14 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
             Container(
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.background,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(16),
                   topRight: Radius.circular(16),
                 ),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: Column(
@@ -128,22 +134,22 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: Container(
-                      width: 32,
-                      height: 32,
+                      width: 32.w,
+                      height: 32.h,
                       decoration: BoxDecoration(
                         color: Color(0xFFFF5252),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.close, color: Colors.white, size: 18),
+                      child: Icon(Icons.close, color: Colors.white, size: 18.sp),
                     ),
                   ),
                 ],
               ),
             ),
 
-            // Content
-            Container(
-              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.7),
+                // Content
+                Container(
+                  constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.65),
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(16),
                 child: Column(
@@ -270,10 +276,11 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                     SizedBox(height: 24),
 
                     // Add to Meal Plan Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 48,
-                      child: ElevatedButton(
+                    Center(
+                      child: SizedBox(
+                        width: 230.w,
+                        height: 48.h,
+                        child: ElevatedButton(
                         onPressed: isLoading
                             ? null
                             : () async {
@@ -317,8 +324,8 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF2D4A2B),
-                          disabledBackgroundColor: Color(0xFF2D4A2B).withOpacity(0.5),
+                          backgroundColor: Color(0xFF1C2D07),
+                          disabledBackgroundColor: Color(0xFF1C2D07).withOpacity(0.5),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -345,6 +352,7 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                         ),
                       ),
                     ),
+                    ),
 
                     SizedBox(height: 16),
 
@@ -356,14 +364,14 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.delete_outline, color: Color(0xFFFF5252), size: 18),
+                          Icon(Icons.delete_outline, color: Color(0xFFFF5252), size: 20.sp),
                           SizedBox(width: 8),
                           Text(
                             'Delete this recipe from Meal Plan, Prep List and Shopping List',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFFFF5252),
+                              color: AppColors.mainTextColor,
                               fontFamily: 'Rubik',
                             ),
                           ),
