@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/core/widgets/custom_text_field.dart';
 import 'package:freshbite/features/auth/sign_in/signin_screen/signin_screen.dart';
@@ -76,10 +75,6 @@ class SignUpScreen extends StatelessWidget {
                       controller: controller.passwordController,
                       hintText: "Password",
                       keyboardType: "visiblePassword",
-                      suffixSvg: controller.isPasswordHidden.value
-                          ? AppImages.passwordOn
-                          : AppImages.passwordOff,
-                      readOnly: false,
                       errorText: controller.passwordError.value,
                     ),
                   ),
@@ -91,10 +86,6 @@ class SignUpScreen extends StatelessWidget {
                       controller: controller.confirmPasswordController,
                       hintText: "Confirm Password",
                       keyboardType: "visiblePassword",
-                      suffixSvg: controller.isPasswordHidden.value
-                          ? AppImages.passwordOn
-                          : AppImages.passwordOff,
-                      readOnly: false,
                       errorText: controller.confirmPasswordError.value,
                     ),
                   ),

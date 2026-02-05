@@ -77,11 +77,6 @@ class ResetPasswordScreen extends StatelessWidget {
                  controller: controller.newPasswordController,
                  hintText: "Set New Password",
                  keyboardType: "visiblePassword",
-                 prefixSvg: AppImages.imageIcon,
-                 suffixSvg: controller.isNewPasswordHidden.value
-                     ? AppImages.passwordOff
-                     : AppImages.passwordOff,
-                 onTapSuffix: controller.toggleNewPasswordVisibility,
                  errorText: controller.newPasswordError.value,
                )),
 
@@ -92,11 +87,6 @@ class ResetPasswordScreen extends StatelessWidget {
                  controller: controller.confirmPasswordController,
                  hintText: "Confirm New Password",
                  keyboardType: "visiblePassword",
-                 prefixSvg: AppImages.imageIcon,
-                 suffixSvg: controller.isConfirmPasswordHidden.value
-                     ? AppImages.passwordOff
-                     : AppImages.passwordOff,
-                 onTapSuffix: controller.toggleConfirmPasswordVisibility,
                  errorText: controller.confirmPasswordError.value,
                )),
 

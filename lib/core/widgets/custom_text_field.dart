@@ -245,9 +245,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       prefixIcon: _buildPrefixIcon(context),
       suffixIcon: _isPasswordField && !widget.readOnly // Don't show password toggle for readOnly fields
           ? IconButton(
-        icon: widget.suffixSvg != null && _obscureText
-            ? _buildSuffixIcon(context)!
-            : SvgPicture.asset(
+        icon: Image.asset(
           _obscureText ? AppImages.passwordOff : AppImages.passwordOn,
           height: 18.h,
           width: 18.w,

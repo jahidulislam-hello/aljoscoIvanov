@@ -68,6 +68,7 @@ class ChangePasswordScreen extends StatelessWidget {
                 CustomTextField(
                   controller: controller.fullNameController,
                   hintText: "Current password".tr,
+                  keyboardType: "visiblePassword",
                   isEnabled: controller.isEditing.value,
                 ),
 
@@ -82,6 +83,7 @@ class ChangePasswordScreen extends StatelessWidget {
                 CustomTextField(
                   controller: controller.phoneController,
                   hintText: "New password".tr,
+                  keyboardType: "visiblePassword",
                   isEnabled: controller.isEditing.value,
                 ),
 
@@ -95,6 +97,7 @@ class ChangePasswordScreen extends StatelessWidget {
                 CustomTextField(
                   controller: controller.emailController,
                   hintText: "Re-type new password".tr,
+                  keyboardType: "visiblePassword",
                   isEnabled: false,
                   readOnly: true,
                 ),
