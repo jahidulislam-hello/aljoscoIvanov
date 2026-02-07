@@ -12,6 +12,8 @@ import 'package:freshbite/features/home/terms_condition/frequently_ask_question.
 import 'package:freshbite/features/home/terms_condition/privacy_policy.dart';
 import 'package:freshbite/features/home/terms_condition/terms_conditions.dart';
 import 'package:freshbite/features/subscription/subscription_screen.dart';
+import 'package:freshbite/features/auth/sign_in/signin_screen/signin_screen.dart';
+import 'package:freshbite/core/utils/shared_preference_helper.dart';
 import 'package:get/get.dart';
 
 
@@ -260,7 +262,10 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
 
                 SizedBox(height: 16.h),
 
-                _buildMenuItem('assets/icons/menu10.png', 'Sign Out', isLogout: true),
+                _buildMenuItem('assets/icons/menu10.png', 'Sign Out', isLogout: true, onTap: () async {
+                  await SharedPreferencesHelper.clearAllData();
+                  Get.offAll(() => const LoginScreen());
+                }),
               ],
             ),
           ),
