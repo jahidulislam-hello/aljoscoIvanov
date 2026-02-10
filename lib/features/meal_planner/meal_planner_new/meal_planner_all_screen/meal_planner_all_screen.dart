@@ -789,8 +789,8 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                     top: 4.h,
                     right: 4.w,
                     child: Container(
-                      width: 18.w,
-                      height: 18.h,
+                      width: 16.w,
+                      height: 16.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
@@ -802,7 +802,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                           ),
                         ],
                       ),
-                      child: Icon(Icons.edit, size: 10, color: Color(0xFF757575)),
+                      child: Icon(Icons.edit, size: 16, color: Color(0xFF757575)),
                     ),
                   ),
                 ],
@@ -1253,40 +1253,65 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Recipe image
-              Container(
-                width: 100.w,
-                height: 72.h,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(8.r),
-                    topRight: Radius.circular(8.r),
-                  ),
-                  color: Color(0xFFE0E0E0),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(8.r),
-                    topRight: Radius.circular(8.r),
-                  ),
-                  child: recipeItem.recipeImage != null && recipeItem.recipeImage!.isNotEmpty
-                      ? Image.network(
-                          recipeItem.recipeImage!,
-                          fit: BoxFit.cover,
-                          width: 100.w,
-                          height: 72.h,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
+              // Recipe image with edit icon
+              Stack(
+                children: [
+                  Container(
+                    width: 100.w,
+                    height: 72.h,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(8.r),
+                        topRight: Radius.circular(8.r),
+                      ),
+                      color: Color(0xFFE0E0E0),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(8.r),
+                        topRight: Radius.circular(8.r),
+                      ),
+                      child: recipeItem.recipeImage != null && recipeItem.recipeImage!.isNotEmpty
+                          ? Image.network(
+                              recipeItem.recipeImage!,
+                              fit: BoxFit.cover,
+                              width: 100.w,
+                              height: 72.h,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Color(0xFFFF8C42),
+                                  child: Icon(Icons.restaurant, color: Colors.white, size: 28),
+                                );
+                              },
+                            )
+                          : Container(
                               color: Color(0xFFFF8C42),
                               child: Icon(Icons.restaurant, color: Colors.white, size: 28),
-                            );
-                          },
-                        )
-                      : Container(
-                          color: Color(0xFFFF8C42),
-                          child: Icon(Icons.restaurant, color: Colors.white, size: 28),
-                        ),
-                ),
+                            ),
+                    ),
+                  ),
+                  // Edit icon
+                  Positioned(
+                    top: 4.h,
+                    right: 4.w,
+                    child: Container(
+                      width: 16.w,
+                      height: 16.h,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(Icons.edit, size: 16, color: Color(0xFF757575)),
+                    ),
+                  ),
+                ],
               ),
               // Title and Servings
               Expanded(

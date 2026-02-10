@@ -27,7 +27,8 @@ class SkillsChip extends StatelessWidget {
         // Divider touching the full width
         Container(
           height: 1,
-          color: AppColors.rateborder, // or whatever thin line color you want
+          color: AppColors.rateborder, // or whatever thin
+          // line color you want
         ),
       ],
     );
