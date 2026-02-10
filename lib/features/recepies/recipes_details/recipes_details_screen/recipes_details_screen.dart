@@ -161,38 +161,50 @@ class _RecipesDetailsRecipeScreenState extends State<RecipesDetailsRecipeScreen>
                     ),
                     SizedBox(height: 12.h),
 
-                    /// Title + Rating
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          fit: FlexFit.loose,
-                          child: Text(
-                            recipeDetails.title,
-                            style: AppTextStyles.H4_Regular.copyWith(fontSize: 20.sp),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
-                          decoration: BoxDecoration(
-                            color: AppColors.pureWhite,
-                            borderRadius: BorderRadius.circular(8.r),
-                            border: Border.all(color: AppColors.rateborder),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.star, color: AppColors.buttonColor, size:18.sp),
-                              SizedBox(width: 4.w),
-                              Text(recipeDetails.rating.toStringAsFixed(1), style: AppTextStyles.labelBold),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
 
-                    SizedBox(height: 20.h),
+                  /// Title + Rating
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        fit: FlexFit.loose,
+                        child: Text(
+                          recipeDetails.title,
+                          style: AppTextStyles.medium18.copyWith(
+                            color: AppColors.green900, // full green-900
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+                        decoration: BoxDecoration(
+                          color: AppColors.greyUlt50, // pure white equivalent
+                          borderRadius: BorderRadius.circular(8.r),
+                          border: Border.all(color: AppColors.grey300),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.star,
+                              color: AppColors.green900,
+                              size: 18.sp,
+                            ),
+                            SizedBox(width: 4.w),
+                            Text(
+                              recipeDetails.rating.toStringAsFixed(1),
+                              style: AppTextStyles.medium14.copyWith(
+                                color: AppColors.green900,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 20.h),
 
                     // ==============================
                     // EXPANDABLE: DESCRIPTION
@@ -207,9 +219,8 @@ class _RecipesDetailsRecipeScreenState extends State<RecipesDetailsRecipeScreen>
                         padding: EdgeInsets.only(top: 10.h),
                         child: Text(
                           recipeDetails.description,
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.textSecondary,
-                            height: 1.6,
+                          style: AppTextStyles.regular14.copyWith(
+                            color: AppColors.grey400,
                           ),
                         ),
                       ),
@@ -502,7 +513,7 @@ class _RecipesDetailsRecipeScreenState extends State<RecipesDetailsRecipeScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: AppTextStyles.H3_Regular.copyWith(fontSize: 16.sp)),
+          Text(title, style: AppTextStyles.medium16.copyWith(color: AppColors.grey500)),
           Icon(
             expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
             color: AppColors.mainTextColor,

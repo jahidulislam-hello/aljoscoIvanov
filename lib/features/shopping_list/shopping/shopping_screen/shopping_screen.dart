@@ -344,7 +344,7 @@ class _ShoppingListTile extends StatelessWidget {
 
           SizedBox(width: 10.w),
 
-          /// --- Texts + Avatar + Tick ---
+          /// --- Texts ---
           Expanded(
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 10.h),
@@ -368,44 +368,55 @@ class _ShoppingListTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   SizedBox(height: 4.h),
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 10.r,
-                        backgroundColor: AppColors.primary.withOpacity(0.1),
-                        child: ClipOval(
-                          child: SvgPicture.asset(
-                            AppImages.profile,
-                            width: 20.r,
-                            height: 20.r,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 4.w),
-                      Expanded(
-                        child: Text(
-                          "created by ${item.coocker}, on ${item.getFormattedDate()}",
-                          style: AppTextStyles.caption.copyWith(
-                            fontSize: 10.sp,
-                            color: AppColors.textLight,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    "created by ${item.coocker}, on ${item.getFormattedDate()}",
+                    style: AppTextStyles.caption.copyWith(
+                      fontSize: 10.sp,
+                      color: AppColors.textLight,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
           ),
 
-          /// --- Tick button ---
+          /// --- Cooker Icon ---
+          Container(
+            width: 32.w,
+            height: 32.h,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30.r),
+              border: Border.all(
+                color: AppColors.border,
+                width: 0.5,
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(30.r),
+              child: SvgPicture.asset(
+                AppImages.profile,
+                width: 32.w,
+                height: 32.h,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+
+          /// --- Tick button with left border ---
           GestureDetector(
             onTap: onToggle,
             child: Container(
-              margin: EdgeInsets.only(right: 12.w),
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              decoration: BoxDecoration(
+                border: Border(
+                  left: BorderSide(
+                    color: AppColors.border,
+                    width: 0.5,
+                  ),
+                ),
+              ),
               child: Icon(
                 item.isDone ? Icons.check_circle : Icons.radio_button_unchecked,
                 color: AppColors.buttonColor,

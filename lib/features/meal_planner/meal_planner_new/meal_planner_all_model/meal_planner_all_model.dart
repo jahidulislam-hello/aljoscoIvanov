@@ -142,7 +142,7 @@ class PrepListRecipe {
   final String? recipeId;
   final String? recipeTitle;
   final String? recipeImage;
-  final bool isDone;
+  bool isDone;
 
   PrepListRecipe({
     this.recipeId,

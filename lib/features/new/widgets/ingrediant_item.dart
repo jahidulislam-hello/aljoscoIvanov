@@ -68,92 +68,113 @@ class IngredientItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (showServingsControls && servingsValue != null) ...[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Obx(() => Text(
-                "For ${servingsValue!.value} People",
-                style: AppTextStyles.HeadBold.copyWith(fontSize: 14.sp),
-              )),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 4.w),
-                decoration: BoxDecoration(
-                  color: AppColors.starYellow,
-                  borderRadius: BorderRadius.circular(36.r),
-                  border: Border.all(color: AppColors.grey),
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: decreaseServings,
-                      icon: const Icon(Icons.remove_circle_outline),
-                    ),
-                    Obx(() => Text(
-                      "${servingsValue!.value}",
-                      style: AppTextStyles.buttonText,
-                    )),
-                    IconButton(
-                      onPressed: increaseServings,
-                      icon: const Icon(Icons.add_circle_outline),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 20.h),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end, // align to the right
-            children: [
-              SizedBox(
-                width: 110.w, // fixed width
-                child: isMetricUnit != null
-                    ? Obx(() => DropdownButtonFormField<String>(
-                        value: isMetricUnit!.value ? "g/ml" : "Household",
-                        items: ["g/ml", "Household"]
-                            .map((e) => DropdownMenuItem(
-                                  value: e,
-                                  child: Text(e, textAlign: TextAlign.center),
-                                ))
-                            .toList(),
-                        onChanged: (val) {
-                          if (val != null && recipeDetailsController != null) {
-                            recipeDetailsController.toggleUnitMode(val == "g/ml");
-                          }
-                        },
-                        decoration: InputDecoration(
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
+
+          /// ================= SERVINGS HEADER =================
+          Container(
+            height: 50.h,
+            width: double.infinity,
+            color: Colors.white,
+            child: Column(
+              children: [
+
+                /// top border
+                const Divider(height: 1, thickness: 1, color: Color(0xFFACACAC)),
+
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+
+                      /// text
+                      Obx(() => Text(
+                        "For ${servingsValue!.value} Servings",
+                        style: AppTextStyles.HeadBold.copyWith(fontSize: 14.sp),
+                      )),
+
+                      /// buttons (UNCHANGED DESIGN)
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 3.w),
+                        decoration: BoxDecoration(
+                          color: AppColors.starYellow,
+                          borderRadius: BorderRadius.circular(30.r),
+                          border: Border.all(color: AppColors.grey),
                         ),
-                        isExpanded: true, // ensures text uses full width
-                      ))
-                    : DropdownButtonFormField<String>(
-                        value: "g/ml",
-                        items: ["g/ml", "Household"]
-                            .map((e) => DropdownMenuItem(
-                                  value: e,
-                                  child: Text(e, textAlign: TextAlign.center),
-                                ))
-                            .toList(),
-                        onChanged: (val) {},
-                        decoration: InputDecoration(
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              onPressed: decreaseServings,
+                              icon: const Icon(Icons.remove_circle_outline),
+                            ),
+                            Obx(() => Text(
+                              "${servingsValue!.value}",
+                              style: AppTextStyles.buttonText,
+                            )),
+                            IconButton(
+                              onPressed: increaseServings,
+                              icon: const Icon(Icons.add_circle_outline),
+                            ),
+                          ],
                         ),
-                        isExpanded: true,
                       ),
-              ),
-            ],
+                    ],
+                  ).paddingSymmetric(horizontal: 8.w),
+                ),
+
+                /// bottom border
+                const Divider(height: 1, thickness: 1, color: Color(0xFFACACAC)),
+              ],
+            ),
           ),
 
-          SizedBox(height: 25.h),
+          SizedBox(height: 10.h),
+
+          /// ================= UNIT DROPDOWN =================
+          Align(
+            alignment: Alignment.centerRight,
+            child: SizedBox(
+              width: 98.w,
+              height: 24.h,
+              child: isMetricUnit != null
+                  ? Obx(() => DropdownButtonFormField<String>(
+                value: isMetricUnit!.value ? "g/ml" : "Household",
+                items: ["g/ml", "Household"]
+                    .map((e) => DropdownMenuItem(
+                  value: e,
+                  child: Text(
+                    e,
+                    style: TextStyle(fontSize: 10.sp),
+                  ),
+                ))
+                    .toList(),
+                onChanged: (val) {
+                  if (val != null && recipeDetailsController != null) {
+                    recipeDetailsController.toggleUnitMode(val == "g/ml");
+                  }
+                },
+                icon: Icon(
+                  Icons.keyboard_arrow_down,
+                  size: 12,
+                  color: const Color(0xFF1F1F1F),
+                ),
+                decoration: InputDecoration(
+                  isDense: true,
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding:
+                  EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6.r),
+                    borderSide: const BorderSide(color: Color(0xFFACACAC)),
+                  ),
+                ),
+              ))
+                  : const SizedBox(),
+            ),
+          ),
+
+          SizedBox(height: 20.h),
         ],
+
         Divider(color: Color(0xFFACACAC), height: 2,),
         Padding(
           padding: EdgeInsets.symmetric(vertical: 12.h),

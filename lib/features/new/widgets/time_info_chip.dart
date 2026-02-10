@@ -18,7 +18,7 @@ class TimeInfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 2.h),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       decoration: BoxDecoration(
         color: AppColors.pureWhite,
         borderRadius: BorderRadius.circular(12.r),
@@ -32,14 +32,13 @@ class TimeInfoChip extends StatelessWidget {
             children: [
               Text(
                 'Total Time',
-                style: AppTextStyles.labelBold.copyWith(fontSize: 14.sp),
+                style: AppTextStyles.semi14.copyWith(color: AppColors.green900),
               ),
               SizedBox(height: 4.h),
               Text(
                 totalTime,
                 style: AppTextStyles.caption.copyWith(fontSize: 11.sp),
               ),
-              SizedBox(height: 20.h),
             ],
           ),
 
@@ -48,7 +47,7 @@ class TimeInfoChip extends StatelessWidget {
             children: [
               Text(
                 'Prep Time',
-                style: AppTextStyles.labelBold.copyWith(fontSize: 14.sp),
+                style: AppTextStyles.semi14.copyWith(color: AppColors.green900),
               ),
               SizedBox(height: 4.h),
               Text(
@@ -63,7 +62,7 @@ class TimeInfoChip extends StatelessWidget {
             children: [
               Text(
                 'Cook Time',
-                style: AppTextStyles.labelBold.copyWith(fontSize: 14.sp),
+                style: AppTextStyles.semi14.copyWith(color: AppColors.green900),
               ),
               SizedBox(height: 4.h),
               Text(

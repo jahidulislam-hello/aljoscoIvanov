@@ -1340,21 +1340,26 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
               child: Icon(Icons.person, color: Color(0xFF9E9E9E), size: 18),
             ),
             SizedBox(width: 16.w),
-            // Check icon (from API)
-            Container(
-              width: 24.w,
-              height: 24.h,
-              decoration: BoxDecoration(
-                color: isDone ? AppColors.buttonColor : Colors.transparent,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: isDone ? AppColors.buttonColor : Color(0xFFE0E0E0),
-                  width: 2,
+            // Check icon (clickable)
+            GestureDetector(
+              onTap: () {
+                _controller.togglePrepItemDone(index);
+              },
+              child: Container(
+                width: 24.w,
+                height: 24.h,
+                decoration: BoxDecoration(
+                  color: isDone ? AppColors.buttonColor : Colors.transparent,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: isDone ? AppColors.buttonColor : Color(0xFFE0E0E0),
+                    width: 2,
+                  ),
                 ),
+                child: isDone
+                    ? Icon(Icons.check, color: Colors.white, size: 18)
+                    : null,
               ),
-              child: isDone
-                  ? Icon(Icons.check, color: Colors.white, size: 18)
-                  : null,
             ),
           ],
         ),
