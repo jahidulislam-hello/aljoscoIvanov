@@ -497,6 +497,15 @@ class MealPlanController extends GetxController {
     prepListComments.add(comment);
   }
 
+  /// Toggle prep list item done state
+  void togglePrepItemDone(int index) {
+    if (prepListItems.isNotEmpty && index < prepListItems.first.recipes.length) {
+      prepListItems.first.recipes[index].isDone = !prepListItems.first.recipes[index].isDone;
+      prepListItems.refresh();
+      print("✅ Toggled prep item $index: isDone = ${prepListItems.first.recipes[index].isDone}");
+    }
+  }
+
   /// Check if a date has a meal plan
   bool dateHasMealPlan(String dateStr) {
     final normalizedDateStr = _toDateString(dateStr);

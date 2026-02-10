@@ -18,9 +18,8 @@ class SkillsChip extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: 8.h),
           child: Text(
             skills,
-            style: AppTextStyles.caption.copyWith(
-              color: AppColors.textSecondary,
-              fontSize: 12.sp,
+            style: AppTextStyles.regular14.copyWith(
+              color: AppColors.green500,
             ),
           ),
         ),

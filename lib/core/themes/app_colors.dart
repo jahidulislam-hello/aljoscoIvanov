@@ -48,6 +48,68 @@ class AppColors {
   static const Color success = Color(0xFF43A047);
   static const Color warning = Color(0xFFFB8C00);
 
+
+  /// ===============================
+  /// Green Palette
+  /// ===============================
+  static const Color green50  = Color(0xFFE8EAE6);
+  static const Color green100 = Color(0xFFB9BEB2);
+  static const Color green200 = Color(0xFF979E8D);
+  static const Color green300 = Color(0xFF677259);
+  static const Color green400 = Color(0xFF495739);
+  static const Color green500 = Color(0xFF1C2D07);
+  static const Color green600 = Color(0xFF192906);
+  static const Color green700 = Color(0xFF142005);
+  static const Color green800 = Color(0xFF0F1904);
+  static const Color green900 = Color(0xFF0C1303);
+
+  /// ===============================
+  /// Chartreuse Palette
+  /// ===============================
+  static const Color chartreuse50  = Color(0xFFF9FBED);
+  static const Color chartreuse100 = Color(0xFFECF3C6);
+  static const Color chartreuse200 = Color(0xFFE2EEAA);
+  static const Color chartreuse300 = Color(0xFFD5E684);
+  static const Color chartreuse400 = Color(0xFFCDE16C);
+  static const Color chartreuse500 = Color(0xFFC1D947);
+  static const Color chartreuse600 = Color(0xFFB0C541);
+  static const Color chartreuse700 = Color(0xFF899A32);
+  static const Color chartreuse800 = Color(0xFF6A7727);
+  static const Color chartreuse900 = Color(0xFF515B1E);
+
+  /// ===============================
+  /// Grey Palette
+  /// ===============================
+  static const Color grey50  = Color(0xFFEDEDED);
+  static const Color grey100 = Color(0xFFC7C7C7);
+  static const Color grey200 = Color(0xFFACACAC);
+  static const Color grey300 = Color(0xFF868686);
+  static const Color grey400 = Color(0xFF6E6E6E);
+  static const Color grey500 = Color(0xFF4A4A4A);
+  static const Color grey600 = Color(0xFF434343);
+  static const Color grey700 = Color(0xFF353535);
+  static const Color grey800 = Color(0xFF292929);
+  static const Color grey900 = Color(0xFF1F1F1F);
+
+  /// ===============================
+  /// Ultimate Grey Palette
+  /// ===============================
+  static const Color greyUlt50  = Color(0xFFFFFEFE);
+  static const Color greyUlt100 = Color(0xFFFDFDFC);
+  static const Color greyUlt200 = Color(0xFFFDFCFB);
+  static const Color greyUlt300 = Color(0xFFFCFBF9);
+  static const Color greyUlt400 = Color(0xFFFBFAF8);
+  static const Color greyUlt500 = Color(0xFFFAF9F6);
+  static const Color greyUlt600 = Color(0xFFE4E3E0);
+  static const Color greyUlt700 = Color(0xFFB2B1AF);
+  static const Color greyUlt800 = Color(0xFF8A8987);
+  static const Color greyUlt900 = Color(0xFF696967);
+
+  /// ===============================
+  /// Text Defaults
+  /// ===============================
+  static const Color defaultText = grey900;
+
   // Gradient
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [primary, primaryDark],

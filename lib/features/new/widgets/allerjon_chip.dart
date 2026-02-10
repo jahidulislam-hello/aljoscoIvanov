@@ -23,9 +23,8 @@ class AllergenChip extends StatelessWidget {
       ),
       child: Text(
         allergen,
-        style: AppTextStyles.caption.copyWith(
-          color: AppColors.textSecondary,
-          fontSize: 12.sp,
+        style: AppTextStyles.regular16.copyWith(
+          color: AppColors.grey200,
         ),
       ),
     );

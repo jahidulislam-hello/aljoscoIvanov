@@ -44,6 +44,7 @@ class ProfileSettingsScreen extends StatelessWidget {
             title: 'Account Settings'.tr,
             titleStyle: AppTextStyles.heading2,
             showShadow: false,
+            showBackButton: true,
 
           ),
         ),

@@ -1,13 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 
 class ImageCarousel extends StatefulWidget {
   final List<String> images;
+  final Duration autoSwipeDuration;
 
   const ImageCarousel({
     Key? key,
     required this.images,
+    this.autoSwipeDuration = const Duration(seconds: 4),
   }) : super(key: key);
 
   @override
@@ -16,6 +20,36 @@ class ImageCarousel extends StatefulWidget {
 
 class _ImageCarouselState extends State<ImageCarousel> {
   int _selectedIndex = 0;
+  Timer? _autoSwipeTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startAutoSwipe();
+  }
+
+  @override
+  void dispose() {
+    _autoSwipeTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startAutoSwipe() {
+    if (widget.images.length > 1) {
+      _autoSwipeTimer = Timer.periodic(widget.autoSwipeDuration, (timer) {
+        if (mounted) {
+          setState(() {
+            _selectedIndex = (_selectedIndex + 1) % widget.images.length;
+          });
+        }
+      });
+    }
+  }
+
+  void _resetAutoSwipeTimer() {
+    _autoSwipeTimer?.cancel();
+    _startAutoSwipe();
+  }
 
   /// Helper method to check if image is a network URL
   bool _isNetworkImage(String imagePath) {
@@ -141,6 +175,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
                     setState(() {
                       _selectedIndex = index;
                     });
+                    _resetAutoSwipeTimer();
                   },
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),

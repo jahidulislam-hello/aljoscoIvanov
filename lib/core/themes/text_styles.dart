@@ -6,6 +6,8 @@ import 'app_colors.dart';
 class AppTextStyles {
   AppTextStyles._();
 
+  static final String _fontFamily = GoogleFonts.rubik().fontFamily!;
+
   static final TextStyle H1_Regular = TextStyle(
     fontSize: 40.sp,
     fontWeight: FontWeight.w700,
@@ -20,6 +22,7 @@ class AppTextStyles {
     fontFamily: GoogleFonts.rubik().fontFamily,
     color: AppColors.defaulttext,
     letterSpacing: 0,
+
   );
 
   static final TextStyle H3_Regular = TextStyle(
@@ -206,5 +209,153 @@ class AppTextStyles {
     fontWeight: FontWeight.w800,
     color: AppColors.textPrimary,
     height: 3,
+  );
+
+
+  /// ===============================
+  /// MEDIUM (FontWeight.w500)
+  /// ===============================
+
+  static final TextStyle medium24 = TextStyle(
+    fontSize: 24.sp,
+    fontWeight: FontWeight.w500,
+    fontFamily: _fontFamily,
+    height: 1,
+    letterSpacing: 0,
+    color: AppColors.defaultText,
+  );
+
+  static final TextStyle medium20 = TextStyle(
+    fontSize: 20.sp,
+    fontWeight: FontWeight.w500,
+    fontFamily: _fontFamily,
+    height: 24 / 20,
+    letterSpacing: 0,
+    color: AppColors.defaultText,
+  );
+
+  static final TextStyle medium18 = TextStyle(
+    fontSize: 18.sp,
+    fontWeight: FontWeight.w500,
+    fontFamily: _fontFamily,
+    height: 22 / 18,
+    letterSpacing: 0,
+    color: AppColors.defaultText,
+  );
+
+  static final TextStyle medium16 = TextStyle(
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w500,
+    fontFamily: _fontFamily,
+    height: 1,
+    letterSpacing: 0,
+    color: AppColors.defaultText,
+  );
+
+  static final TextStyle medium16Caps = TextStyle(
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w500,
+    fontFamily: _fontFamily,
+    height: 1,
+    letterSpacing: 0,
+    color: AppColors.defaultText,
+  );
+
+  static final TextStyle medium14 = TextStyle(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w500,
+    fontFamily: _fontFamily,
+    height: 1,
+    letterSpacing: -0.005 * 14,
+    color: AppColors.defaultText,
+  );
+
+  /// ===============================
+  /// REGULAR (FontWeight.w400)
+  /// ===============================
+
+  static final TextStyle regular16 = TextStyle(
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w400,
+    fontFamily: _fontFamily,
+    height: 1,
+    letterSpacing: 0,
+    color: AppColors.defaultText,
+  );
+
+  static final TextStyle regular14 = TextStyle(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w400,
+    fontFamily: _fontFamily,
+    height: 1,
+    letterSpacing: -0.005 * 14,
+    color: AppColors.defaultText,
+  );
+
+  static final TextStyle regular12 = TextStyle(
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w400,
+    fontFamily: _fontFamily,
+    height: 1,
+    letterSpacing: -0.005 * 12,
+    color: AppColors.defaultText,
+  );
+
+  static final TextStyle regular10 = TextStyle(
+    fontSize: 10.sp,
+    fontWeight: FontWeight.w400,
+    fontFamily: _fontFamily,
+    height: 1,
+    letterSpacing: 0,
+    color: AppColors.defaultText,
+  );
+
+  /// ===============================
+  /// SEMIBOLD (FontWeight.w600)
+  /// ===============================
+
+  static final TextStyle semi24 = TextStyle(
+    fontSize: 24.sp,
+    fontWeight: FontWeight.w600,
+    fontFamily: _fontFamily,
+    height: 1,
+    letterSpacing: 0,
+    color: AppColors.defaultText,
+  );
+
+  static final TextStyle semi20 = TextStyle(
+    fontSize: 20.sp,
+    fontWeight: FontWeight.w600,
+    fontFamily: _fontFamily,
+    height: 30 / 20,
+    letterSpacing: 0,
+    color: AppColors.defaultText,
+  );
+
+  static final TextStyle semi18 = TextStyle(
+    fontSize: 18.sp,
+    fontWeight: FontWeight.w600,
+    fontFamily: _fontFamily,
+    height: 1,
+    letterSpacing: 0,
+    color: AppColors.defaultText,
+  );
+
+  static final TextStyle semi16 = TextStyle(
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w600,
+    fontFamily: _fontFamily,
+    height: 20 / 16,
+    letterSpacing: 0,
+    color: AppColors.defaultText,
+  );
+
+  static final TextStyle semi14 = TextStyle(
+    fontSize: 14.sp,
+    fontWeight: FontWeight.w600,
+    fontFamily: _fontFamily,
+    height: 1.25,
+    letterSpacing: 0,
+    color: AppColors.defaultText,
   );
 }
