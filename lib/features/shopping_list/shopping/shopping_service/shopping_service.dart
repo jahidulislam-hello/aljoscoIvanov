@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:freshbite/core/network_celler/endpoints.dart';
 import 'package:freshbite/core/network_celler/http_client.dart';
+import 'package:freshbite/core/utils/shared_preference_helper.dart';
 
 class ShoppingService {
   /// Get all shopping lists for the current user
@@ -161,49 +162,141 @@ class ShoppingService {
     try {
       debugPrint('📤 Creating shopping list...');
 
-      var request = http.MultipartRequest(
-        'POST',
-        Uri.parse('${Urls.baseUrl}/shopping/create-shopping-list'),
-      );
+      final token = await SharedPreferencesHelper.getAccessToken();
 
-      // Add form fields
-      request.fields['title'] = title;
-      request.fields['description'] = description;
-      request.fields['date'] = date;
-      request.fields['coocker'] = coocker;
-      request.fields['list'] = jsonEncode(list);
+      // Log all values before sending
+      debugPrint('📋 Request data:');
+      debugPrint('   title: "$title"');
+      debugPrint('   description: "$description"');
+      debugPrint('   date: "$date"');
+      debugPrint('   coocker: "$coocker"');
+      debugPrint('   list items: ${list.length}');
+      debugPrint('   coverImage: ${coverImage?.path ?? "null"}');
 
-      // Add cover image if provided
+      // Get userId from SharedPreferences
+      final userId = await SharedPreferencesHelper.getUserId();
+      debugPrint('   userId: "$userId"');
+
+      // Process list to ensure all required fields have valid values
+      final processedList = list.map((section) {
+        final ingredients = (section['ingredient'] as List).map((ing) {
+          return {
+            'name': ing['name'] ?? '',
+            'unit': ing['unit'] ?? 'pcs',
+            'value': ing['value'] ?? '1',
+            'singleValue': (ing['singleValue'] != null && ing['singleValue'].toString().isNotEmpty)
+                ? ing['singleValue']
+                : '0.5',
+            'categories': (ing['categories'] != null && ing['categories'].toString().isNotEmpty)
+                ? ing['categories']
+                : 'Convenience',
+            'houseHoldUnit': ing['houseHoldUnit'] ?? 'g',
+            'householdValue': ing['householdValue'] ?? '100',
+            'houseHoldForSingleValue': (ing['houseHoldForSingleValue'] != null && ing['houseHoldForSingleValue'].toString().isNotEmpty)
+                ? ing['houseHoldForSingleValue']
+                : '50',
+          };
+        }).toList();
+
+        return {
+          'name': section['name'],
+          'ingredient': ingredients,
+        };
+      }).toList();
+
+      // Prepare request body
+      final Map<String, dynamic> body = {
+        'title': title.isNotEmpty ? title : 'Shopping List',
+        'description': description.isNotEmpty ? description : 'My shopping list',
+        'date': date,
+        'coocker': coocker.isNotEmpty ? coocker : 'me',
+        'list': processedList,
+        'coverImages': '',  // Empty string when no image
+        if (userId != null) 'userId': userId,  // Add userId if available
+      };
+
+      // If there's a cover image, use multipart; otherwise use JSON
       if (coverImage != null && await coverImage.exists()) {
-        var stream = http.ByteStream(coverImage.openRead());
-        var length = await coverImage.length();
-        var multipartFile = http.MultipartFile(
-          'coverImage',
-          stream,
-          length,
-          filename: coverImage.path.split('/').last,
+        debugPrint('📤 Sending as multipart (with image)...');
+
+        var request = http.MultipartRequest(
+          'POST',
+          Uri.parse('${Urls.baseUrl}/shopping/create-shopping-list'),
+        );
+
+        // Add authorization header
+        if (token != null) {
+          request.headers['Authorization'] = 'Bearer $token';
+        }
+
+        // Add form fields
+        request.fields['title'] = body['title'];
+        request.fields['description'] = body['description'];
+        request.fields['date'] = body['date'];
+        request.fields['coocker'] = body['coocker'];
+        request.fields['list'] = jsonEncode(body['list']);
+
+        // Add cover image
+        String filename = coverImage.path.split('/').last;
+        if (filename.contains('\\')) {
+          filename = filename.split('\\').last;
+        }
+
+        var multipartFile = await http.MultipartFile.fromPath(
+          'coverImages',
+          coverImage.path,
+          filename: filename,
         );
         request.files.add(multipartFile);
-        debugPrint('📎 Cover image attached: ${coverImage.path}');
-      }
+        debugPrint('📎 Cover image attached: $filename');
 
-      debugPrint('📤 Sending create shopping list request...');
-      var streamedResponse = await HttpClient.sendMultipart(request);
-      var response = await http.Response.fromStream(streamedResponse);
+        var streamedResponse = await request.send();
+        var response = await http.Response.fromStream(streamedResponse);
 
-      debugPrint('📥 Create shopping list response: ${response.statusCode}');
+        debugPrint('📥 Create shopping list response: ${response.statusCode}');
+        debugPrint('📥 Response body: ${response.body}');
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = jsonDecode(response.body);
-        if (responseData['success'] == true) {
-          debugPrint('✅ Shopping list created successfully');
-          return responseData;
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final responseData = jsonDecode(response.body);
+          if (responseData['success'] == true) {
+            debugPrint('✅ Shopping list created successfully');
+            return responseData;
+          } else {
+            throw Exception(responseData['message'] ?? 'Failed to create shopping list');
+          }
         } else {
-          throw Exception(responseData['message'] ?? 'Failed to create shopping list');
+          final errorData = jsonDecode(response.body);
+          throw Exception(errorData['message'] ?? 'Failed to create shopping list');
         }
       } else {
-        final errorData = jsonDecode(response.body);
-        throw Exception(errorData['message'] ?? 'Failed to create shopping list');
+        // No image - send as JSON
+        debugPrint('📤 Sending as JSON (no image)...');
+        debugPrint('📤 Request body: ${jsonEncode(body)}');
+
+        final response = await http.post(
+          Uri.parse('${Urls.baseUrl}/shopping/create-shopping-list'),
+          headers: {
+            'Content-Type': 'application/json',
+            if (token != null) 'Authorization': 'Bearer $token',
+          },
+          body: jsonEncode(body),
+        );
+
+        debugPrint('📥 Create shopping list response: ${response.statusCode}');
+        debugPrint('📥 Response body: ${response.body}');
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final responseData = jsonDecode(response.body);
+          if (responseData['success'] == true) {
+            debugPrint('✅ Shopping list created successfully');
+            return responseData;
+          } else {
+            throw Exception(responseData['message'] ?? 'Failed to create shopping list');
+          }
+        } else {
+          final errorData = jsonDecode(response.body);
+          throw Exception(errorData['message'] ?? 'Failed to create shopping list');
+        }
       }
     } catch (e) {
       debugPrint('❌ Error creating shopping list: $e');

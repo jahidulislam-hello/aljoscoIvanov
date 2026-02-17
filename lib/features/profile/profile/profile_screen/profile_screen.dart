@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/appbar/custom_appbar.dart';
+import 'package:freshbite/core/navbar/controller/navbar_controller.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
 import 'package:freshbite/features/profile/profile/model/profile_recipe_model.dart';
@@ -61,6 +62,9 @@ class ProfileScreen extends StatelessWidget {
       titleStyle: AppTextStyles.heading2,
       // padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       showShadow: false,
+      onLeadingPressed: () {
+        Get.find<BottomNavbarController>().changeIndex(0);
+      },
       actionButtons: [
         AppBarAction(
           icon: Icons.settings_outlined,

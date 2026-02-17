@@ -35,12 +35,13 @@ class SettingsScreen extends StatelessWidget {
             title: 'My Profile'.tr,
             titleStyle: AppTextStyles.heading2,
             showShadow: false,
-            actionButtons: [
-              AppBarAction(
-                icon: Icons.settings_outlined,
-                onPressed: () => controller.openSettings(),
-              ),
-            ],
+            showBackButton: true,
+            // actionButtons: [
+            //   AppBarAction(
+            //     icon: Icons.settings_outlined,
+            //     onPressed: () => controller.openSettings(),
+            //   ),
+            // ],
           ),
         ),
       ),

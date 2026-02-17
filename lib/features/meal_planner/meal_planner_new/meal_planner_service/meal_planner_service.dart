@@ -158,6 +158,38 @@ class MealPlannerService {
     };
   }
 
+  /// Add comment to meal plan
+  static Future<Map<String, dynamic>> addCommentToMealPlan({
+    required String mealPlanId,
+    required String comment,
+  }) async {
+    try {
+      print("📤 Adding comment to meal plan: $mealPlanId");
+      print("   Comment: $comment");
+
+      final response = await HttpClient.patch(
+        Uri.parse("${Urls.baseUrl}/mealplan/commnets-meal-plan/$mealPlanId"),
+        body: jsonEncode({
+          "comment": comment,
+        }),
+      );
+
+      print("📥 Add comment response (${response.statusCode}): ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        print("✅ Comment added successfully");
+        return responseData;
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        throw Exception("Failed to add comment: ${errorResponse['message'] ?? 'Unknown error'}");
+      }
+    } catch (e) {
+      print("❌ Add comment error: $e");
+      rethrow;
+    }
+  }
+
   /// Get prep list
   static Future<Map<String, dynamic>> getPrepList(String date) async {
     try {
