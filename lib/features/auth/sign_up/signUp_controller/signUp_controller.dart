@@ -42,9 +42,9 @@ class SignUpController extends GetxController {
     return RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
   }
 
-  // Validate phone number
+  // Validate phone number (exactly 10 digits)
   bool _isValidPhone(String phone) {
-    return RegExp(r"^[0-9]{10,15}$").hasMatch(phone);
+    return RegExp(r"^[0-9]{10}$").hasMatch(phone);
   }
 
   void toggleTerms(bool? value) {
@@ -93,7 +93,7 @@ class SignUpController extends GetxController {
       phoneError.value = 'Please enter your phone number';
       hasError = true;
     } else if (!_isValidPhone(phone)) {
-      phoneError.value = 'Please enter a valid phone number (10-15 digits)';
+      phoneError.value = 'Please enter a valid 10-digit phone number';
       hasError = true;
     }
 
@@ -167,8 +167,26 @@ class SignUpController extends GetxController {
         final errorMessage = responseData["message"] ?? "Registration failed.";
         print("❌ Registration failed: $errorMessage");
 
+        // Handle validation errors from backend
+        if (responseData["errorSource"] != null && responseData["errorSource"] is List) {
+          final errorSource = responseData["errorSource"] as List;
+          for (var error in errorSource) {
+            final path = error["path"]?.toString().toLowerCase() ?? '';
+            final message = error["message"]?.toString() ?? 'Invalid input';
+
+            if (path.contains('phone')) {
+              phoneError.value = 'Please enter a valid 10-digit phone number';
+            } else if (path.contains('email')) {
+              emailError.value = message;
+            } else if (path.contains('password')) {
+              passwordError.value = message;
+            } else if (path.contains('name')) {
+              nameError.value = message;
+            }
+          }
+        }
         // Show user-friendly error based on backend response
-        if (errorMessage.toLowerCase().contains('email') &&
+        else if (errorMessage.toLowerCase().contains('email') &&
             (errorMessage.toLowerCase().contains('exist') ||
              errorMessage.toLowerCase().contains('already') ||
              errorMessage.toLowerCase().contains('taken'))) {
@@ -186,7 +204,7 @@ class SignUpController extends GetxController {
     } catch (e) {
       print("❌ Register error: $e");
       if (e.toString().contains('FormatException')) {
-        phoneError.value = 'Please enter a valid phone number (digits only)';
+        phoneError.value = 'Please enter a valid 10-digit phone number';
       } else {
         emailError.value = 'Unable to connect. Please check your internet connection.';
       }

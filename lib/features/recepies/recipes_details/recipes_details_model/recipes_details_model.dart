@@ -69,6 +69,13 @@ class RecipesDetailsModel {
           .map((item) => IngredientDetails(
                 name: item['name'] ?? '',
                 quantity: '${item['value']} ${item['unit']}',
+                metricValue: item['value']?.toString() ?? '',
+                metricUnit: item['unit']?.toString() ?? '',
+                singleValue: item['singleValue']?.toString() ?? '',
+                categories: item['categories']?.toString() ?? '',
+                householdUnit: item['houseHoldUnit']?.toString() ?? '',
+                householdValue: item['householdValue']?.toString() ?? '',
+                houseHoldForSingleValue: item['houseHoldForSingleValue']?.toString() ?? '',
               ))
           .toList();
     }
@@ -221,6 +228,9 @@ class IngredientDetails {
   final String metricUnit; // e.g., "g", "ml", "pcs"
   final String householdValue; // e.g., "560"
   final String householdUnit; // e.g., "cup", "tbsp"
+  final String singleValue; // e.g., "0.3333333333333333"
+  final String categories; // e.g., "Bakery"
+  final String houseHoldForSingleValue; // e.g., "166.66666666666666"
 
   IngredientDetails({
     required this.name,
@@ -229,6 +239,9 @@ class IngredientDetails {
     this.metricUnit = '',
     this.householdValue = '',
     this.householdUnit = '',
+    this.singleValue = '',
+    this.categories = '',
+    this.houseHoldForSingleValue = '',
   });
 
   /// Get metric quantity string (e.g., "200 g")

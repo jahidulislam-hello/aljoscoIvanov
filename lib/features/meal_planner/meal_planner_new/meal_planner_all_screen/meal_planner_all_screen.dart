@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/appbar/custom_appbar.dart';
+import 'package:freshbite/core/navbar/controller/navbar_controller.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
@@ -82,60 +83,117 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
     super.dispose();
   }
 
-  void _showAddCommentPopup() {
+  // Variable to store the current meal plan ID for commenting
+  String? _currentMealPlanId;
+  bool _isPostingComment = false;
+
+  void _showAddCommentPopup({String? mealPlanId}) {
     _commentController.clear();
+    _currentMealPlanId = mealPlanId;
+
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: AppColors.background,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.r),
-        ),
-        insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: Padding(
-          padding: EdgeInsets.all(20.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title
-              Text(
-                'Add a comment to your planned Meal.',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.mainTextColor,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => Dialog(
+          backgroundColor: AppColors.background,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Padding(
+            padding: EdgeInsets.all(20.w),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title
+                Text(
+                  'Add a comment to your planned Meal.',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.mainTextColor,
+                  ),
                 ),
-              ),
-              SizedBox(height: 16.h),
-              // Comment text field
-              CustomTextField(
-                controller: _commentController,
-                hintText: 'Write anything here...',
-                keyboardType: 'multiline',
-                boxHeight: 12,
-              ),
-              SizedBox(height: 16.h),
-              // Post button
-              CustomButton(
-                text: 'Post',
-                color: AppColors.buttonColor,
-                onTap: () {
-                  // Handle post comment
-                  Navigator.pop(context);
-                },
-              ),
-              SizedBox(height: 12.h),
-              // Info text
-              Text(
-                'Your comment will be visible to all family members. Only you can remove it.',
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  color: AppColors.textLight,
+                SizedBox(height: 16.h),
+                // Comment text field
+                CustomTextField(
+                  controller: _commentController,
+                  hintText: 'Write anything here...',
+                  keyboardType: 'multiline',
+                  boxHeight: 12,
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+                SizedBox(height: 16.h),
+                // Post button
+                CustomButton(
+                  text: _isPostingComment ? 'Posting...' : 'Post',
+                  color: AppColors.buttonColor,
+                  onTap: () async {
+                    if (_isPostingComment) return;
+
+                    if (_commentController.text.trim().isEmpty) {
+                      Get.snackbar(
+                        'Error',
+                        'Please enter a comment',
+                        backgroundColor: Colors.orange,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                      return;
+                    }
+
+                    if (_currentMealPlanId == null) {
+                      Get.snackbar(
+                        'Error',
+                        'No meal plan selected',
+                        backgroundColor: Colors.orange,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                      return;
+                    }
+
+                    setDialogState(() => _isPostingComment = true);
+
+                    final success = await _controller.addCommentToMealPlan(
+                      mealPlanId: _currentMealPlanId!,
+                      comment: _commentController.text.trim(),
+                    );
+
+                    setDialogState(() => _isPostingComment = false);
+
+                    if (success) {
+                      Navigator.pop(context);
+                      Get.snackbar(
+                        'Success',
+                        'Comment added successfully',
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                    } else {
+                      Get.snackbar(
+                        'Error',
+                        'Failed to add comment',
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                    }
+                  },
+                ),
+                SizedBox(height: 12.h),
+                // Info text
+                Text(
+                  'Your comment will be visible to all family members. Only you can remove it.',
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    color: AppColors.textLight,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -297,6 +355,9 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
             title: 'Meal Planner',
             titleAlignment: AppBarTitleAlignment.center,
             showBackButton: true,
+            onLeadingPressed: () {
+              Get.find<BottomNavbarController>().changeIndex(0);
+            },
             actionButtons: [
               AppBarAction(
                 imagePath: 'assets/icons/charm_menu.png',
@@ -626,6 +687,15 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
   }
 
   Widget _buildMealSection(MealSection meal) {
+    // Get the meal plan ID for this section
+    final dateStr = _weekDates[_selectedDateIndex].toIso8601String().split('T')[0];
+    final mealPlanId = _controller.getMealPlanIdForSection(meal.id, dateStr);
+
+    // Get comments for this meal plan
+    final comments = mealPlanId != null
+        ? _controller.getCommentsForMealPlan(mealPlanId)
+        : <Comment>[];
+
     return Container(
       margin: EdgeInsets.only(bottom: 1),
       color: Color(0xFFE8EAE6),
@@ -694,27 +764,28 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
 
                   SizedBox(height: 16),
 
-                  // Comments
-                  if (meal.comments.isNotEmpty) ...[
-                    ...meal.comments.map((comment) => Padding(
+                  // Comments from API
+                  if (comments.isNotEmpty) ...[
+                    ...comments.map((comment) => Padding(
                       padding: EdgeInsets.only(bottom: 12),
                       child: _buildCommentCard(comment),
                     )),
                   ],
 
-                  // Comment Icon (aligned to left)
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: GestureDetector(
-                      onTap: () => _showAddCommentPopup(),
-                      child: Image.asset(
-                        AppImages.chatIcon, // your asset path
-                        height: 24,
-                        width: 24,
-                        color: AppColors.buttonColor, // optional tint
+                  // Comment Icon (aligned to left) - only show if there's a meal plan
+                  if (mealPlanId != null)
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: GestureDetector(
+                        onTap: () => _showAddCommentPopup(mealPlanId: mealPlanId),
+                        child: Image.asset(
+                          AppImages.chatIcon,
+                          height: 24,
+                          width: 24,
+                          color: AppColors.buttonColor,
+                        ),
                       ),
                     ),
-                  )
 
                 ],
               ),
@@ -789,8 +860,8 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                     top: 4.h,
                     right: 4.w,
                     child: Container(
-                      width: 18.w,
-                      height: 18.h,
+                      width: 16.w,
+                      height: 16.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
@@ -802,7 +873,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                           ),
                         ],
                       ),
-                      child: Icon(Icons.edit, size: 10, color: Color(0xFF757575)),
+                      child: Icon(Icons.edit, size: 16, color: Color(0xFF757575)),
                     ),
                   ),
                 ],
@@ -1195,19 +1266,24 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
             )),
           ],
 
-          // Comment Icon (aligned to left)
-          Align(
-            alignment: Alignment.centerLeft,
-            child: GestureDetector(
-              onTap: () => _showAddCommentPopup(),
-              child: Image.asset(
-                AppImages.chatIcon,
-                height: 24,
-                width: 24,
-                color: AppColors.buttonColor,
+          // Comment Icon (aligned to left) - only show if there's a prep list
+          if (hasPrepList && _controller.prepListItems.isNotEmpty)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: GestureDetector(
+                onTap: () {
+                  // Get the prep list ID for commenting
+                  final prepListId = _controller.prepListItems.first.id;
+                  _showAddCommentPopup(mealPlanId: prepListId);
+                },
+                child: Image.asset(
+                  AppImages.chatIcon,
+                  height: 24,
+                  width: 24,
+                  color: AppColors.buttonColor,
+                ),
               ),
             ),
-          ),
 
           SizedBox(height: 16.h),
 
@@ -1253,40 +1329,65 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Recipe image
-              Container(
-                width: 100.w,
-                height: 72.h,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(8.r),
-                    topRight: Radius.circular(8.r),
-                  ),
-                  color: Color(0xFFE0E0E0),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(8.r),
-                    topRight: Radius.circular(8.r),
-                  ),
-                  child: recipeItem.recipeImage != null && recipeItem.recipeImage!.isNotEmpty
-                      ? Image.network(
-                          recipeItem.recipeImage!,
-                          fit: BoxFit.cover,
-                          width: 100.w,
-                          height: 72.h,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
+              // Recipe image with edit icon
+              Stack(
+                children: [
+                  Container(
+                    width: 100.w,
+                    height: 72.h,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(8.r),
+                        topRight: Radius.circular(8.r),
+                      ),
+                      color: Color(0xFFE0E0E0),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(8.r),
+                        topRight: Radius.circular(8.r),
+                      ),
+                      child: recipeItem.recipeImage != null && recipeItem.recipeImage!.isNotEmpty
+                          ? Image.network(
+                              recipeItem.recipeImage!,
+                              fit: BoxFit.cover,
+                              width: 100.w,
+                              height: 72.h,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Color(0xFFFF8C42),
+                                  child: Icon(Icons.restaurant, color: Colors.white, size: 28),
+                                );
+                              },
+                            )
+                          : Container(
                               color: Color(0xFFFF8C42),
                               child: Icon(Icons.restaurant, color: Colors.white, size: 28),
-                            );
-                          },
-                        )
-                      : Container(
-                          color: Color(0xFFFF8C42),
-                          child: Icon(Icons.restaurant, color: Colors.white, size: 28),
-                        ),
-                ),
+                            ),
+                    ),
+                  ),
+                  // Edit icon
+                  Positioned(
+                    top: 4.h,
+                    right: 4.w,
+                    child: Container(
+                      width: 16.w,
+                      height: 16.h,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(Icons.edit, size: 16, color: Color(0xFF757575)),
+                    ),
+                  ),
+                ],
               ),
               // Title and Servings
               Expanded(

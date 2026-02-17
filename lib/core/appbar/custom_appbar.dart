@@ -9,6 +9,17 @@ enum AppBarTitleAlignment {
 }
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  // Safe back navigation that avoids snackbar initialization errors
+  static void _safeBack(BuildContext context) {
+    try {
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      debugPrint('Navigation error: $e');
+    }
+  }
+
   // Title Properties
   final String? title;
   final TextStyle? titleStyle;
@@ -99,7 +110,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Left Side
-          _buildLeading(),
+          _buildLeading(context),
 
           // Title (Center or Dynamic)
           if (titleAlignment == AppBarTitleAlignment.center)
@@ -116,7 +127,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  Widget _buildLeading() {
+  Widget _buildLeading(BuildContext context) {
     if (leading != null) return leading!;
 
     if (!showBackButton) return const SizedBox.shrink();
@@ -124,7 +135,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     // Custom Leading Image
     if (leadingImage != null) {
       return GestureDetector(
-        onTap: onLeadingPressed ?? () => Get.back(),
+        onTap: onLeadingPressed ?? () => _safeBack(context),
         child: Container(
           width: leadingImageSize ?? 36.w,
           height: leadingImageSize ?? 34.h,
@@ -152,7 +163,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     // Default Back Button
     return GestureDetector(
-      onTap: onLeadingPressed ?? () => Get.back(),
+      onTap: onLeadingPressed ?? () => _safeBack(context),
       child: Container(
         width: 36.w,
         height: 34.h,

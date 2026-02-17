@@ -14,12 +14,33 @@ import '../create_shopping_model/create_shopping_model.dart';
 
 
 class CreateShoppingScreen extends StatelessWidget {
-  const CreateShoppingScreen({super.key});
+  final bool isFromRecipe;
+  final String? recipeName;
+  final List<Map<String, dynamic>>? ingredients;
+
+  const CreateShoppingScreen({
+    super.key,
+    this.isFromRecipe = false,
+    this.recipeName,
+    this.ingredients,
+  });
 
 
   @override
   Widget build(BuildContext context) {
+    // Create new controller
     final controller = Get.put(CreateShoppingController());
+
+    // If from recipe, add ingredients
+    if (isFromRecipe && recipeName != null && ingredients != null) {
+      // Use Future.microtask to ensure controller is initialized
+      Future.microtask(() {
+        controller.addIngredientsFromRecipe(
+          recipeName: recipeName!,
+          ingredients: ingredients!,
+        );
+      });
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -45,10 +66,9 @@ class CreateShoppingScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            /// Cover Image Section
-            _buildCoverImageSection(controller),
-
-            SizedBox(height: 16.h),
+            // /// Cover Image Section - Commented out
+            // _buildCoverImageSection(controller),
+            // SizedBox(height: 16.h),
 
             /// Title (Editable)
             Text("Title", style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600)),
@@ -93,7 +113,12 @@ class CreateShoppingScreen extends StatelessWidget {
               children: controller.shoppingSections
                   .asMap()
                   .entries
-                  .map((entry) => _buildRecipeSection(entry.value, controller, entry.key))
+                  .map((entry) => _buildRecipeSection(
+                    entry.value,
+                    controller,
+                    entry.key,
+                    isFromRecipe,  // Use screen parameter directly
+                  ))
                   .toList(),
             )),
 
@@ -161,6 +186,7 @@ class CreateShoppingScreen extends StatelessWidget {
       RecipeSection section,
       CreateShoppingController controller,
       int index,
+      bool isFromRecipe,
       ) {
     return Padding(
       padding: EdgeInsets.only(bottom: 20.h),
@@ -168,40 +194,42 @@ class CreateShoppingScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
-          /// HEADER
+          /// HEADER - Show "Ingredients" label when from recipe
           Row(
             children: [
               Expanded(
-                child: Text(
-                  section.title,
-                  style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (isFromRecipe) ...[
+                      Text(
+                        "Ingredients",
+                        style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+                      ),
+                      SizedBox(height: 4.h),
+                    ],
+                    Text(
+                      section.title,
+                      style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+                    ),
+                  ],
                 ),
               ),
-
-
             ],
           ),
 
           SizedBox(height: 12.h),
 
           /// ITEMS
-          Column(
+          Obx(() => Column(
             children: section.items
                 .map((item) => _buildShoppingItem(item))
                 .toList(),
-          ),
+          )),
 
           SizedBox(height: 8.h),
 
-          // /// DIVIDER
-          // Divider(
-          //   color: Colors.grey.shade300,
-          //   thickness: 1,
-          // ),
-
-          SizedBox(height: 8.h),
-
-          /// ADD CUSTOM ITEM
+          /// ADD CUSTOM ITEM - Always visible
           _buildAddCustomItemRow(controller, section),
         ],
       ),

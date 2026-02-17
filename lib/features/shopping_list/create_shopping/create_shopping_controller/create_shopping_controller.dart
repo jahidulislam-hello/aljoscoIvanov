@@ -6,23 +6,39 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class CreateShoppingController extends GetxController {
-  /// We wrap everything inside ONE RecipeSection
-  var shoppingSections = <RecipeSection>[
-    RecipeSection(
-      title: "Ingredients",
-      items: [
-        ShoppingItemModel(name: "Rice", amount: "2", unit: "kg"),
-        ShoppingItemModel(name: "Onion", amount: "1", unit: "ps"),
-        ShoppingItemModel(name: "Red bell pepper", amount: "1", unit: "ps"),
-        ShoppingItemModel(name: "Garlic cloves", amount: "3", unit: "Cloves"),
-        ShoppingItemModel(name: "Ground cumin", amount: "1", unit: "tsp"),
-        ShoppingItemModel(name: "Smoked paprika", amount: "1", unit: "can (28 oz)"),
-        ShoppingItemModel(name: "Fresh parsley", amount: "1/4", unit: "cup"),
-        ShoppingItemModel(name: "Eggs", amount: "4", unit: "large"),
-        ShoppingItemModel(name: "Chili powder", amount: "1/2", unit: "tsp"),
-      ],
-    ),
-  ].obs;
+  /// Shopping sections - starts with default "Ingredients" section
+  var shoppingSections = <RecipeSection>[].obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    // Initialize with default section if empty
+    if (shoppingSections.isEmpty) {
+      shoppingSections.add(
+        RecipeSection(
+          title: "Ingredients",
+          items: [],
+        ),
+      );
+    }
+  }
+
+  /// Reset controller for fresh start
+  void resetController() {
+    titleController.clear();
+    descriptionController.clear();
+    coverImage.value = null;
+    selectedPerson.value = "me";
+    selectedDate.value = null;
+    isFromRecipe.value = false;
+    shoppingSections.clear();
+    shoppingSections.add(
+      RecipeSection(
+        title: "Ingredients",
+        items: [],
+      ),
+    );
+  }
 
   // ========= TITLE =========
   TextEditingController titleController = TextEditingController();
@@ -229,6 +245,55 @@ class CreateShoppingController extends GetxController {
     return true;
   }
 
+  // Track if this is from a recipe
+  var isFromRecipe = false.obs;
+
+  // ========= ADD INGREDIENTS FROM RECIPE =========
+  void addIngredientsFromRecipe({
+    required String recipeName,
+    required List<Map<String, dynamic>> ingredients,
+  }) {
+    // Mark as coming from recipe
+    isFromRecipe.value = true;
+
+    // Clear all existing sections first
+    shoppingSections.clear();
+
+    // Set default title and description
+    titleController.text = '$recipeName Shopping List';
+    descriptionController.text = 'Ingredients for $recipeName';
+
+    // Set default date if not selected
+    if (selectedDate.value == null) {
+      selectedDate.value = DateTime.now();
+    }
+
+    // Create items from ingredients
+    List<ShoppingItemModel> items = ingredients.map((ing) {
+      return ShoppingItemModel(
+        name: ing['name'] ?? '',
+        amount: ing['value']?.toString() ?? '',
+        unit: ing['unit']?.toString() ?? '',
+        singleValue: ing['singleValue']?.toString() ?? '',
+        categories: ing['categories']?.toString() ?? '',
+        houseHoldUnit: ing['houseHoldUnit']?.toString() ?? '',
+        householdValue: ing['householdValue']?.toString() ?? '',
+        houseHoldForSingleValue: ing['houseHoldForSingleValue']?.toString() ?? '',
+      );
+    }).toList();
+
+    // Create single section with recipe name as title
+    shoppingSections.add(
+      RecipeSection(
+        title: recipeName.isNotEmpty ? recipeName : "Ingredients",
+        items: items,
+      ),
+    );
+
+    shoppingSections.refresh();
+    debugPrint('✅ Added ${items.length} ingredients from recipe: $recipeName');
+  }
+
   // ========= TRANSFORM DATA TO API FORMAT =========
   List<Map<String, dynamic>> _transformToApiFormat() {
     List<Map<String, dynamic>> apiList = [];
@@ -243,7 +308,11 @@ class CreateShoppingController extends GetxController {
           "name": item.name,
           "unit": item.unit,
           "value": item.amount,
-          "category": "shop",
+          "singleValue": item.singleValue,
+          "categories": item.categories,
+          "houseHoldUnit": item.houseHoldUnit,
+          "householdValue": item.householdValue,
+          "houseHoldForSingleValue": item.houseHoldForSingleValue,
         });
       }
 

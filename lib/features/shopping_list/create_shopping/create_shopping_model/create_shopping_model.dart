@@ -5,13 +5,22 @@ class ShoppingItemModel {
   String name;
   String amount;
   String unit;
+  String singleValue;
+  String categories;
+  String houseHoldUnit;
+  String householdValue;
+  String houseHoldForSingleValue;
   RxBool checked;
-
 
   ShoppingItemModel({
     required this.name,
     required this.amount,
     required this.unit,
+    this.singleValue = '',
+    this.categories = '',
+    this.houseHoldUnit = '',
+    this.householdValue = '',
+    this.houseHoldForSingleValue = '',
     bool checked = false,
   }) : checked = checked.obs;
 }

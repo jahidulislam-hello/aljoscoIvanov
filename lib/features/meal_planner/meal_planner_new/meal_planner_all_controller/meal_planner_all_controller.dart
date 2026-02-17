@@ -497,6 +497,81 @@ class MealPlanController extends GetxController {
     prepListComments.add(comment);
   }
 
+  /// Add comment to meal plan via API
+  Future<bool> addCommentToMealPlan({
+    required String mealPlanId,
+    required String comment,
+  }) async {
+    try {
+      print("📤 Adding comment to meal plan: $mealPlanId");
+
+      final response = await MealPlannerService.addCommentToMealPlan(
+        mealPlanId: mealPlanId,
+        comment: comment,
+      );
+
+      if (response['success'] == true) {
+        print("✅ Comment added successfully");
+
+        // Refresh the meal plans to get updated comments
+        final today = _toDateString(DateTime.now().toIso8601String());
+        await fetchMealPlansForDate(today);
+
+        return true;
+      } else {
+        print("❌ Failed to add comment: ${response['message']}");
+        return false;
+      }
+    } catch (e) {
+      print("❌ Error adding comment: $e");
+      return false;
+    }
+  }
+
+  /// Get meal plan ID for a specific meal section on current date
+  String? getMealPlanIdForSection(String mealSectionId, String dateStr) {
+    final normalizedDateStr = _toDateString(dateStr);
+    final plansForDate = mealPlansByDate[normalizedDateStr] ?? [];
+
+    // Find the meal plan that matches the meal section's meal time
+    final mealSection = meals.firstWhereOrNull((m) => m.id == mealSectionId);
+    if (mealSection == null) return null;
+
+    final mealTime = mealSection.title.toLowerCase();
+    final matchingPlan = plansForDate.firstWhereOrNull(
+      (plan) => plan.mealTime.toLowerCase() == mealTime,
+    );
+
+    return matchingPlan?.id;
+  }
+
+  /// Get comments for a specific meal plan
+  List<Comment> getCommentsForMealPlan(String mealPlanId) {
+    // Search through all meal plans to find the one with matching ID
+    for (var entry in mealPlansByDate.entries) {
+      for (var mealPlan in entry.value) {
+        if (mealPlan.id == mealPlanId) {
+          return mealPlan.comments.map((c) {
+            if (c is Map<String, dynamic>) {
+              return Comment(
+                userName: c['userName'] ?? c['user'] ?? 'User',
+                date: c['date'] ?? c['createdAt'] ?? '',
+                message: c['comment'] ?? c['message'] ?? c['text'] ?? '',
+                avatarUrl: c['avatar'] ?? c['avatarUrl'],
+              );
+            }
+            return Comment(
+              userName: 'User',
+              date: '',
+              message: c.toString(),
+            );
+          }).toList();
+        }
+      }
+    }
+    return [];
+  }
+
   /// Toggle prep list item done state
   void togglePrepItemDone(int index) {
     if (prepListItems.isNotEmpty && index < prepListItems.first.recipes.length) {

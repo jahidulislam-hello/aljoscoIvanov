@@ -19,6 +19,8 @@ import 'package:freshbite/features/recepies/recipes_details/recipes_details_cont
 import 'package:freshbite/features/new/popup/popup_screen/personal_notes_popup.dart';
 import 'package:freshbite/features/new/popup/popup_screen/rating_popup.dart';
 import 'package:freshbite/features/video/instruction_video.dart';
+import 'package:freshbite/features/shopping_list/create_shopping/create_shopping_controller/create_shopping_controller.dart';
+import 'package:freshbite/features/shopping_list/create_shopping/create_shopping_screen/create_shopping_screen.dart';
 import 'package:get/get.dart';
 
 class RecipesDetailsRecipeScreen extends StatefulWidget {
@@ -58,6 +60,35 @@ class _RecipesDetailsRecipeScreenState extends State<RecipesDetailsRecipeScreen>
       return '${duration.inHours}h ${duration.inMinutes % 60}min';
     }
     return '${duration.inMinutes}min';
+  }
+
+  /// Add ingredients to shopping list and navigate to create shopping screen
+  void _addToShoppingList(RecipesDetailsModel recipeDetails) {
+    // Convert ingredients to the format expected by CreateShoppingController
+    List<Map<String, dynamic>> ingredientsData = recipeDetails.ingredients.map((ing) {
+      return {
+        'name': ing.name,
+        'value': ing.metricValue.isNotEmpty ? ing.metricValue : ing.quantity.split(' ').first,
+        'unit': ing.metricUnit.isNotEmpty ? ing.metricUnit : (ing.quantity.split(' ').length > 1 ? ing.quantity.split(' ').last : ''),
+        'singleValue': ing.singleValue,
+        'categories': ing.categories,
+        'houseHoldUnit': ing.householdUnit,
+        'householdValue': ing.householdValue,
+        'houseHoldForSingleValue': ing.houseHoldForSingleValue,
+      };
+    }).toList();
+
+    // Delete existing controller if any to start fresh
+    if (Get.isRegistered<CreateShoppingController>()) {
+      Get.delete<CreateShoppingController>();
+    }
+
+    // Navigate to create shopping screen with recipe data
+    Get.to(() => CreateShoppingScreen(
+      isFromRecipe: true,
+      recipeName: recipeDetails.title,
+      ingredients: ingredientsData,
+    ));
   }
 
   @override
@@ -282,7 +313,9 @@ class _RecipesDetailsRecipeScreenState extends State<RecipesDetailsRecipeScreen>
 
                           CustomTextButton(
                             text: 'ADD TO SHOPPING LIST',
-                            onTap: () {},
+                            onTap: () {
+                              _addToShoppingList(recipeDetails);
+                            },
                           ),
                         ],
                       ),

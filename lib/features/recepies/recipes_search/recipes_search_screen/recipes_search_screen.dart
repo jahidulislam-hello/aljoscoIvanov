@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:freshbite/core/appbar/custom_appbar.dart';
+import 'package:freshbite/core/navbar/controller/navbar_controller.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
@@ -39,6 +40,9 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
             title: 'Recipe Search',
             titleAlignment: AppBarTitleAlignment.center,
             showBackButton: true,
+            onLeadingPressed: () {
+              Get.find<BottomNavbarController>().changeIndex(0);
+            },
             actionButtons: [
               AppBarAction(imagePath: 'assets/icons/charm_menu.png', onPressed: () {}),
             ],
