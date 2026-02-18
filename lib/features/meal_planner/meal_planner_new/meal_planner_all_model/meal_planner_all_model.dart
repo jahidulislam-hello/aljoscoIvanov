@@ -95,11 +95,12 @@ class MealPlanApiModel {
 
   factory MealPlanApiModel.fromJson(Map<String, dynamic> json) {
     return MealPlanApiModel(
-      id: json['_id'] ?? '',
+      id: json['_id'] ?? json['id'] ?? '',
       userId: json['userId'] ?? '',
       date: json['date'] ?? '',
       serving: json['serving'] ?? 0,
-      mealTime: json['meal_time'] ?? '',
+      // Support both 'meal_time' (API format) and 'mealTime' (old cache format)
+      mealTime: json['meal_time'] ?? json['mealTime'] ?? '',
       recipes: json['recipes'] ?? [],
       comments: json['comments'] ?? [],
     );

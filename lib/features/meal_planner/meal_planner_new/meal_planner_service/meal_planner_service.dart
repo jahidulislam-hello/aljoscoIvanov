@@ -77,85 +77,75 @@ class MealPlannerService {
   }
 
   /// Get all meal plans (no date filter) - NOT SUPPORTED BY BACKEND
-  /// The backend has corrupted data causing "Invalid Date" errors
-  /// This method is disabled - use getMealPlan(date) for specific dates instead
   static Future<Map<String, dynamic>> getAllMealPlans() async {
-    // Backend has corrupted date data that causes "Invalid Date" errors
-    // when trying to fetch all meal plans. Throwing exception to trigger
-    // fallback to date-specific fetching.
-    throw Exception("Get all meal plans endpoint has backend data issues - use date-specific queries instead");
+    throw Exception("Get all meal plans endpoint not supported - use getMealPlan(date) instead");
   }
 
-  /// Get meal plan for a specific date
-  /// Tries multiple endpoint variations since the exact path is unclear
+  /// Get meal plan for a specific date using POST with body
   static Future<Map<String, dynamic>> getMealPlan(String date) async {
-    // Format date as YYYY-MM-DD for query parameter
-    final parsedDate = DateTime.parse(date);
-    final formattedDate = '${parsedDate.year}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.day.toString().padLeft(2, '0')}';
+    try {
+      // Format date as ISO 8601 with time 08:00:00 UTC
+      final parsedDate = DateTime.parse(date);
+      // Use DateTime.utc to create UTC time directly (no conversion needed)
+      final formattedDate = DateTime.utc(
+        parsedDate.year,
+        parsedDate.month,
+        parsedDate.day,
+        8, 0, 0, // 08:00:00 UTC
+      ).toIso8601String();
 
-    // List of possible endpoint variations to try
-    final endpoints = [
-      "${Urls.baseUrl}/meal-plan/get-meal-plan?date=$formattedDate",
-      "${Urls.baseUrl}/mealplan/getmealplan?date=$formattedDate",
-      "${Urls.baseUrl}/mealplans/get-mealplans?date=$formattedDate",
-      "${Urls.baseUrl}/mealplan/get?date=$formattedDate",
-      // Add more potential endpoints
-      "${Urls.baseUrl}/meal-plans?date=$formattedDate",
-      "${Urls.baseUrl}/meal-plan?date=$formattedDate",
-      "${Urls.baseUrl}/meal-plans/date/$formattedDate",
-      "${Urls.baseUrl}/meal-plan/date/$formattedDate",
-    ];
+      final url = "${Urls.baseUrl}/mealplan/get-meal-plan";
+      final body = {"date": formattedDate};
 
-    Exception? lastException;
+      print("═══════════════════════════════════════════");
+      print("📤 MEAL PLAN API REQUEST:");
+      print("   URL: $url");
+      print("   Method: POST");
+      print("   Body: ${jsonEncode(body)}");
+      print("═══════════════════════════════════════════");
 
-    for (var endpoint in endpoints) {
-      try {
-        print("📤 Trying meal plan endpoint: $endpoint");
+      final response = await HttpClient.post(
+        Uri.parse(url),
+        body: jsonEncode(body),
+      );
 
-        final response = await HttpClient.get(Uri.parse(endpoint));
+      print("📥 Get meal plan response (${response.statusCode})");
+      print("📥 Response body: ${response.body.substring(0, response.body.length > 500 ? 500 : response.body.length)}...");
 
-        print("📥 Response (${response.statusCode}): ${response.body.substring(0, response.body.length > 100 ? 100 : response.body.length)}...");
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
 
-        if (response.statusCode == 200) {
-          final responseData = jsonDecode(response.body);
+        if (responseData['success'] == true && responseData['data'] != null) {
+          final List<dynamic> mealPlans = responseData['data'];
+          print("✅ Found ${mealPlans.length} meal plans for $formattedDate");
 
-          // Sort data by date (ascending - oldest first)
-          if (responseData['success'] == true && responseData['data'] != null) {
-            final List<dynamic> mealPlans = responseData['data'];
-            mealPlans.sort((a, b) {
-              try {
-                final dateA = DateTime.parse(a['date'] ?? '');
-                final dateB = DateTime.parse(b['date'] ?? '');
-                return dateA.compareTo(dateB);
-              } catch (e) {
-                return 0;
-              }
-            });
-            responseData['data'] = mealPlans;
-            print("✅ SUCCESS! Found ${mealPlans.length} meal plans at: $endpoint");
+          // Log meal times found
+          for (var plan in mealPlans) {
+            final mealTime = plan['meal_time'] ?? 'unknown';
+            final recipes = plan['recipes'] as List? ?? [];
+            final recipeTitle = recipes.isNotEmpty ? (recipes[0]['title'] ?? 'unknown') : 'no recipe';
+            print("   - $mealTime: $recipeTitle");
           }
-
-          return responseData;
-        } else if (response.statusCode != 404) {
-          // If it's not a 404, it might be the right endpoint but with another error
-          print("⚠️ Endpoint exists but returned ${response.statusCode}");
-          lastException = Exception("Failed to load meal plan: ${response.statusCode}");
         }
-      } catch (e) {
-        print("❌ Endpoint failed: $e");
-        lastException = e as Exception;
-        continue; // Try next endpoint
-      }
-    }
 
-    // All endpoints failed - this is expected since the backend doesn't have working endpoints
-    // Return success with empty data to allow using local cached data
-    print("❌ All meal plan endpoints failed. Returning empty data to use local cache.");
-    return {
-      'success': true,
-      'data': [],
-      'message': 'Using local cache due to API unavailability'
-    };
+        return responseData;
+      } else {
+        print("❌ Get meal plan failed: ${response.statusCode}");
+        print("   Response: ${response.body}");
+        return {
+          'success': false,
+          'data': [],
+          'message': 'Failed to fetch meal plans'
+        };
+      }
+    } catch (e) {
+      print("❌ Get meal plan error: $e");
+      return {
+        'success': false,
+        'data': [],
+        'message': e.toString()
+      };
+    }
   }
 
   /// Add comment to meal plan

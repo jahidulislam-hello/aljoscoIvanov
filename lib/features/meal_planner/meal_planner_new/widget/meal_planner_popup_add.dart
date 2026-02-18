@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/features/meal_planner/meal_planner_new/meal_planner_all_model/meal_planner_all_model.dart';
+import 'package:get/get.dart';
 
 // ============================================
 // ADD PLANNING POPUP
@@ -303,7 +304,16 @@ class _AddPlanningPopupState extends State<AddPlanningPopup> {
                           });
 
                           if (success) {
-                            Navigator.pop(context);
+                            // Close this dialog
+                            Navigator.of(context).pop();
+                            // Show success message
+                            Get.snackbar(
+                              'Success',
+                              'Meal plan added successfully!',
+                              backgroundColor: Colors.green,
+                              colorText: Colors.white,
+                              snackPosition: SnackPosition.BOTTOM,
+                            );
                           } else {
                             showDialog(
                               context: context,

@@ -101,15 +101,61 @@ class CreateShoppingController extends GetxController {
     debugPrint('✅ Removed section at index $index');
   }
 
+  // ========= VALID UNITS =========
+  static const List<String> validUnits = [
+    'pcs', 'g', 'kg', 'ml', 'L', 'tbsp', 'tsp', 'cup', 'oz', 'lb'
+  ];
+
   // ========= ADD CUSTOM ITEM =========
   void addCustomItem(RecipeSection section) {
     if (section.nameCtrl.text.trim().isEmpty) return;
 
+    // Get the unit and validate it
+    String unit = section.unitCtrl.text.trim();
+    if (unit.isEmpty) {
+      unit = 'pcs'; // Default to pieces if empty
+    } else if (!validUnits.contains(unit)) {
+      // Try to find a matching valid unit (case-insensitive)
+      final lowerUnit = unit.toLowerCase();
+      final matchingUnit = validUnits.firstWhereOrNull(
+        (u) => u.toLowerCase() == lowerUnit,
+      );
+      if (matchingUnit != null) {
+        unit = matchingUnit;
+      } else {
+        Get.snackbar(
+          'Invalid Unit',
+          'Please use a valid unit: ${validUnits.join(", ")}',
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+    }
+
+    // Get amount with default
+    String amount = section.amountCtrl.text.trim();
+    if (amount.isEmpty) {
+      amount = '1';
+    }
+
+    // Calculate dynamic values based on amount
+    final parsedAmount = double.tryParse(amount) ?? 1.0;
+    final singleVal = parsedAmount / 2;
+    final householdVal = parsedAmount * 100;
+    final householdSingleVal = householdVal * singleVal / parsedAmount;
+
     section.items.add(
       ShoppingItemModel(
         name: section.nameCtrl.text.trim(),
-        amount: section.amountCtrl.text.trim(),
-        unit: section.unitCtrl.text.trim(),
+        amount: amount,
+        unit: unit,
+        singleValue: singleVal.toString(),
+        categories: 'Convenience',
+        houseHoldUnit: _getHouseholdUnit(unit),
+        householdValue: householdVal.toString(),
+        houseHoldForSingleValue: householdSingleVal.toString(),
       ),
     );
 
@@ -134,12 +180,39 @@ class CreateShoppingController extends GetxController {
       String amount,
       String unit,
       ) {
-    section.items[index]
-      ..name = name
-      ..amount = amount
-      ..unit = unit;
+    final item = section.items[index];
+    item.name = name;
+    item.amount = amount.isEmpty ? '1' : amount;
+    item.unit = unit.isEmpty ? 'pcs' : unit;
+
+    // Calculate dynamic defaults based on actual values
+    final parsedAmount = double.tryParse(item.amount) ?? 1.0;
+    final singleVal = parsedAmount / 2;
+    final householdVal = parsedAmount * 100;
+    final householdSingleVal = householdVal * singleVal / parsedAmount;
+
+    if (item.singleValue.isEmpty) item.singleValue = singleVal.toString();
+    if (item.categories.isEmpty) item.categories = 'Convenience';
+    if (item.houseHoldUnit.isEmpty) item.houseHoldUnit = _getHouseholdUnit(item.unit);
+    if (item.householdValue.isEmpty) item.householdValue = householdVal.toString();
+    if (item.houseHoldForSingleValue.isEmpty) item.houseHoldForSingleValue = householdSingleVal.toString();
 
     section.items.refresh();
+  }
+
+  // ========= GET HOUSEHOLD UNIT =========
+  String _getHouseholdUnit(String unit) {
+    // Map units to appropriate household units
+    switch (unit.toLowerCase()) {
+      case 'l':
+        return 'ml';
+      case 'kg':
+        return 'g';
+      case 'lb':
+        return 'oz';
+      default:
+        return 'g';
+    }
   }
 
   // ========= DATE PICKER =========
@@ -304,15 +377,28 @@ class CreateShoppingController extends GetxController {
       List<Map<String, dynamic>> ingredients = [];
 
       for (var item in section.items) {
+        // Ensure unit is valid, default to 'pcs' if not
+        String unit = item.unit;
+        if (unit.isEmpty || !validUnits.contains(unit)) {
+          unit = 'pcs';
+        }
+
+        // Calculate dynamic defaults based on actual amount
+        final amount = item.amount.isEmpty ? '1' : item.amount;
+        final parsedAmount = double.tryParse(amount) ?? 1.0;
+        final defaultSingleVal = parsedAmount / 2;
+        final defaultHouseholdVal = parsedAmount * 100;
+        final defaultHouseholdSingleVal = defaultHouseholdVal * defaultSingleVal / parsedAmount;
+
         ingredients.add({
           "name": item.name,
-          "unit": item.unit,
-          "value": item.amount,
-          "singleValue": item.singleValue,
-          "categories": item.categories,
-          "houseHoldUnit": item.houseHoldUnit,
-          "householdValue": item.householdValue,
-          "houseHoldForSingleValue": item.houseHoldForSingleValue,
+          "unit": unit,
+          "value": amount,
+          "singleValue": item.singleValue.isEmpty ? defaultSingleVal.toString() : item.singleValue,
+          "categories": item.categories.isEmpty ? 'Convenience' : item.categories,
+          "houseHoldUnit": item.houseHoldUnit.isEmpty ? _getHouseholdUnit(unit) : item.houseHoldUnit,
+          "householdValue": item.householdValue.isEmpty ? defaultHouseholdVal.toString() : item.householdValue,
+          "houseHoldForSingleValue": item.houseHoldForSingleValue.isEmpty ? defaultHouseholdSingleVal.toString() : item.houseHoldForSingleValue,
         });
       }
 
@@ -343,7 +429,7 @@ class CreateShoppingController extends GetxController {
       debugPrint('   Title: ${titleController.text.trim()}');
       debugPrint('   Description: ${descriptionController.text.trim()}');
       debugPrint('   Date: $dateString');
-      debugPrint('   Coocker: ${selectedPerson.value}');
+      debugPrint('   Cooker: ${selectedPerson.value}');
       debugPrint('   Sections: ${apiList.length}');
       debugPrint('   Has cover image: ${coverImage.value != null}');
 
