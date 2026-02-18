@@ -1289,16 +1289,21 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
 
           // Create shopping list button (show only when there's prep list data)
           if (hasPrepList)
-            CustomButton(
-              text: 'Create shopping list for $formattedDate',
-              color: AppColors.buttonColor,
-              onTap: () {
-                // Handle create shopping list
-                final dateStr = selectedDate.toIso8601String().split('T')[0];
-                _controller.markDateWithShoppingList(dateStr);
-                print("✅ Shopping list created for $dateStr");
+            Obx(() => CustomButton(
+              text: _controller.isLoading.value
+                  ? 'Creating...'
+                  : 'Create shopping list for $formattedDate',
+              color: _controller.isLoading.value
+                  ? AppColors.buttonColor.withOpacity(0.6)
+                  : AppColors.buttonColor,
+              onTap: () async {
+                if (_controller.isLoading.value) return;
+                final success = await _controller.createShoppingListFromPrepList(selectedDate);
+                if (success) {
+                  print("✅ Shopping list created for $formattedDate");
+                }
               },
-            ),
+            )),
         ],
       );
     });

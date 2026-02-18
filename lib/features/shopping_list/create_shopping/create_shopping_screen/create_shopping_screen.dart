@@ -195,28 +195,28 @@ class CreateShoppingScreen extends StatelessWidget {
         children: [
 
           /// HEADER - Show "Ingredients" label when from recipe
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (isFromRecipe) ...[
-                      Text(
-                        "Ingredients",
-                        style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
-                      ),
-                      SizedBox(height: 4.h),
-                    ],
-                    Text(
-                      section.title,
-                      style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+          // Row(
+          //   children: [
+          //     Expanded(
+          //       child: Column(
+          //         crossAxisAlignment: CrossAxisAlignment.start,
+          //         children: [
+          //           if (isFromRecipe) ...[
+          //             Text(
+          //               "Ingredients",
+          //               style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+          //             ),
+          //             SizedBox(height: 4.h),
+          //           ],
+          //           Text(
+          //             section.title,
+          //             style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   ],
+          // ),
 
           SizedBox(height: 12.h),
 

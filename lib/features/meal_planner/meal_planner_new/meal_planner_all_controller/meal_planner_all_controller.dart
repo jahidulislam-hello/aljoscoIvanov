@@ -3,10 +3,13 @@
 // ============================================
 
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../meal_planner_all_model/meal_planner_all_model.dart';
 import '../meal_planner_service/meal_planner_service.dart';
+import 'package:freshbite/features/shopping_list/shopping/shopping_service/shopping_service.dart';
+import 'package:freshbite/features/recepies/recipes_details/recipes_details_service/recipes_details_service.dart';
 
 class MealPlanController extends GetxController {
   var meals = <MealSection>[].obs;
@@ -89,111 +92,51 @@ class MealPlanController extends GetxController {
     }
   }
 
-  /// Fetch ALL meal plans from API and organize by date
-  Future<void> fetchAllMealPlansFromAPI() async {
-    print("📥 Fetching ALL meal plans from API...");
-    final response = await MealPlannerService.getAllMealPlans();
-
-    if (response['success'] == true && response['data'] != null) {
-      final List<dynamic> allMealPlansJson = response['data'];
-      final allMealPlans = allMealPlansJson
-          .map((json) => MealPlanApiModel.fromJson(json))
-          .toList();
-
-      print("✅ Fetched ${allMealPlans.length} total meal plans from API");
-
-      // Clear existing data
-      mealPlansByDate.clear();
-      datesWithMealPlans.clear();
-
-      // Group by date
-      for (var mealPlan in allMealPlans) {
-        final planDateStr = _toDateString(mealPlan.date);
-
-        if (!mealPlansByDate.containsKey(planDateStr)) {
-          mealPlansByDate[planDateStr] = [];
-        }
-        mealPlansByDate[planDateStr]!.add(mealPlan);
-        datesWithMealPlans.add(planDateStr);
-      }
-
-      print("📊 Organized meal plans into ${mealPlansByDate.length} unique dates");
-      print("📅 Dates with meal plans: ${datesWithMealPlans.toList()}");
-
-      mealPlansByDate.refresh();
-      datesWithMealPlans.refresh();
-
-      // Save to local storage for persistence
-      await saveMealPlansToLocalStorage();
-    } else {
-      throw Exception("Failed to fetch all meal plans: ${response['message'] ?? 'Unknown error'}");
-    }
-  }
-
-  /// Fetch meal plans for a specific date from API (optional - for targeted refresh)
+  /// Fetch meal plans for a specific date from API
   Future<void> fetchMealPlansForDate(String dateStr) async {
     try {
       isLoading.value = true;
 
       final normalizedDateStr = _toDateString(dateStr);
-      print("📅 Loading meal plans for date: $normalizedDateStr");
+      print("📅 Fetching meal plans for date: $normalizedDateStr");
 
-      // First, load from cache if available
-      loadMealPlansForDate(normalizedDateStr);
+      // Fetch from API
+      final response = await MealPlannerService.getMealPlan(normalizedDateStr);
 
-      // Try to fetch fresh data from API (try all meal plans first, then fallback to date-specific)
-      bool apiSuccess = false;
+      if (response['success'] == true && response['data'] != null) {
+        final List<dynamic> mealPlansJson = response['data'];
 
-      try {
-        // Try fetching all meal plans
-        await fetchAllMealPlansFromAPI();
-        apiSuccess = true;
-        print("✅ Successfully refreshed all meal plans from API");
-      } catch (e) {
-        print("⚠️ Failed to fetch all meal plans, trying date-specific fetch: $e");
+        if (mealPlansJson.isNotEmpty) {
+          final mealPlans = mealPlansJson
+              .map((json) => MealPlanApiModel.fromJson(json))
+              .toList();
 
-        // Fallback: try date-specific endpoint
-        try {
-          final response = await MealPlannerService.getMealPlan(normalizedDateStr);
+          // Store in cache
+          mealPlansByDate[normalizedDateStr] = mealPlans;
+          datesWithMealPlans.add(normalizedDateStr);
 
-          if (response['success'] == true && response['data'] != null) {
-            final List<dynamic> mealPlansJson = response['data'];
+          mealPlansByDate.refresh();
+          datesWithMealPlans.refresh();
 
-            if (mealPlansJson.isNotEmpty) {
-              final mealPlans = mealPlansJson
-                  .map((json) => MealPlanApiModel.fromJson(json))
-                  .toList();
+          // Save to local storage
+          await saveMealPlansToLocalStorage();
 
-              mealPlansByDate[normalizedDateStr] = mealPlans;
-              datesWithMealPlans.add(normalizedDateStr);
-
-              mealPlansByDate.refresh();
-              datesWithMealPlans.refresh();
-
-              await saveMealPlansToLocalStorage();
-
-              apiSuccess = true;
-              print("✅ Successfully fetched meal plans for $normalizedDateStr from date-specific API");
-            } else {
-              print("ℹ️ No meal plans found on API for $normalizedDateStr");
-              mealPlansByDate[normalizedDateStr] = [];
-              datesWithMealPlans.remove(normalizedDateStr);
-            }
-          }
-        } catch (e2) {
-          print("⚠️ Date-specific fetch also failed: $e2");
-          print("ℹ️ Using cached data only");
+          print("✅ Fetched ${mealPlans.length} meal plans for $normalizedDateStr");
+        } else {
+          print("ℹ️ No meal plans found for $normalizedDateStr");
+          mealPlansByDate[normalizedDateStr] = [];
         }
+      } else {
+        print("⚠️ API returned no success, using cached data");
       }
 
-      // Reload the UI with potentially updated data
+      // Load into UI sections
       loadMealPlansForDate(normalizedDateStr);
 
-      if (apiSuccess) {
-        print("✅ Meal plans refreshed and loaded for $normalizedDateStr");
-      } else {
-        print("ℹ️ Displaying cached meal plans for $normalizedDateStr");
-      }
+    } catch (e) {
+      print("❌ Error fetching meal plans: $e");
+      // Try to load from cache on error
+      loadMealPlansForDate(_toDateString(dateStr));
     } finally {
       isLoading.value = false;
     }
@@ -202,7 +145,10 @@ class MealPlanController extends GetxController {
   /// Load meal plans for a specific date into the meal sections (from cache)
   void loadMealPlansForDate(String dateStr) {
     final normalizedDateStr = _toDateString(dateStr);
-    print("📅 Loading meal plans for date: $normalizedDateStr");
+    print("📅 Loading meal plans into UI for: $normalizedDateStr");
+
+    // Debug: Show all cached dates
+    print("   📦 Cached dates: ${mealPlansByDate.keys.toList()}");
 
     // Initialize meal sections if they're empty
     _initializeMeals();
@@ -210,57 +156,71 @@ class MealPlanController extends GetxController {
     // Get meal plans for this date
     final plansForDate = mealPlansByDate[normalizedDateStr] ?? [];
 
-    // Clear existing recipes from meal sections for this date
+    // Clear existing recipes from all meal sections
     for (var meal in meals) {
       meal.recipe = null;
     }
 
     if (plansForDate.isEmpty) {
-      print("ℹ️ No meal plans for $normalizedDateStr");
+      print("ℹ️ No meal plans to display for $normalizedDateStr");
       meals.refresh();
       return;
     }
 
-    print("✅ Found ${plansForDate.length} meal plans for $normalizedDateStr");
+    print("✅ Loading ${plansForDate.length} meal plans into UI");
 
     // Update meal sections with data for this date
     for (var mealPlan in plansForDate) {
       final mealTime = mealPlan.mealTime.toLowerCase();
-      final index = meals.indexWhere(
-          (meal) => meal.title.toLowerCase() == mealTime);
+      print("   🍽️ Processing: meal_time='$mealTime', serving=${mealPlan.serving}");
+
+      // Find matching meal section (breakfast, lunch, dinner, snack)
+      int index = -1;
+      if (mealTime == 'breakfast') {
+        index = meals.indexWhere((m) => m.id == 'breakfast');
+      } else if (mealTime == 'lunch') {
+        index = meals.indexWhere((m) => m.id == 'lunch');
+      } else if (mealTime == 'dinner') {
+        index = meals.indexWhere((m) => m.id == 'dinner');
+      } else if (mealTime == 'snack') {
+        // Find first empty snack slot
+        index = meals.indexWhere((m) => m.id.startsWith('snack') && m.recipe == null);
+        if (index == -1) {
+          index = meals.indexWhere((m) => m.id == 'snack1');
+        }
+      }
+
+      print("   🔍 Found index: $index for meal_time: $mealTime");
 
       if (index != -1) {
-        // Get recipe details if available
+        // Get recipe details from the populated recipes array
         String recipeName = 'Meal Plan';
         String? imageUrl;
         int servings = mealPlan.serving;
 
-        // Try to extract recipe info from the recipes array
+        print("   📋 Recipes count: ${mealPlan.recipes.length}");
+
         if (mealPlan.recipes.isNotEmpty) {
           final recipe = mealPlan.recipes[0];
-          if (recipe is Map<String, dynamic>) {
-            // Handle different possible field names for recipe title
-            recipeName = recipe['title'] ??
-                         recipe['name'] ??
-                         recipe['recipeName'] ??
-                         recipe['recipe_title'] ??
-                         'Recipe';
+          print("   📋 Recipe type: ${recipe.runtimeType}");
 
-            // Handle different possible structures for images
-            if (recipe['images'] != null) {
-              if (recipe['images'] is List && (recipe['images'] as List).isNotEmpty) {
-                imageUrl = recipe['images'][0];
-              } else if (recipe['images'] is String) {
-                imageUrl = recipe['images'];
+          if (recipe is Map<String, dynamic>) {
+            // Full recipe data from API
+            recipeName = recipe['title'] ?? 'Recipe';
+
+            // Get image from images array
+            if (recipe['images'] != null && recipe['images'] is List) {
+              final images = recipe['images'] as List;
+              if (images.isNotEmpty) {
+                imageUrl = images[0]?.toString();
               }
-            } else if (recipe['image'] != null) {
-              imageUrl = recipe['image'];
-            } else if (recipe['imageUrl'] != null) {
-              imageUrl = recipe['imageUrl'];
             }
+
+            print("   ✅ Setting ${meals[index].title}: $recipeName (image: ${imageUrl != null})");
           } else if (recipe is String) {
-            // Just an ID, keep default name
-            recipeName = 'Recipe ${recipe.substring(0, 8)}...';
+            // Just recipe ID
+            recipeName = 'Recipe';
+            print("   ✅ Setting ${meals[index].title}: Recipe ID $recipe");
           }
         }
 
@@ -269,12 +229,14 @@ class MealPlanController extends GetxController {
           servings: '$servings servings',
           imageUrl: imageUrl,
         );
-
-        print("   ✓ Updated ${meals[index].title} section: $recipeName ($servings servings)");
+      } else {
+        print("   ⚠️ No matching section found for meal_time: $mealTime");
       }
     }
 
+    print("   🔄 Refreshing meals list...");
     meals.refresh();
+    print("   ✅ Done loading meal plans into UI");
   }
 
   /// Fetch prep list from API
@@ -310,52 +272,54 @@ class MealPlanController extends GetxController {
     }
   }
 
-  /// Helper function to parse date string to ISO 8601 format
+  /// Helper function to parse date string to ISO 8601 format with 08:00:00 UTC
   /// Supports formats like: "17.12.2025", "Mo, 22.1.26", "2025-12-17"
   String _parseToIso8601(String dateStr) {
     try {
       // Remove day names like "Mo, ", "Tu, " etc
       String cleanDate = dateStr.replaceAll(RegExp(r'^[A-Za-z]+,?\s*'), '').trim();
 
-      // Try parsing different formats
-      DateTime? dateTime;
+      int? day, month, year;
 
       // Format: "17.12.2025" or "22.1.26"
       if (cleanDate.contains('.')) {
         final parts = cleanDate.split('.');
         if (parts.length >= 3) {
-          final day = int.tryParse(parts[0]);
-          final month = int.tryParse(parts[1]);
+          day = int.tryParse(parts[0]);
+          month = int.tryParse(parts[1]);
           final yearStr = parts[2];
 
           // Handle 2-digit year (e.g., "26" -> "2026")
-          int? year;
           if (yearStr.length == 2) {
             year = 2000 + int.parse(yearStr);
           } else {
             year = int.tryParse(yearStr);
           }
-
-          if (day != null && month != null && year != null) {
-            dateTime = DateTime(year, month, day);
-          }
         }
       }
       // Format: "2025-12-17"
       else if (cleanDate.contains('-')) {
-        dateTime = DateTime.tryParse(cleanDate);
+        final parsed = DateTime.tryParse(cleanDate);
+        if (parsed != null) {
+          day = parsed.day;
+          month = parsed.month;
+          year = parsed.year;
+        }
       }
 
-      if (dateTime != null) {
-        return _toDateString(dateTime.toIso8601String());
+      if (day != null && month != null && year != null) {
+        // Create UTC time directly to avoid timezone conversion issues
+        return DateTime.utc(year, month, day, 8, 0, 0).toIso8601String();
       }
 
-      // Fallback: use current date
+      // Fallback: use current date with 08:00:00 UTC
       print("⚠️ Could not parse date '$dateStr', using current date");
-      return _toDateString(DateTime.now().toIso8601String());
+      final now = DateTime.now();
+      return DateTime.utc(now.year, now.month, now.day, 8, 0, 0).toIso8601String();
     } catch (e) {
       print("⚠️ Error parsing date '$dateStr': $e, using current date");
-      return _toDateString(DateTime.now().toIso8601String());
+      final now = DateTime.now();
+      return DateTime.utc(now.year, now.month, now.day, 8, 0, 0).toIso8601String();
     }
   }
 
@@ -369,10 +333,12 @@ class MealPlanController extends GetxController {
     try {
       isCreatingMealPlan.value = true;
 
-      // Convert to API format with proper date strings
+      // Convert to API format with proper date strings (ISO 8601 with 08:00:00 UTC)
+      final now = DateTime.now();
+      final defaultDate = DateTime.utc(now.year, now.month, now.day, 8, 0, 0).toIso8601String();
       final prepListDate = prepItems.isNotEmpty && prepItems[0].day.isNotEmpty
           ? _parseToIso8601(prepItems[0].day)
-          : _toDateString(DateTime.now().toIso8601String());
+          : defaultDate;
 
       final prepList = {
         "date": prepListDate,
@@ -443,21 +409,14 @@ class MealPlanController extends GetxController {
           await saveMealPlansToLocalStorage();
         }
 
-        // Try to refresh from API (optional, won't fail if API is down)
-        try {
-          await fetchAllMealPlansFromAPI();
-        } catch (e) {
-          print("⚠️ Could not refresh from API after creation, using local data: $e");
-        }
-
-        // Load the first affected date into the UI
+        // Refresh from API to get full recipe data
         if (mealItems.isNotEmpty && mealItems[0].day.isNotEmpty) {
           final firstDateStr = _parseToIso8601(mealItems[0].day);
-          loadMealPlansForDate(firstDateStr);
 
-          // Also update the UI for the current selected date if it's different
-          // This ensures the UI reflects the changes immediately
-          loadMealPlansForDate(_toDateString(DateTime.now().toIso8601String()));
+          // Fetch fresh data from API with full recipe details
+          await fetchMealPlansForDate(firstDateStr);
+
+          print("✅ Refreshed meal plans for $firstDateStr");
         }
 
         return true;
@@ -610,11 +569,11 @@ class MealPlanController extends GetxController {
       mealPlansByDate.forEach((date, mealPlans) {
         dataToSave[date] = mealPlans.map((plan) {
           return {
-            'id': plan.id,
+            '_id': plan.id,
             'userId': plan.userId,
             'date': plan.date,
             'serving': plan.serving,
-            'mealTime': plan.mealTime,
+            'meal_time': plan.mealTime,  // Use underscore to match API format
             'recipes': plan.recipes,
             'comments': plan.comments,
           };
@@ -685,5 +644,193 @@ class MealPlanController extends GetxController {
         print("⚠️ Failed to refresh prep list: $e");
       }),
     ]);
+  }
+
+  /// Create shopping list from prep list
+  Future<bool> createShoppingListFromPrepList(DateTime selectedDate) async {
+    try {
+      if (prepListItems.isEmpty || prepListItems.first.recipes.isEmpty) {
+        Get.snackbar(
+          'Error',
+          'No prep list available for this date',
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return false;
+      }
+
+      isLoading.value = true;
+      final prepList = prepListItems.first;
+      final dateStr = selectedDate.toUtc().toIso8601String();
+      final formattedDate = '${selectedDate.day}.${selectedDate.month}.${selectedDate.year.toString().substring(2)}';
+
+      print("📤 Creating shopping list from prep list...");
+      print("   Date: $dateStr");
+      print("   Recipes: ${prepList.recipes.length}");
+      print("   Cooker: ${prepList.cooker}");
+
+      // Get recipe IDs from prep list
+      final recipeIds = prepList.recipes
+          .where((r) => r.recipeId != null && r.recipeId!.isNotEmpty)
+          .map((r) => r.recipeId!)
+          .toList();
+
+      if (recipeIds.isEmpty) {
+        Get.snackbar(
+          'Error',
+          'No valid recipes found in prep list',
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return false;
+      }
+
+      print("   Recipe IDs: $recipeIds");
+
+      // Fetch recipe details for all recipes to get ingredients
+      List<Map<String, dynamic>> allSections = [];
+      List<String> recipeNames = [];
+
+      for (var recipeId in recipeIds) {
+        try {
+          print("📤 Fetching recipe details for: $recipeId");
+          final recipeResponse = await RecipesDetailsService.getSingleRecipe(recipeId);
+
+          if (recipeResponse['success'] == true && recipeResponse['data'] != null) {
+            final recipeData = recipeResponse['data'];
+            final recipeName = recipeData['title'] ?? 'Recipe';
+            recipeNames.add(recipeName);
+
+            // Get ingredients from recipe
+            final ingredients = recipeData['ingredients'] as List<dynamic>? ?? [];
+
+            if (ingredients.isNotEmpty) {
+              // Transform ingredients to shopping list format
+              List<Map<String, dynamic>> ingredientList = [];
+
+              for (var ing in ingredients) {
+                // Parse amount value
+                final value = ing['value']?.toString() ?? '1';
+                final parsedAmount = double.tryParse(value) ?? 1.0;
+                final singleVal = parsedAmount / 2;
+                final householdVal = parsedAmount * 100;
+                final householdSingleVal = householdVal * singleVal / parsedAmount;
+
+                // Get unit and map to household unit
+                final unit = ing['unit']?.toString() ?? 'pcs';
+                String houseHoldUnit = 'g';
+                switch (unit.toLowerCase()) {
+                  case 'l':
+                    houseHoldUnit = 'ml';
+                    break;
+                  case 'kg':
+                    houseHoldUnit = 'g';
+                    break;
+                  case 'lb':
+                    houseHoldUnit = 'oz';
+                    break;
+                  default:
+                    houseHoldUnit = 'g';
+                }
+
+                ingredientList.add({
+                  'name': ing['name'] ?? '',
+                  'unit': unit,
+                  'value': value,
+                  'singleValue': singleVal.toString(),
+                  'categories': ing['categories'] ?? 'Convenience',
+                  'houseHoldUnit': houseHoldUnit,
+                  'householdValue': householdVal.toString(),
+                  'houseHoldForSingleValue': householdSingleVal.toString(),
+                });
+              }
+
+              allSections.add({
+                'name': recipeName,
+                'ingredient': ingredientList,
+              });
+
+              print("✅ Added ${ingredientList.length} ingredients from $recipeName");
+            }
+          }
+        } catch (e) {
+          print("⚠️ Failed to fetch recipe $recipeId: $e");
+        }
+      }
+
+      if (allSections.isEmpty) {
+        Get.snackbar(
+          'Error',
+          'Could not fetch recipe ingredients',
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return false;
+      }
+
+      // Create shopping list title
+      final title = recipeNames.length == 1
+          ? '${recipeNames.first} Shopping List'
+          : 'Prep List Shopping - $formattedDate';
+
+      final description = recipeNames.length == 1
+          ? 'Ingredients for ${recipeNames.first}'
+          : 'Ingredients for: ${recipeNames.join(", ")}';
+
+      print("📤 Creating shopping list:");
+      print("   Title: $title");
+      print("   Sections: ${allSections.length}");
+
+      // Create proper shopping list using ShoppingService
+      final response = await ShoppingService.createShoppingList(
+        title: title,
+        description: description,
+        date: dateStr,
+        list: allSections,
+        coocker: prepList.cooker.isNotEmpty ? prepList.cooker : 'me',
+      );
+
+      if (response['success'] == true) {
+        print("✅ Shopping list created successfully from prep list");
+
+        // Mark the date as having a shopping list
+        markDateWithShoppingList(_toDateString(dateStr));
+
+        Get.snackbar(
+          'Success',
+          'Shopping list created for $formattedDate',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+
+        return true;
+      } else {
+        print("❌ Failed to create shopping list: ${response['message']}");
+        Get.snackbar(
+          'Error',
+          response['message'] ?? 'Failed to create shopping list',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return false;
+      }
+    } catch (e) {
+      print("❌ Error creating shopping list from prep list: $e");
+      Get.snackbar(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
   }
 }
