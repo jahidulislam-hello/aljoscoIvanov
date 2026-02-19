@@ -8,6 +8,7 @@ import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/features/shopping_list/create_shopping/create_shopping_screen/create_shopping_screen.dart';
+import 'package:freshbite/features/shopping_list/edit_shopping_list/edit_shopping_list_screen/edit_shopping_list_screen.dart';
 import 'package:freshbite/features/shopping_list/select_prep_list/select_prep_list_screen/select_prep_list_screen.dart';
 import 'package:freshbite/features/shopping_list/shopping/shopping_controller/shopping_controller.dart';
 import 'package:freshbite/features/shopping_list/shopping/shopping_model/shopping_model.dart';
@@ -243,6 +244,14 @@ class ShoppingScreen extends StatelessWidget {
                             return _ShoppingListTile(
                               item: item,
                               onToggle: () => controller.toggleFinished(index),
+                              onTap: () async {
+                                await Get.to(
+                                  () => EditShoppingListScreen(),
+                                  arguments: {'shoppingListId': item.id},
+                                );
+                                // Refresh list after returning
+                                controller.refreshShoppingLists();
+                              },
                             );
                           },
                         ),
@@ -284,16 +293,20 @@ class ShoppingScreen extends StatelessWidget {
 class _ShoppingListTile extends StatelessWidget {
   final ShoppingModel item;
   final VoidCallback onToggle;
+  final VoidCallback? onTap;
   const _ShoppingListTile({
     required this.item,
     required this.onToggle,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: 10.h),
-      child: Row(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.only(bottom: 10.h),
+        child: Row(
         children: [
           /// --- Image ---
           ClipRRect(
@@ -430,7 +443,7 @@ class _ShoppingListTile extends StatelessWidget {
           ),
         ],
       ),
-
+      ),
     );
   }
 }

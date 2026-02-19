@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:freshbite/core/network_celler/endpoints.dart';
 import 'package:freshbite/core/network_celler/http_client.dart';
+import 'package:freshbite/core/utils/shared_preference_helper.dart';
+import 'package:http/http.dart' as http;
 
 class MealPlannerService {
   /// Get all recipes
@@ -81,7 +83,7 @@ class MealPlannerService {
     throw Exception("Get all meal plans endpoint not supported - use getMealPlan(date) instead");
   }
 
-  /// Get meal plan for a specific date using POST with body
+  /// Get meal plan for a specific date using GET with body
   static Future<Map<String, dynamic>> getMealPlan(String date) async {
     try {
       // Format date as ISO 8601 with time 08:00:00 UTC
@@ -97,17 +99,27 @@ class MealPlannerService {
       final url = "${Urls.baseUrl}/mealplan/get-meal-plan";
       final body = {"date": formattedDate};
 
+      // Get auth token
+      final token = await SharedPreferencesHelper.getAccessToken();
+
       print("═══════════════════════════════════════════");
       print("📤 MEAL PLAN API REQUEST:");
       print("   URL: $url");
-      print("   Method: POST");
+      print("   Method: GET (with body)");
       print("   Body: ${jsonEncode(body)}");
+      print("   Token: ${token != null ? '${token.substring(0, 20)}...' : 'NULL'}");
       print("═══════════════════════════════════════════");
 
-      final response = await HttpClient.post(
-        Uri.parse(url),
-        body: jsonEncode(body),
-      );
+      // Use http.Request to send GET with body (unusual but supported)
+      final request = http.Request('GET', Uri.parse(url));
+      request.headers['Content-Type'] = 'application/json';
+      if (token != null) {
+        request.headers['Authorization'] = 'Bearer $token';
+      }
+      request.body = jsonEncode(body);
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
 
       print("📥 Get meal plan response (${response.statusCode})");
       print("📥 Response body: ${response.body.substring(0, response.body.length > 500 ? 500 : response.body.length)}...");

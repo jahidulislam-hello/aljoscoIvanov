@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../edit_shopping_list_model.dart';
 import 'package:freshbite/features/shopping_list/select_prep_list/select_prep_list_model/prep_list_model.dart';
 import 'package:freshbite/features/shopping_list/shopping/shopping_service/shopping_service.dart';
+import 'package:freshbite/features/shopping_list/shopping/shopping_model/shopping_model.dart';
 
 class EditShoppingController extends GetxController {
   // ========= TABS =========
@@ -12,11 +13,12 @@ class EditShoppingController extends GetxController {
 
   // ========= DESCRIPTION =========
   TextEditingController descriptionController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
 
 
   // ========= PLAN SHOPPING =========
-  RxString selectedPerson = "Aljoscha Ivanov".obs;
-  List<String> people = ["Aljoscha Ivanov", "John Doe", "Emma Watson"];
+  RxString selectedPerson = "me".obs;
+  List<String> people = ["me", "Partner", "Family Member", "Other"];
   void changePerson(String? value) => selectedPerson.value = value!;
 
   RxString selectedDate = "Select date".obs;
@@ -28,6 +30,14 @@ class EditShoppingController extends GetxController {
 
   // ========= LOADING STATE =========
   var isSaving = false.obs;
+  var isLoading = false.obs;
+
+  // ========= SHOPPING LIST ID (for edit mode) =========
+  String? shoppingListId;
+  RxBool isEditMode = false.obs;
+
+  // ========= TITLE =========
+  RxString listTitle = "".obs;
 
   void pickDate() async {
     DateTime? picked = await showDatePicker(
@@ -47,16 +57,149 @@ class EditShoppingController extends GetxController {
   // ========= RECIPE SECTIONS (REACTIVE) =========
   RxList<RecipeSection> recipeSections = <RecipeSection>[].obs;
 
+  // ========= CATEGORY SECTIONS (for BY CATEGORY tab) =========
+  RxList<RecipeSection> categorySections = <RecipeSection>[].obs;
+
   @override
   void onInit() {
     super.onInit();
-    _loadRecipesFromArguments();
+    _loadDataFromArguments();
+  }
+
+  /// Load data based on arguments (either from prep lists or from existing shopping list)
+  void _loadDataFromArguments() {
+    final args = Get.arguments;
+    if (args != null) {
+      if (args['shoppingListId'] != null) {
+        // Edit mode - load from single shopping list API
+        shoppingListId = args['shoppingListId'];
+        isEditMode.value = true;
+        _loadSingleShoppingList(shoppingListId!);
+      } else if (args['selectedPrepLists'] != null) {
+        // Create mode - load from prep lists
+        _loadRecipesFromPrepLists(args);
+      }
+    }
+  }
+
+  /// Load single shopping list from API
+  Future<void> _loadSingleShoppingList(String id) async {
+    try {
+      isLoading.value = true;
+      debugPrint('📤 Loading shopping list: $id');
+
+      final response = await ShoppingService.getSingleShoppingList(id);
+      final data = response['data'];
+
+      if (data != null) {
+        // Parse shopping model from response
+        final shoppingModel = ShoppingModel.fromJson(data);
+
+        // Set title
+        listTitle.value = shoppingModel.title;
+        titleController.text = shoppingModel.title;
+
+        // Set description
+        descriptionController.text = shoppingModel.description;
+
+        // Set coocker/person
+        selectedPerson.value = shoppingModel.coocker.isNotEmpty ? shoppingModel.coocker : "me";
+        if (!people.contains(selectedPerson.value)) {
+          people.add(selectedPerson.value);
+        }
+
+        // Set date
+        if (shoppingModel.date.isNotEmpty) {
+          try {
+            final dateTime = DateTime.parse(shoppingModel.date);
+            selectedDate.value = "${dateTime.day}/${dateTime.month}/${dateTime.year}";
+          } catch (e) {
+            debugPrint('❌ Error parsing date: $e');
+          }
+        }
+
+        // Convert list items to recipe sections (BY RECIPE)
+        recipeSections.value = shoppingModel.list.map((listItem) {
+          final items = listItem.ingredients.map((ingredient) {
+            return ShoppingItem(
+              name: ingredient.name,
+              amount: ingredient.value,
+              unit: ingredient.unit,
+              singleValue: ingredient.singleValue,
+              categories: ingredient.categories,
+              houseHoldUnit: ingredient.houseHoldUnit,
+              householdValue: ingredient.householdValue,
+              houseHoldForSingleValue: ingredient.houseHoldForSingleValue,
+            );
+          }).toList();
+
+          return RecipeSection(
+            title: listItem.name,
+            items: items,
+          );
+        }).toList();
+
+        // Build category sections (BY CATEGORY)
+        _buildCategorySections(shoppingModel);
+
+        debugPrint('✅ Shopping list loaded successfully');
+        debugPrint('   Title: ${shoppingModel.title}');
+        debugPrint('   Sections: ${recipeSections.length}');
+      }
+    } catch (e) {
+      debugPrint('❌ Error loading shopping list: $e');
+      Get.snackbar(
+        "Error",
+        "Failed to load shopping list",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Build category sections from shopping model
+  void _buildCategorySections(ShoppingModel shoppingModel) {
+    // Group all ingredients by category
+    final Map<String, List<ShoppingItem>> categoryMap = {};
+
+    for (var listItem in shoppingModel.list) {
+      for (var ingredient in listItem.ingredients) {
+        final category = ingredient.categories ?? 'Other';
+
+        if (!categoryMap.containsKey(category)) {
+          categoryMap[category] = [];
+        }
+
+        categoryMap[category]!.add(ShoppingItem(
+          name: ingredient.name,
+          amount: ingredient.value,
+          unit: ingredient.unit,
+          singleValue: ingredient.singleValue,
+          categories: ingredient.categories,
+          houseHoldUnit: ingredient.houseHoldUnit,
+          householdValue: ingredient.householdValue,
+          houseHoldForSingleValue: ingredient.houseHoldForSingleValue,
+        ));
+      }
+    }
+
+    // Convert map to sections
+    categorySections.value = categoryMap.entries.map((entry) {
+      return RecipeSection(
+        title: entry.key,
+        items: entry.value,
+      );
+    }).toList();
+
+    debugPrint('✅ Category sections built: ${categorySections.length}');
   }
 
   /// Load recipes from selected prep lists
-  void _loadRecipesFromArguments() {
-    final args = Get.arguments;
-    if (args != null && args['selectedPrepLists'] != null) {
+  void _loadRecipesFromPrepLists(Map<String, dynamic> args) {
+    if (args['selectedPrepLists'] != null) {
       final List<PrepListModel> selectedPrepLists = args['selectedPrepLists'];
 
       // Extract all recipes from all selected prep lists
@@ -77,6 +220,11 @@ class EditShoppingController extends GetxController {
             name: ingredient.name,
             amount: ingredient.value,
             unit: ingredient.unit,
+            singleValue: ingredient.singleValue,
+            categories: ingredient.categories,
+            houseHoldUnit: ingredient.houseHoldUnit,
+            householdValue: ingredient.householdValue,
+            houseHoldForSingleValue: ingredient.houseHoldForSingleValue,
           );
         }).toList();
 
@@ -86,9 +234,52 @@ class EditShoppingController extends GetxController {
         );
       }).toList();
 
+      // Build category sections from prep list recipes
+      _buildCategorySectionsFromPrepLists(allRecipes);
+
       debugPrint('✅ Loaded ${recipeSections.length} recipes with ingredients');
       debugPrint('✅ Recipe IDs: $recipeIds');
     }
+  }
+
+  /// Build category sections from prep list recipes
+  void _buildCategorySectionsFromPrepLists(List<RecipeDetail> recipes) {
+    final Map<String, List<ShoppingItem>> categoryMap = {};
+
+    for (var recipe in recipes) {
+      for (var ingredient in recipe.ingredients) {
+        final category = ingredient.categories ?? 'Other';
+
+        if (!categoryMap.containsKey(category)) {
+          categoryMap[category] = [];
+        }
+
+        categoryMap[category]!.add(ShoppingItem(
+          name: ingredient.name,
+          amount: ingredient.value,
+          unit: ingredient.unit,
+          singleValue: ingredient.singleValue,
+          categories: ingredient.categories,
+          houseHoldUnit: ingredient.houseHoldUnit,
+          householdValue: ingredient.householdValue,
+          houseHoldForSingleValue: ingredient.houseHoldForSingleValue,
+        ));
+      }
+    }
+
+    categorySections.value = categoryMap.entries.map((entry) {
+      return RecipeSection(
+        title: entry.key,
+        items: entry.value,
+      );
+    }).toList();
+
+    debugPrint('✅ Category sections from prep lists: ${categorySections.length}');
+  }
+
+  /// Get current sections based on selected tab
+  RxList<RecipeSection> get currentSections {
+    return selectedTab.value == 0 ? recipeSections : categorySections;
   }
 
 
@@ -169,7 +360,7 @@ class EditShoppingController extends GetxController {
       debugPrint('📤 Saving grocery list with date: $isoDate');
       debugPrint('📤 Recipe IDs: $recipeIds');
 
-      final response = await ShoppingService.createGroceryList(
+      await ShoppingService.createGroceryList(
         date: isoDate,
         recipeIds: recipeIds,
       );
