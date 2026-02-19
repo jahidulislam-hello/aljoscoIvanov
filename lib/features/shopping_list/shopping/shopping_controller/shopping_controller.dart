@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../shopping_model/shopping_model.dart';
 import '../shopping_service/shopping_service.dart';
+import 'package:freshbite/features/meal_planner/meal_planner_new/meal_planner_service/meal_planner_service.dart';
 
 class ShoppingController extends GetxController {
   var selectedDate = DateTime.now().obs;
@@ -127,17 +128,46 @@ class ShoppingController extends GetxController {
     }
   }
 
-  /// Fetch meal plan dates from MealPlanController if available
+  /// Fetch meal plan dates for the week
   Future<void> _fetchMealPlanDates() async {
     try {
-      // Try to get MealPlanController if it exists
-      if (Get.isRegistered<dynamic>(tag: 'MealPlanController')) {
-        // MealPlanController is registered, sync dates
-        debugPrint('📅 Syncing meal plan dates from MealPlanController');
+      debugPrint('📅 Fetching meal plan dates for the week...');
+      datesWithMealPlans.clear();
+
+      // Fetch meal plans for all dates in parallel for better performance
+      final futures = weekDates.map((date) async {
+        final dateStr = _toDateString(date);
+
+        try {
+          final response = await MealPlannerService.getMealPlan(dateStr);
+
+          if (response['success'] == true && response['data'] != null) {
+            final List<dynamic> mealPlans = response['data'];
+
+            // If there are meal plans for this date, return the date string
+            if (mealPlans.isNotEmpty) {
+              debugPrint('   ✅ Date $dateStr has ${mealPlans.length} meal plan(s)');
+              return dateStr;
+            }
+          }
+        } catch (e) {
+          debugPrint('   ⚠️ Could not fetch meal plan for $dateStr: $e');
+        }
+        return null;
+      }).toList();
+
+      // Wait for all requests to complete
+      final results = await Future.wait(futures);
+
+      // Add non-null results to the set
+      for (var dateStr in results) {
+        if (dateStr != null) {
+          datesWithMealPlans.add(dateStr);
+        }
       }
 
-      // For now, we'll fetch from API directly
-      // This can be enhanced to sync with MealPlanController
+      datesWithMealPlans.refresh();
+      debugPrint('📅 Dates with meal plans: ${datesWithMealPlans.toList()}');
     } catch (e) {
       debugPrint('⚠️ Could not fetch meal plan dates: $e');
     }

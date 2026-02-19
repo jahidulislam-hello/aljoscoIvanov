@@ -37,53 +37,74 @@ class EditShoppingListScreen extends StatelessWidget {
       ),
 
 
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            /// Title
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                /// Title Text
-                Text(
-                  "Shopping List from Prep List(s) 18.1.25",
-                  style: TextStyle(fontSize: 12.sp, color: Colors.black87),
-                ),
-
-                /// Edit Icon
-                GestureDetector(
-                  onTap: () {
-                    // your edit action here
-                  },
-                  child: Image.asset(
-                    AppImages.edit_icon,
-                    height: 24,
-                    width: 24,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return Center(
+            child: CircularProgressIndicator(
+              color: AppColors.buttonColor,
             ),
+          );
+        }
+
+        return SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              /// Title
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  /// Title Text
+                  Expanded(
+                    child: Obx(() => Text(
+                      controller.listTitle.value.isNotEmpty
+                          ? controller.listTitle.value
+                          : "Shopping List from Prep List(s)",
+                      style: TextStyle(fontSize: 12.sp, color: Colors.black87),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )),
+                  ),
+
+                  /// Edit Icon
+                  GestureDetector(
+                    onTap: () {
+                      // your edit action here
+                    },
+                    child: Image.asset(
+                      AppImages.edit_icon,
+                      height: 24,
+                      width: 24,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
 
 
-            SizedBox(height: 16.h),
+              SizedBox(height: 16.h),
 
-            /// Tabs
-            _buildTabButtons(controller),
+              /// Tabs
+              _buildTabButtons(controller),
 
-            SizedBox(height: 20.h),
+              SizedBox(height: 20.h),
 
-            /// Sections List
-            Obx(() => Column(
-              children: controller.recipeSections
-                  .asMap()
-                  .entries
-                  .map((entry) => _buildRecipeSection(entry.value, controller, entry.key))
-                  .toList(),
-            )),
+              /// Sections List (switches between BY RECIPE and BY CATEGORY)
+              Obx(() {
+                final sections = controller.selectedTab.value == 0
+                    ? controller.recipeSections
+                    : controller.categorySections;
+
+                return Column(
+                  children: sections
+                      .asMap()
+                      .entries
+                      .map((entry) => _buildRecipeSection(entry.value, controller, entry.key))
+                      .toList(),
+                );
+              }),
 
             SizedBox(height: 20.h),
 
@@ -139,8 +160,9 @@ class EditShoppingListScreen extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
+          ),
+        );
+      }),
     );
 
   }
@@ -279,7 +301,7 @@ class EditShoppingListScreen extends StatelessWidget {
           /// ITEMS
           Column(
             children: section.items
-                .map((item) => _buildShoppingItem(item))
+                .map((item) => _buildShoppingItem(item, controller))
                 .toList(),
           ),
 
@@ -296,8 +318,12 @@ class EditShoppingListScreen extends StatelessWidget {
   // ------------------------------------------------------------
   // SHOPPING ITEM ROW
   // ------------------------------------------------------------
-  Widget _buildShoppingItem(ShoppingItem item) {
+  Widget _buildShoppingItem(ShoppingItem item, EditShoppingController controller) {
     return Obx(() {
+      // Get display value and unit based on selected unit type
+      final displayValue = item.getDisplayValue(controller.selectedUnit.value);
+      final displayUnit = item.getDisplayUnit(controller.selectedUnit.value);
+
       return Column(
         children: [
 
@@ -330,18 +356,18 @@ class EditShoppingListScreen extends StatelessWidget {
                   ),
                 ),
 
-                /// Amount
+                /// Amount (displays based on unit selection)
                 Text(
-                  item.amount,
+                  _formatValue(displayValue),
                   style: TextStyle(
                       fontWeight: FontWeight.w700, fontSize: 14.sp),
                 ),
 
                 SizedBox(width: 6.w),
 
-                /// Unit
+                /// Unit (displays based on unit selection)
                 Text(
-                  item.unit,
+                  displayUnit,
                   style: TextStyle(fontSize: 12.sp, color: Colors.black54),
                 ),
 
@@ -500,5 +526,25 @@ class EditShoppingListScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  // ------------------------------------------------------------
+  // HELPER: Format value (round decimals)
+  // ------------------------------------------------------------
+  String _formatValue(String value) {
+    try {
+      final numValue = double.tryParse(value);
+      if (numValue == null) return value;
+
+      // If it's a whole number, show without decimals
+      if (numValue == numValue.roundToDouble()) {
+        return numValue.toInt().toString();
+      }
+
+      // Otherwise show with 1 decimal place
+      return numValue.toStringAsFixed(1);
+    } catch (e) {
+      return value;
+    }
   }
 }

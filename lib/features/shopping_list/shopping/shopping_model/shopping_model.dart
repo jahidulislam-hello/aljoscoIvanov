@@ -122,13 +122,21 @@ class Ingredient {
   final String name;
   final String unit;
   final String value;
-  final String? category;
+  final String? singleValue;
+  final String? categories;
+  final String? houseHoldUnit;
+  final String? householdValue;
+  final String? houseHoldForSingleValue;
 
   Ingredient({
     required this.name,
     required this.unit,
     required this.value,
-    this.category,
+    this.singleValue,
+    this.categories,
+    this.houseHoldUnit,
+    this.householdValue,
+    this.houseHoldForSingleValue,
   });
 
   factory Ingredient.fromJson(Map<String, dynamic> json) {
@@ -136,7 +144,11 @@ class Ingredient {
       name: json['name'] ?? '',
       unit: json['unit'] ?? '',
       value: json['value'] ?? '',
-      category: json['category'],
+      singleValue: json['singleValue'],
+      categories: json['categories'],
+      houseHoldUnit: json['houseHoldUnit'],
+      householdValue: json['householdValue'],
+      houseHoldForSingleValue: json['houseHoldForSingleValue'],
     );
   }
 
@@ -145,7 +157,11 @@ class Ingredient {
       'name': name,
       'unit': unit,
       'value': value,
-      if (category != null) 'category': category,
+      if (singleValue != null) 'singleValue': singleValue,
+      if (categories != null) 'categories': categories,
+      if (houseHoldUnit != null) 'houseHoldUnit': houseHoldUnit,
+      if (householdValue != null) 'householdValue': householdValue,
+      if (houseHoldForSingleValue != null) 'houseHoldForSingleValue': houseHoldForSingleValue,
     };
   }
 }
