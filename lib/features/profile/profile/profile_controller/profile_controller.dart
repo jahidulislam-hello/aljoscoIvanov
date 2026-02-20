@@ -1,4 +1,4 @@
-
+import 'package:flutter/widgets.dart';
 import 'package:freshbite/core/utils/shared_preference_helper.dart';
 import 'package:freshbite/features/profile/profile/model/profile_recipe_model.dart';
 import 'package:freshbite/features/profile/profile/model/user_model.dart';
@@ -19,6 +19,19 @@ class ProfileController extends GetxController {
     super.onInit();
     fetchProfileData();
     fetchUserRecipes();
+  }
+
+  /// Shows a snackbar safely, ensuring the Overlay is ready
+  void _showSnackbarSafely(String title, String message) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (Get.isSnackbarOpen != true) {
+        Get.snackbar(
+          title,
+          message,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      }
+    });
   }
 
   Future<void> fetchProfileData() async {
@@ -55,11 +68,7 @@ class ProfileController extends GetxController {
       }
     } catch (e) {
       print('Error fetching profile: $e');
-      Get.snackbar(
-        'Error',
-        'Failed to load profile data',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      _showSnackbarSafely('Error', 'Failed to load profile data');
     } finally {
       isLoadingProfile.value = false;
     }
@@ -78,11 +87,7 @@ class ProfileController extends GetxController {
       }
     } catch (e) {
       print('Error fetching recipes: $e');
-      Get.snackbar(
-        'Error',
-        'Failed to load recipes',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      _showSnackbarSafely('Error', 'Failed to load recipes');
     } finally {
       isLoadingRecipes.value = false;
     }

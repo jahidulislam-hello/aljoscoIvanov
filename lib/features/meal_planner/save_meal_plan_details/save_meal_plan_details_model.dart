@@ -13,7 +13,12 @@ class MealItemModel {
 
 class DailyMealPlanModel {
   final String date;
+  final String? planTitle;
   final List<MealItemModel> meals;
 
-  DailyMealPlanModel({required this.date, required this.meals});
+  DailyMealPlanModel({
+    required this.date,
+    this.planTitle,
+    required this.meals,
+  });
 }

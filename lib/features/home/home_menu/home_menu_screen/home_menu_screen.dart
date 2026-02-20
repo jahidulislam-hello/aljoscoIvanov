@@ -287,6 +287,7 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
     return InkWell(
       onTap: () {
         _closeMenu(); // close sidebar animation first
+        Get.back(); // close the menu dialog/overlay
         if (onTap != null) {
           onTap();
         }

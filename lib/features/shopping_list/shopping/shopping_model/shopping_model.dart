@@ -9,6 +9,7 @@ class ShoppingModel {
   final List<ShoppingListItem> list;
   final String userId;
   final String createdAt;
+  final String note;
 
   ShoppingModel({
     required this.id,
@@ -21,6 +22,7 @@ class ShoppingModel {
     required this.list,
     required this.userId,
     required this.createdAt,
+    this.note = '',
   });
 
   factory ShoppingModel.fromJson(Map<String, dynamic> json) {
@@ -37,6 +39,7 @@ class ShoppingModel {
           .toList() ?? [],
       userId: json['userId'] ?? '',
       createdAt: json['createdAt'] ?? '',
+      note: json['note'] ?? '',
     );
   }
 
@@ -52,6 +55,7 @@ class ShoppingModel {
       'list': list.map((item) => item.toJson()).toList(),
       'userId': userId,
       'createdAt': createdAt,
+      'note': note,
     };
   }
 
@@ -66,6 +70,7 @@ class ShoppingModel {
     List<ShoppingListItem>? list,
     String? userId,
     String? createdAt,
+    String? note,
   }) {
     return ShoppingModel(
       id: id ?? this.id,
@@ -78,6 +83,7 @@ class ShoppingModel {
       list: list ?? this.list,
       userId: userId ?? this.userId,
       createdAt: createdAt ?? this.createdAt,
+      note: note ?? this.note,
     );
   }
 

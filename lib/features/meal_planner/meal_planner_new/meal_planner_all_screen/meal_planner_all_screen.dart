@@ -14,6 +14,7 @@ import 'package:freshbite/core/widgets/button.dart';
 import 'package:freshbite/features/meal_planner/meal_planner_new/select_meal_popup/selact_meal_popup_screen/select_meal_popup_screen.dart';
 import 'package:freshbite/features/meal_planner/meal_planner_new/select_meal_popup/select_meal_popup_model/select_meal_popup_model.dart';
 import 'package:freshbite/features/meal_planner/meal_planner_new/widget/meal_planner_popup_add.dart';
+import 'package:freshbite/features/meal_planner/reused_meal_plan/reused_meal_plan_screen/reused_meal_plan_screen.dart';
 import 'package:get/get.dart';
 
 import '../meal_planner_all_controller/meal_planner_all_controller.dart';
@@ -81,6 +82,56 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
   void dispose() {
     _commentController.dispose();
     super.dispose();
+  }
+
+  void _showFullCalendar() {
+    showDatePicker(
+      context: context,
+      initialDate: _weekDates[_selectedDateIndex],
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors.buttonColor,
+              onPrimary: Colors.white,
+              surface: AppColors.background,
+              onSurface: AppColors.text,
+            ),
+            dialogTheme: DialogThemeData(
+              backgroundColor: AppColors.background,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    ).then((pickedDate) async {
+      if (pickedDate != null) {
+        setState(() {
+          // Update week dates to center around the picked date
+          _weekDates = List.generate(7, (index) {
+            return pickedDate.add(Duration(days: index - 3));
+          });
+          // Set selected index to middle (the picked date)
+          _selectedDateIndex = 3;
+          // Update month display
+          _currentMonth = _getMonthYear(pickedDate);
+        });
+
+        // Fetch meal plans for the selected date
+        final selectedDateStr = pickedDate.toIso8601String().split('T')[0];
+        await _controller.fetchMealPlansForDate(selectedDateStr);
+
+        // Fetch prep list if on prep list tab
+        if (_selectedTab == 1) {
+          await _controller.fetchPrepList(pickedDate.toIso8601String());
+        }
+      }
+    });
   }
 
   // Variable to store the current meal plan ID for commenting
@@ -435,7 +486,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               InkWell(
-                onTap: () {},
+                onTap: () => _showFullCalendar(),
                 child: Row(
                   children: [
                     Text(
@@ -457,6 +508,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                   switch (value) {
                     case 0:
                       // Apply Saved Meal Plan
+                      Get.to(() => const ReusedMealPlanScreen());
                       break;
                     case 1:
                       // Create Meal Plan

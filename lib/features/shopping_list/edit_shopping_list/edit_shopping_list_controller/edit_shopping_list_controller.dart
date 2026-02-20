@@ -36,6 +36,13 @@ class EditShoppingController extends GetxController {
   String? shoppingListId;
   RxBool isEditMode = false.obs;
 
+  // ========= VIEW MODE (after saving) =========
+  RxBool isViewMode = false.obs;
+
+  // ========= PERSONAL COMMENT/NOTE =========
+  TextEditingController noteController = TextEditingController();
+  RxString personalNote = "".obs;
+
   // ========= TITLE =========
   RxString listTitle = "".obs;
 
@@ -142,9 +149,16 @@ class EditShoppingController extends GetxController {
         // Build category sections (BY CATEGORY)
         _buildCategorySections(shoppingModel);
 
+        // Set note
+        debugPrint('📝 Loading note from API: "${shoppingModel.note}"');
+        noteController.text = shoppingModel.note;
+        personalNote.value = shoppingModel.note;
+        debugPrint('📝 personalNote.value set to: "${personalNote.value}"');
+
         debugPrint('✅ Shopping list loaded successfully');
         debugPrint('   Title: ${shoppingModel.title}');
         debugPrint('   Sections: ${recipeSections.length}');
+        debugPrint('   Note: "${shoppingModel.note}"');
       }
     } catch (e) {
       debugPrint('❌ Error loading shopping list: $e');
@@ -331,18 +345,6 @@ class EditShoppingController extends GetxController {
       return;
     }
 
-    // Validate recipe IDs
-    if (recipeIds.isEmpty) {
-      Get.snackbar(
-        "Error",
-        "No recipes available to save",
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
-      return;
-    }
-
     try {
       isSaving.value = true;
 
@@ -357,29 +359,100 @@ class EditShoppingController extends GetxController {
       final year = dateParts[2];
       final isoDate = '$year-$month-${day}T00:00:00.000Z';
 
-      debugPrint('📤 Saving grocery list with date: $isoDate');
-      debugPrint('📤 Recipe IDs: $recipeIds');
+      debugPrint('📤 Saving shopping list...');
+      debugPrint('📤 Is Edit Mode: ${isEditMode.value}');
+      debugPrint('📤 Shopping List ID: $shoppingListId');
 
-      await ShoppingService.createGroceryList(
-        date: isoDate,
-        recipeIds: recipeIds,
-      );
+      if (isEditMode.value && shoppingListId != null) {
+        // UPDATE existing shopping list
+        debugPrint('📤 Updating existing shopping list: $shoppingListId');
 
-      debugPrint('✅ Grocery list saved successfully');
+        // Build the list sections from recipeSections
+        final List<Map<String, dynamic>> listSections = recipeSections.map((section) {
+          return {
+            'name': section.title,
+            'ingredient': section.items.map((item) {
+              return {
+                'name': item.name,
+                'unit': item.unit,
+                'value': item.amount,
+                'singleValue': item.singleValue,
+                'categories': item.categories,
+                'houseHoldUnit': item.houseHoldUnit,
+                'householdValue': item.householdValue,
+                'houseHoldForSingleValue': item.houseHoldForSingleValue,
+              };
+            }).toList(),
+          };
+        }).toList();
+
+        await ShoppingService.updateShoppingList(
+          id: shoppingListId!,
+          title: listTitle.value.isNotEmpty ? listTitle.value : titleController.text,
+          description: descriptionController.text,
+          date: isoDate,
+          list: listSections,
+          coocker: selectedPerson.value,
+        );
+
+        debugPrint('✅ Shopping list updated successfully');
+      } else if (recipeIds.isNotEmpty) {
+        // CREATE new grocery list from prep lists
+        debugPrint('📤 Creating new grocery list with date: $isoDate');
+        debugPrint('📤 Recipe IDs: $recipeIds');
+
+        await ShoppingService.createGroceryList(
+          date: isoDate,
+          recipeIds: recipeIds,
+        );
+
+        debugPrint('✅ Grocery list created successfully');
+      } else {
+        // CREATE new shopping list with current items
+        debugPrint('📤 Creating new shopping list...');
+
+        final List<Map<String, dynamic>> listSections = recipeSections.map((section) {
+          return {
+            'name': section.title,
+            'ingredient': section.items.map((item) {
+              return {
+                'name': item.name,
+                'unit': item.unit,
+                'value': item.amount,
+                'singleValue': item.singleValue,
+                'categories': item.categories,
+                'houseHoldUnit': item.houseHoldUnit,
+                'householdValue': item.householdValue,
+                'houseHoldForSingleValue': item.houseHoldForSingleValue,
+              };
+            }).toList(),
+          };
+        }).toList();
+
+        await ShoppingService.createShoppingList(
+          title: listTitle.value.isNotEmpty ? listTitle.value : 'Shopping List',
+          description: descriptionController.text,
+          date: isoDate,
+          list: listSections,
+          coocker: selectedPerson.value,
+        );
+
+        debugPrint('✅ Shopping list created successfully');
+      }
 
       Get.snackbar(
         "Success",
-        "Grocery list saved successfully!",
+        isEditMode.value ? "Shopping list updated successfully!" : "Shopping list saved successfully!",
         backgroundColor: Colors.green,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
 
-      // Navigate back after successful save
-      await Future.delayed(Duration(seconds: 1));
-      Get.back();
+      // Switch to view mode after successful save
+      isViewMode.value = true;
+      personalNote.value = noteController.text;
     } catch (e) {
-      debugPrint('❌ Error saving grocery list: $e');
+      debugPrint('❌ Error saving shopping list: $e');
 
       Get.snackbar(
         "Error",
@@ -391,6 +464,107 @@ class EditShoppingController extends GetxController {
       );
     } finally {
       isSaving.value = false;
+    }
+  }
+
+  // ========= SWITCH TO EDIT MODE =========
+  void switchToEditMode() {
+    isViewMode.value = false;
+  }
+
+  // ========= SAVE NOTE =========
+  Future<void> saveNote() async {
+    if (shoppingListId == null) {
+      Get.snackbar(
+        "Error",
+        "Cannot save note - no shopping list ID",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    final noteText = noteController.text.trim();
+    debugPrint('📤 Saving shopping note: "$noteText"');
+
+    if (noteText.isEmpty) {
+      Get.snackbar(
+        "Info",
+        "Please enter a note first",
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    try {
+      isSaving.value = true;
+
+      await ShoppingService.updateShoppingList(
+        id: shoppingListId!,
+        note: noteText,
+      );
+
+      personalNote.value = noteText;
+      debugPrint('✅ Note saved and personalNote updated to: "${personalNote.value}"');
+
+      Get.snackbar(
+        "Success",
+        "Shopping note saved successfully!",
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      debugPrint('❌ Error saving note: $e');
+      Get.snackbar(
+        "Error",
+        "Failed to save note",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isSaving.value = false;
+    }
+  }
+
+  // ========= MARK AS COMPLETE =========
+  Future<void> markAsComplete() async {
+    try {
+      isSaving.value = true;
+
+      if (shoppingListId != null) {
+        await ShoppingService.updateShoppingList(
+          id: shoppingListId!,
+          isDone: true,
+        );
+      }
+
+      isSaving.value = false;
+      Get.back();
+
+      Future.delayed(Duration(milliseconds: 300), () {
+        Get.snackbar(
+          "Success",
+          "Shopping list marked as complete!",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
+      });
+    } catch (e) {
+      debugPrint('❌ Error marking as complete: $e');
+      isSaving.value = false;
+      Get.snackbar(
+        "Error",
+        "Failed to mark as complete",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 }
