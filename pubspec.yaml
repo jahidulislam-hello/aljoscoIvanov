@@ -46,6 +46,8 @@ dependencies:
   package_info_plus: ^4.2.0
   sqflite: ^2.3.0
   smooth_page_indicator: ^1.1.0
+  pdf: ^3.10.8
+  printing: ^5.12.0
 
 
 

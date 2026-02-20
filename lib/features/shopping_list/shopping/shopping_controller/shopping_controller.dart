@@ -179,6 +179,25 @@ class ShoppingController extends GetxController {
     // You can add date filtering logic here if needed
   }
 
+  /// Select a date from calendar picker and update week view
+  void selectDateFromCalendar(DateTime pickedDate) {
+    selectedDate.value = pickedDate;
+
+    // Update week dates to center around the picked date
+    weekDates.value = List.generate(7, (index) {
+      return pickedDate.add(Duration(days: index - 3)); // -3 to +3 from picked date
+    });
+
+    // Set selected index to middle (the picked date)
+    selectedDateIndex.value = 3;
+
+    // Update month display
+    currentMonth.value = _getMonthYear(pickedDate);
+
+    // Refresh meal plan dates for new week
+    _fetchMealPlanDates();
+  }
+
   /// Toggle finished status of a shopping list
   Future<void> toggleFinished(int index) async {
     try {

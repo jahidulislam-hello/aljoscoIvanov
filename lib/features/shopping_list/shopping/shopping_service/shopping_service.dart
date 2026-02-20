@@ -304,17 +304,66 @@ class ShoppingService {
     }
   }
 
-  /// Update shopping list (mark as done/undone)
+  /// Update shopping list (supports full update or just isDone)
   static Future<Map<String, dynamic>> updateShoppingList({
     required String id,
-    required bool isDone,
+    bool? isDone,
+    String? title,
+    String? description,
+    String? date,
+    List<Map<String, dynamic>>? list,
+    String? coocker,
+    String? note,
   }) async {
     try {
       debugPrint('📤 Updating shopping list: $id');
 
+      // Build request body with only provided fields
+      final Map<String, dynamic> body = {};
+
+      if (isDone != null) body['isDone'] = isDone;
+      if (title != null) body['title'] = title;
+      if (description != null) body['description'] = description;
+      if (date != null) body['date'] = date;
+      if (coocker != null) body['coocker'] = coocker;
+      if (note != null) body['note'] = note;
+
+      if (list != null) {
+        // Process list to ensure all required fields have valid values
+        final processedList = list.map((section) {
+          final ingredients = (section['ingredient'] as List).map((ing) {
+            return {
+              'name': ing['name'] ?? '',
+              'unit': ing['unit'] ?? 'pcs',
+              'value': ing['value'] ?? '1',
+              'singleValue': (ing['singleValue'] != null && ing['singleValue'].toString().isNotEmpty)
+                  ? ing['singleValue']
+                  : '0.5',
+              'categories': (ing['categories'] != null && ing['categories'].toString().isNotEmpty)
+                  ? ing['categories']
+                  : 'Convenience',
+              'houseHoldUnit': ing['houseHoldUnit'] ?? 'g',
+              'householdValue': ing['householdValue'] ?? '100',
+              'houseHoldForSingleValue': (ing['houseHoldForSingleValue'] != null && ing['houseHoldForSingleValue'].toString().isNotEmpty)
+                  ? ing['houseHoldForSingleValue']
+                  : '50',
+            };
+          }).toList();
+
+          return {
+            'name': section['name'],
+            'ingredient': ingredients,
+          };
+        }).toList();
+
+        body['list'] = processedList;
+      }
+
+      debugPrint('📤 Update body: ${jsonEncode(body)}');
+
       final response = await HttpClient.patch(
         Uri.parse('${Urls.baseUrl}/shopping/update-shopping-list/$id'),
-        body: jsonEncode({'isDone': isDone}),
+        body: jsonEncode(body),
       );
 
       debugPrint('📥 Update shopping list response: ${response.statusCode}');

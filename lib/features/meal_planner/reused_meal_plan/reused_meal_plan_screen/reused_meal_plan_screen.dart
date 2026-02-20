@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/features/meal_planner/reused_meal_plan/reused_meal_plan_controller/reused_meal_plan_controller.dart';
+import 'package:freshbite/features/meal_planner/save_meal_plan_details/save_meal_plan_details_screen/save_meal_plan_details_screen.dart';
 import 'package:get/get.dart';
 
-
+import '../../../../core/appbar/custom_appbar.dart';
 
 // ================= SCREEN =================
 class ReusedMealPlanScreen extends StatelessWidget {
@@ -16,21 +17,16 @@ class ReusedMealPlanScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F3EF),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF1F3EF),
-        elevation: 0,
-        titleSpacing: 0,
-        centerTitle: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Get.back(),
-        ),
-        title: Text(
-          "Apply Saved Meal Plan",
-          style: TextStyle(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF2D2D2D),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: SafeArea(
+          child: CustomAppBar(
+            title: 'Apply Saved Meal Plan',
+            titleAlignment: AppBarTitleAlignment.center,
+            showBackButton: true,
+            actionButtons: [
+              AppBarAction(imagePath: 'assets/icons/charm_menu.png', onPressed: () {}),
+            ],
           ),
         ),
       ),
@@ -41,42 +37,44 @@ class ReusedMealPlanScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 10.h),
-            Text(
-              "Saved Meal Plans",
-              style: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
-            ),
-            SizedBox(height: 10.h),
 
-            // Sort Button
-            Align(
-              alignment: Alignment.centerRight,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8.r),
-                  border: Border.all(color: const Color(0xFFB5B7B4)),
+            // Saved Meal Plans and Sort Button in same row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Saved Meal Plans",
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      "Sorted by date",
-                      style: TextStyle(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF2D2D2D),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.r),
+                    border: Border.all(color: const Color(0xFFB5B7B4)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        "Sorted by date",
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF2D2D2D),
+                        ),
                       ),
-                    ),
-                    SizedBox(width: 6.w),
-                    const Icon(Icons.keyboard_arrow_down, size: 18),
-                  ],
+                      SizedBox(width: 6.w),
+                      const Icon(Icons.keyboard_arrow_down, size: 18),
+                    ],
+                  ),
                 ),
-              ),
+              ],
             ),
+
             SizedBox(height: 20.h),
 
             Expanded(
@@ -87,26 +85,38 @@ class ReusedMealPlanScreen extends StatelessWidget {
                     final item = controller.mealPlans[index];
 
                     return GestureDetector(
-                      onTap: () => controller.selectMeal(index),
+                      onTap: () => controller.toggleSelection(index),
                       child: Container(
                         margin: EdgeInsets.only(bottom: 14.h),
                         padding: EdgeInsets.all(14.w),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                Icon(
-                                  item.isSelected
-                                      ? Icons.radio_button_checked
-                                      : Icons.radio_button_off,
-                                  color: item.isSelected
-                                      ? const Color(0xFF4A8A38)
-                                      : Colors.grey,
+                                // Circular checkbox for multiple selection
+                                Container(
+                                  width: 22.w,
+                                  height: 22.h,
+                                  decoration: BoxDecoration(
+                                    color: item.isSelected
+                                        ? const Color(0xFF1C2D07)
+                                        : Colors.transparent,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: item.isSelected
+                                          ? const Color(0xFF1C2D07)
+                                          : Colors.grey,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: item.isSelected
+                                      ? Icon(
+                                          Icons.check,
+                                          size: 14.sp,
+                                          color: Colors.white,
+                                        )
+                                      : null,
                                 ),
                                 SizedBox(width: 10.w),
                                 Expanded(
@@ -154,23 +164,40 @@ class ReusedMealPlanScreen extends StatelessWidget {
             SizedBox(height: 10.h),
 
             // CONTINUE BUTTON
-            SizedBox(
+            Obx(() => SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4A8A38),
+                  backgroundColor: controller.hasSelection()
+                      ? const Color(0xFF1C2D07)
+                      : const Color(0xFF1C2D07).withOpacity(0.5),
                   padding: EdgeInsets.symmetric(vertical: 14.h),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: controller.hasSelection()
+                    ? () {
+                        final selectedPlans = controller.getSelectedMealPlans();
+                        print('Selected Meal Plans: ${selectedPlans.length}');
+                        for (var plan in selectedPlans) {
+                          print('- ${plan.title} (${plan.date})');
+                        }
+                        Get.to(() => SavedMealPlanDetails(
+                          selectedMealPlans: selectedPlans,
+                        ));
+                      }
+                    : null,
                 child: Text(
                   "CONTINUE",
-                  style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-            ),
+            )),
 
             SizedBox(height: 20.h),
           ],

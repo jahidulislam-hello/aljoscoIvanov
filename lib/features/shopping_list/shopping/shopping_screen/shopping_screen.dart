@@ -75,7 +75,7 @@ class ShoppingScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       InkWell(
-                        onTap: () {},
+                        onTap: () => _showFullCalendar(context, controller),
                         child: Row(
                           children: [
                             Text(
@@ -457,6 +457,38 @@ class _ShoppingListTile extends StatelessWidget {
 
 
 
+
+void _showFullCalendar(BuildContext context, ShoppingController controller) {
+  showDatePicker(
+    context: context,
+    initialDate: controller.selectedDate.value,
+    firstDate: DateTime(2020),
+    lastDate: DateTime(2030),
+    builder: (context, child) {
+      return Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: ColorScheme.light(
+            primary: AppColors.buttonColor,
+            onPrimary: Colors.white,
+            surface: AppColors.background,
+            onSurface: AppColors.text,
+          ),
+          dialogTheme: DialogThemeData(
+            backgroundColor: AppColors.background,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+        ),
+        child: child!,
+      );
+    },
+  ).then((pickedDate) {
+    if (pickedDate != null) {
+      controller.selectDateFromCalendar(pickedDate);
+    }
+  });
+}
 
 void showCreateShoppingListPopup(BuildContext context, ShoppingController controller) {
   showDialog(

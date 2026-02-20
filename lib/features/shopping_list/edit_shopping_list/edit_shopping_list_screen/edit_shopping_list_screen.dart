@@ -21,21 +21,19 @@ class EditShoppingListScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      // Only AppBar is wrapped with SafeArea inside CustomAppBar if needed
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: SafeArea(
-          child: CustomAppBar(
-            title: 'Edit Shopping List',
+          child: Obx(() => CustomAppBar(
+            title: controller.isViewMode.value ? 'Shopping List' : 'Edit Shopping List',
             titleAlignment: AppBarTitleAlignment.center,
             showBackButton: true,
             actionButtons: [
               AppBarAction(imagePath: 'assets/icons/charm_menu.png', onPressed: () {}),
             ],
-          ),
+          )),
         ),
       ),
-
 
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -46,125 +44,433 @@ class EditShoppingListScreen extends StatelessWidget {
           );
         }
 
-        return SingleChildScrollView(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        // Show View Mode or Edit Mode
+        if (controller.isViewMode.value) {
+          return _buildViewMode(controller);
+        } else {
+          return _buildEditMode(controller);
+        }
+      }),
+    );
+  }
+
+  // ============================================================
+  // VIEW MODE - After saving
+  // ============================================================
+  Widget _buildViewMode(EditShoppingController controller) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// Title with three dot menu
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-
-              /// Title
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  /// Title Text
-                  Expanded(
-                    child: Obx(() => Text(
-                      controller.listTitle.value.isNotEmpty
-                          ? controller.listTitle.value
-                          : "Shopping List from Prep List(s)",
-                      style: TextStyle(fontSize: 12.sp, color: Colors.black87),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    )),
+              Expanded(
+                child: Text(
+                  controller.listTitle.value.isNotEmpty
+                      ? controller.listTitle.value
+                      : "Shopping List",
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
                   ),
-
-                  /// Edit Icon
-                  GestureDetector(
-                    onTap: () {
-                      // your edit action here
-                    },
-                    child: Image.asset(
-                      AppImages.edit_icon,
-                      height: 24,
-                      width: 24,
-                      color: Colors.grey,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              PopupMenuButton<int>(
+                icon: Icon(Icons.more_vert, color: Colors.grey),
+                color: AppColors.buttonColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+                onSelected: (value) {
+                  switch (value) {
+                    case 0:
+                      // Edit
+                      controller.switchToEditMode();
+                      break;
+                    case 1:
+                      // Save Note
+                      controller.saveNote();
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem<int>(
+                    value: 0,
+                    child: Text(
+                      'Edit',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: AppColors.pureWhite,
+                      ),
+                    ),
+                  ),
+                  PopupMenuDivider(height: 1),
+                  PopupMenuItem<int>(
+                    value: 1,
+                    child: Text(
+                      'Save Note',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        color: AppColors.pureWhite,
+                      ),
                     ),
                   ),
                 ],
               ),
+            ],
+          ),
 
+          SizedBox(height: 8.h),
 
-              SizedBox(height: 16.h),
+          /// Date
+          Text(
+            controller.selectedDate.value,
+            style: TextStyle(
+              fontSize: 14.sp,
+              color: Colors.grey[600],
+            ),
+          ),
 
-              /// Tabs
-              _buildTabButtons(controller),
+          SizedBox(height: 16.h),
 
-              SizedBox(height: 20.h),
+          /// Shopping Note - Show text if exists, otherwise show input
+          Obx(() {
+            if (controller.personalNote.value.isNotEmpty) {
+              // Show read-only note
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Shopping Note",
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 6.h),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(12.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.pureWhite,
+                      borderRadius: BorderRadius.circular(8.r),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Text(
+                      controller.personalNote.value,
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              // Show input field to add note
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Shopping Note",
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(height: 6.h),
+                  Container(
+                    padding: EdgeInsets.all(12.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.pureWhite,
+                      borderRadius: BorderRadius.circular(8.r),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: TextField(
+                      controller: controller.noteController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Add a note for your shopping...",
+                        hintStyle: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
+          }),
 
-              /// Sections List (switches between BY RECIPE and BY CATEGORY)
-              Obx(() {
-                final sections = controller.selectedTab.value == 0
-                    ? controller.recipeSections
-                    : controller.categorySections;
+          SizedBox(height: 20.h),
 
-                return Column(
-                  children: sections
-                      .asMap()
-                      .entries
-                      .map((entry) => _buildRecipeSection(entry.value, controller, entry.key))
-                      .toList(),
-                );
-              }),
+          /// All List Items
+          Obx(() {
+            final sections = controller.recipeSections;
+            return Column(
+              children: sections
+                  .asMap()
+                  .entries
+                  .map((entry) => _buildViewModeSection(entry.value, controller))
+                  .toList(),
+            );
+          }),
 
-            SizedBox(height: 20.h),
+          SizedBox(height: 30.h),
 
-            /// Description
-            Text("Description", style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600)),
-            SizedBox(height: 6.h),
+          /// MARK AS COMPLETE BUTTON
+          Obx(() => controller.isSaving.value
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.buttonColor,
+                  ),
+                )
+              : CustomTextButton(
+                  text: 'MARK AS COMPLETE',
+                  onTap: controller.markAsComplete,
+                )),
 
-            Container(
-              padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(
-                color: AppColors.pureWhite,
-                borderRadius: BorderRadius.circular(8.r),
+          SizedBox(height: 20.h),
+        ],
+      ),
+    );
+  }
+
+  // ------------------------------------------------------------
+  // VIEW MODE SECTION
+  // ------------------------------------------------------------
+  Widget _buildViewModeSection(RecipeSection section, EditShoppingController controller) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 20.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// Section Title
+          Text(
+            section.title,
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w700,
+              color: Colors.black87,
+            ),
+          ),
+          SizedBox(height: 12.h),
+
+          /// Items
+          Column(
+            children: section.items
+                .map((item) => _buildViewModeItem(item, controller))
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ------------------------------------------------------------
+  // VIEW MODE ITEM
+  // ------------------------------------------------------------
+  Widget _buildViewModeItem(ShoppingItem item, EditShoppingController controller) {
+    return Obx(() {
+      final displayValue = item.getDisplayValue(controller.selectedUnit.value);
+      final displayUnit = item.getDisplayUnit(controller.selectedUnit.value);
+
+      return Column(
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 10.h),
+            child: Row(
+              children: [
+                /// Checkbox
+                GestureDetector(
+                  onTap: () {
+                    item.checked.value = !item.checked.value;
+                  },
+                  child: Image.asset(
+                    item.checked.value
+                        ? AppImages.thik_fill_icon
+                        : AppImages.thik_icon,
+                    height: 24,
+                    width: 24,
+                  ),
+                ),
+
+                SizedBox(width: 12.w),
+
+                /// Name
+                Expanded(
+                  child: Text(
+                    item.name,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      decoration: item.checked.value
+                          ? TextDecoration.lineThrough
+                          : TextDecoration.none,
+                      color: item.checked.value ? Colors.grey : Colors.black87,
+                    ),
+                  ),
+                ),
+
+                /// Amount
+                Text(
+                  _formatValue(displayValue),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14.sp,
+                    color: item.checked.value ? Colors.grey : Colors.black87,
+                  ),
+                ),
+
+                SizedBox(width: 6.w),
+
+                /// Unit
+                Text(
+                  displayUnit,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Divider(
+            color: Colors.grey.shade300,
+            thickness: 1,
+            height: 1,
+          ),
+        ],
+      );
+    });
+  }
+
+  // ============================================================
+  // EDIT MODE - Original edit screen
+  // ============================================================
+  Widget _buildEditMode(EditShoppingController controller) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          /// Title
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              /// Title Text
+              Expanded(
+                child: Obx(() => Text(
+                  controller.listTitle.value.isNotEmpty
+                      ? controller.listTitle.value
+                      : "Shopping List from Prep List(s)",
+                  style: TextStyle(fontSize: 12.sp, color: Colors.black87),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                )),
               ),
-              child: TextField(
-                maxLines: 4,
-                controller: controller.descriptionController,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "Add a short description about this shopping list",
+
+              /// Edit Icon
+              GestureDetector(
+                onTap: () {
+                  // your edit action here
+                },
+                child: Image.asset(
+                  AppImages.edit_icon,
+                  height: 24,
+                  width: 24,
+                  color: Colors.grey,
                 ),
               ),
-            ),
-
-            SizedBox(height: 20.h),
-
-            /// Plan your shopping
-            Text("Plan your shopping", style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600)),
-            SizedBox(height: 8.h),
-
-            _buildPlanSection(controller),
-
-            SizedBox(height: 30.h),
-
-            /// SAVE BUTTON
-            Obx(() => controller.isSaving.value
-                ? Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.buttonColor,
-                    ),
-                  )
-                : CustomTextButton(
-                    text: 'SAVE',
-                    onTap: controller.saveList,
-                  )),
-
-            SizedBox(height: 10.h),
-
-            /// CANCEL BUTTON
-            Center(
-              child: TextButton(
-                onPressed: () => Get.back(),
-                child: Text("CANCEL", style: TextStyle(color: Colors.black54, fontSize: 14.sp)),
-              ),
-            ),
-          ],
+            ],
           ),
-        );
-      }),
-    );
 
+
+          SizedBox(height: 16.h),
+
+          /// Tabs
+          _buildTabButtons(controller),
+
+          SizedBox(height: 20.h),
+
+          /// Sections List (switches between BY RECIPE and BY CATEGORY)
+          Obx(() {
+            final sections = controller.selectedTab.value == 0
+                ? controller.recipeSections
+                : controller.categorySections;
+
+            return Column(
+              children: sections
+                  .asMap()
+                  .entries
+                  .map((entry) => _buildRecipeSection(entry.value, controller, entry.key))
+                  .toList(),
+            );
+          }),
+
+        SizedBox(height: 20.h),
+
+        /// Description
+        Text("Description", style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600)),
+        SizedBox(height: 6.h),
+
+        Container(
+          padding: EdgeInsets.all(12.w),
+          decoration: BoxDecoration(
+            color: AppColors.pureWhite,
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          child: TextField(
+            maxLines: 4,
+            controller: controller.descriptionController,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              hintText: "Add a short description about this shopping list",
+            ),
+          ),
+        ),
+
+        SizedBox(height: 20.h),
+
+        /// Plan your shopping
+        Text("Plan your shopping", style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600)),
+        SizedBox(height: 8.h),
+
+        _buildPlanSection(controller),
+
+        SizedBox(height: 30.h),
+
+        /// SAVE BUTTON
+        Obx(() => controller.isSaving.value
+            ? Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.buttonColor,
+                ),
+              )
+            : CustomTextButton(
+                text: 'SAVE',
+                onTap: controller.saveList,
+              )),
+
+        SizedBox(height: 10.h),
+
+        /// CANCEL BUTTON
+        Center(
+          child: TextButton(
+            onPressed: () => Get.back(),
+            child: Text("CANCEL", style: TextStyle(color: Colors.black54, fontSize: 14.sp)),
+          ),
+        ),
+      ],
+      ),
+    );
   }
 
   // ------------------------------------------------------------
