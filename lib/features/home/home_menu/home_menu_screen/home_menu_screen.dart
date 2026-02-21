@@ -164,7 +164,7 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
               children: [
                 SizedBox(height: 4.h),
 
-                _buildMenuItem('assets/icons/menu1.png', 'My Profile',onTap: () {
+                _buildMenuItem('assets/icons/menu1.png', 'My Profile'.tr, onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -172,7 +172,7 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
                     ),
                   );
                 },),
-                _buildMenuItem('assets/icons/menu2.png', 'Subscription',onTap: () {
+                _buildMenuItem('assets/icons/menu2.png', 'Subscription'.tr, onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -182,7 +182,7 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
                 },),
                 _buildMenuItem(
                   'assets/icons/menu3.png',
-                  'Favourites',
+                  'Favourites'.tr,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -193,7 +193,7 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
                   },
                 ),
 
-                _buildMenuItem('assets/icons/menu4.png', 'Preferences',
+                _buildMenuItem('assets/icons/menu4.png', 'Preferences'.tr,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -205,7 +205,7 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
                 ),
                 _buildMenuItem(
                   'assets/icons/menu5.png',
-                  'Cooking Skills',
+                  'Cooking Skills'.tr,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -227,7 +227,7 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
 
                 SizedBox(height: 26.h),
 
-                _buildMenuItem('assets/icons/menu6.png', 'About freshbite',onTap: () {
+                _buildMenuItem('assets/icons/menu6.png', 'About freshbite'.tr, onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -235,7 +235,7 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
                     ),
                   );
                 },),
-                _buildMenuItem('assets/icons/menu7.png', 'FAQ',onTap: () {
+                _buildMenuItem('assets/icons/menu7.png', 'FAQ'.tr, onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -243,15 +243,15 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
                     ),
                   );
                 },),
-                _buildMenuItem('assets/icons/menu8.png', 'Privacy Policy',onTap: () {
-          Navigator.push(
-          context,
-          MaterialPageRoute(
-          builder: (_) => PrivacyPolicy(),
-          ),
-          );
-          },),
-                _buildMenuItem('assets/icons/menu9.png', 'Terms & Conditions',onTap: () {
+                _buildMenuItem('assets/icons/menu8.png', 'Privacy Policy'.tr, onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PrivacyPolicy(),
+                    ),
+                  );
+                },),
+                _buildMenuItem('assets/icons/menu9.png', 'Terms & Conditions'.tr, onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -262,7 +262,7 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
 
                 SizedBox(height: 16.h),
 
-                _buildMenuItem('assets/icons/menu10.png', 'Sign Out', isLogout: true, onTap: () async {
+                _buildMenuItem('assets/icons/menu10.png', 'Sign Out'.tr, isLogout: true, onTap: () async {
                   await SharedPreferencesHelper.clearAllData();
                   Get.offAll(() => const LoginScreen());
                 }),

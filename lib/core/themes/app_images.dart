@@ -38,6 +38,7 @@ class AppImages {
   static String add_icon =  "$baseUrlImage/add_icon.png";
   static String recipe_icon =  "$baseUrlImage/recipe_icon.png";
   static String shopping_icon =  "$baseUrlImage/shopping_icon.png";
+  static String prep_list_icon =  "$baseUrlImage/thik_fill_icon.png";
   static String thikki_icon =  "$baseUrlImage/thikki.png";
   static String white_thikki_icon =  "$baseUrlImage/white_thikki.png";
   static String crown_icon =  "$baseUrlImage/crown.png";

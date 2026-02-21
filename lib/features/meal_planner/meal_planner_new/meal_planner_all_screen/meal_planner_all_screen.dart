@@ -15,6 +15,8 @@ import 'package:freshbite/features/meal_planner/meal_planner_new/select_meal_pop
 import 'package:freshbite/features/meal_planner/meal_planner_new/select_meal_popup/select_meal_popup_model/select_meal_popup_model.dart';
 import 'package:freshbite/features/meal_planner/meal_planner_new/widget/meal_planner_popup_add.dart';
 import 'package:freshbite/features/meal_planner/reused_meal_plan/reused_meal_plan_screen/reused_meal_plan_screen.dart';
+import 'package:freshbite/features/shopping_list/shopping/shopping_screen/shopping_screen.dart';
+import 'package:confetti/confetti.dart';
 import 'package:get/get.dart';
 
 import '../meal_planner_all_controller/meal_planner_all_controller.dart';
@@ -26,7 +28,45 @@ class AddMealPlanningScreen extends StatefulWidget {
 }
 
 class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
-  final MealPlanController _controller = Get.put(MealPlanController());
+  late final MealPlanController _controller;
+  late ConfettiController _confettiController;
+
+  @override
+  void initState() {
+    super.initState();
+    _confettiController = ConfettiController(duration: const Duration(seconds: 3));
+    // Ensure we use existing controller or create new one
+    _controller = Get.isRegistered<MealPlanController>()
+        ? Get.find<MealPlanController>()
+        : Get.put(MealPlanController());
+    _initializeDates();
+    _loadInitialData();
+  }
+
+  void _loadInitialData() {
+    // Load meal plans from local storage for today's date
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Wait a bit for controller to finish loading from storage
+      await Future.delayed(Duration(milliseconds: 300));
+
+      final todayStr = _weekDates[_selectedDateIndex].toIso8601String().split('T')[0];
+      print("📅 Initial date: $todayStr");
+
+      // Fetch today's meal plans from API
+      await _controller.fetchMealPlansForDate(todayStr);
+
+      // Fetch meal plan and prep list status for all visible dates (for calendar icons)
+      await _controller.fetchMealPlanStatusForDates(_weekDates);
+      await _controller.fetchPrepListStatusForDates(_weekDates);
+
+      print("✅ Loaded meal plans and prep lists for today and status for all dates");
+
+      // Force UI refresh
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
 
   // Selected date index
   int _selectedDateIndex = 3; // Middle (today)
@@ -38,24 +78,6 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
 
   // Comment text controller
   final TextEditingController _commentController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeDates();
-    // Load meal plans from local storage for today's date
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // Wait a bit for controller to finish loading from storage
-      await Future.delayed(Duration(milliseconds: 500));
-
-      final todayStr = _weekDates[_selectedDateIndex].toIso8601String().split('T')[0];
-
-      // Fetch today's meal plans from API
-      await _controller.fetchMealPlansForDate(todayStr);
-
-      print("✅ Loaded meal plans for today from API");
-    });
-  }
 
   void _initializeDates() {
     final today = DateTime.now();
@@ -81,6 +103,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
   @override
   void dispose() {
     _commentController.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
@@ -111,11 +134,13 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
       },
     ).then((pickedDate) async {
       if (pickedDate != null) {
+        // Update week dates to center around the picked date
+        final newWeekDates = List.generate(7, (index) {
+          return pickedDate.add(Duration(days: index - 3));
+        });
+
         setState(() {
-          // Update week dates to center around the picked date
-          _weekDates = List.generate(7, (index) {
-            return pickedDate.add(Duration(days: index - 3));
-          });
+          _weekDates = newWeekDates;
           // Set selected index to middle (the picked date)
           _selectedDateIndex = 3;
           // Update month display
@@ -124,11 +149,21 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
 
         // Fetch meal plans for the selected date
         final selectedDateStr = pickedDate.toIso8601String().split('T')[0];
+        print("📅 Calendar picked date: $selectedDateStr");
         await _controller.fetchMealPlansForDate(selectedDateStr);
+
+        // Fetch meal plan and prep list status for all new week dates (for calendar icons)
+        await _controller.fetchMealPlanStatusForDates(newWeekDates);
+        await _controller.fetchPrepListStatusForDates(newWeekDates);
 
         // Fetch prep list if on prep list tab
         if (_selectedTab == 1) {
           await _controller.fetchPrepList(pickedDate.toIso8601String());
+        }
+
+        // Force UI refresh after fetch
+        if (mounted) {
+          setState(() {});
         }
       }
     });
@@ -374,17 +409,14 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
           );
 
           if (success) {
-            print("✅ SUCCESS: Meal plan created and UI updated");
+            print("✅ SUCCESS: Meal plan created");
 
-            // Update local UI
-            _controller.addRecipeToMeal(
-              mealId,
-              MealRecipe(
-                name: selectedRecipe.title,
-                servings: mealItems.isNotEmpty ? '${mealItems.first.servings} servings' : '2 servings',
-                imageUrl: selectedRecipe.image,
-              ),
-            );
+            // The controller's createMealPlan already calls fetchMealPlansForDate
+            // which refreshes the data from API with full recipe details.
+            // We just need to force a UI refresh here.
+            if (mounted) {
+              setState(() {});
+            }
           } else {
             print("❌ FAILED: Could not create meal plan. Check logs above for details.");
           }
@@ -403,7 +435,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: SafeArea(
           child: CustomAppBar(
-            title: 'Meal Planner',
+            title: 'Meal Planner'.tr,
             titleAlignment: AppBarTitleAlignment.center,
             showBackButton: true,
             onLeadingPressed: () {
@@ -418,8 +450,10 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
           ),
         ),
       ),
-      body: SafeArea(
-        child: Column(
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Column(
           children: [
             // Calendar Header Section
 
@@ -441,6 +475,11 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                         color: AppColors.buttonColor,
                       ),
                     );
+                  }
+
+                  print("🔄 Building meal sections, meals count: ${_controller.meals.length}");
+                  for (var meal in _controller.meals) {
+                    print("   - ${meal.title}: recipe=${meal.recipe?.name ?? 'null'}");
                   }
 
                   return ListView(
@@ -469,6 +508,30 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
             ],
           ],
         ),
+      ),
+          // Confetti widget for celebration
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirectionality: BlastDirectionality.explosive,
+              shouldLoop: false,
+              colors: const [
+                Colors.green,
+                Colors.blue,
+                Colors.pink,
+                Colors.orange,
+                Colors.purple,
+                Colors.yellow,
+              ],
+              numberOfParticles: 30,
+              gravity: 0.2,
+              emissionFrequency: 0.05,
+              maxBlastForce: 20,
+              minBlastForce: 10,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -595,11 +658,17 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
 
                   // Fetch meal plans for the selected date from API
                   final selectedDateStr = _weekDates[i].toIso8601String().split('T')[0];
+                  print("📅 Selected date: $selectedDateStr");
                   await _controller.fetchMealPlansForDate(selectedDateStr);
 
                   // Fetch prep list for new date if on prep list tab
                   if (_selectedTab == 1) {
                     await _controller.fetchPrepList(_weekDates[i].toIso8601String());
+                  }
+
+                  // Force UI refresh after fetch
+                  if (mounted) {
+                    setState(() {});
                   }
                 },
                 child: Container(
@@ -635,6 +704,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
               final dateStr = _weekDates[i].toIso8601String().split('T')[0];
               final hasMealPlan = _controller.dateHasMealPlan(dateStr);
               final hasShoppingList = _controller.dateHasShoppingList(dateStr);
+              final hasPrepList = _controller.dateHasPrepList(dateStr);
 
               return SizedBox(
                 width: 36.w,
@@ -642,11 +712,15 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (hasMealPlan) ...[
-                      Image.asset(AppImages.recipe_icon, width: 12.w, height: 12.h),
+                      Image.asset(AppImages.recipe_icon, width: 10.w, height: 10.h),
+                      if (hasPrepList || hasShoppingList) SizedBox(width: 2.w),
+                    ],
+                    if (hasPrepList) ...[
+                      Image.asset(AppImages.prep_list_icon, width: 10.w, height: 10.h),
                       if (hasShoppingList) SizedBox(width: 2.w),
                     ],
                     if (hasShoppingList) ...[
-                      Image.asset(AppImages.shopping_icon, width: 12.w, height: 12.h),
+                      Image.asset(AppImages.shopping_icon, width: 10.w, height: 10.h),
                     ],
                   ],
                 ),
@@ -688,7 +762,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    "MEAL PLAN",
+                    "MEAL PLAN".tr,
                     style: AppTextStyles.H6_Regular.copyWith(
                       color: _selectedTab == 0
                           ? Colors.white
@@ -722,7 +796,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                 ),
                 child: Center(
                   child: Text(
-                    "PREP LIST",
+                    "PREP LIST".tr,
                     style: AppTextStyles.H6_Regular.copyWith(
                       color: _selectedTab == 1
                           ? Colors.white
@@ -912,8 +986,8 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                     top: 4.h,
                     right: 4.w,
                     child: Container(
-                      width: 16.w,
-                      height: 16.h,
+                      width: 20.w,
+                      height: 20.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
@@ -925,7 +999,13 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                           ),
                         ],
                       ),
-                      child: Icon(Icons.edit, size: 16, color: Color(0xFF757575)),
+                      child: Padding(
+                        padding: EdgeInsets.all(3.w),
+                        child: Image.asset(
+                          AppImages.edit_icon,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -1025,7 +1105,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Icon(
               Icons.add,
               color: Color(0xFF757575),
@@ -1033,7 +1113,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
             ),
             SizedBox(width: 8),
             Text(
-              'Add Recipe',
+              'Add Recipe'.tr,
               style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF757575),
@@ -1130,7 +1210,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Nutritional Values',
+                  'Nutritional Values'.tr,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -1156,21 +1236,21 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Total of 1 serving of each recipe on ${_weekDates[_selectedDateIndex].day}.${_weekDates[_selectedDateIndex].month}.${_weekDates[_selectedDateIndex].year.toString().substring(2)}',
+                    '${'Total of 1 serving of each recipe on'.tr} ${_weekDates[_selectedDateIndex].day}.${_weekDates[_selectedDateIndex].month}.${_weekDates[_selectedDateIndex].year.toString().substring(2)}',
                     style: TextStyle(
                       fontSize: 11,
                       color: Color(0xFF9E9E9E),
                     ),
                   ),
                   SizedBox(height: 16),
-                  _buildNutritionRow('Energy (kJ / kcal)', '970 kJ / 230 kcal'),
-                  _buildNutritionRow('Fat', '103 g'),
-                  _buildNutritionRow('- of which Saturates', '32 g'),
-                  _buildNutritionRow('Carbohydrate', '140 g'),
-                  _buildNutritionRow('- of which Sugars', '90 g'),
-                  _buildNutritionRow('Fibre', '40 g'),
-                  _buildNutritionRow('Protein', '110 g'),
-                  _buildNutritionRow('Salt', '9 g'),
+                  _buildNutritionRow('Energy (kJ / kcal)'.tr, '970 kJ / 230 kcal'),
+                  _buildNutritionRow('Fat'.tr, '103 g'),
+                  _buildNutritionRow('- of which Saturates'.tr, '32 g'),
+                  _buildNutritionRow('Carbohydrate'.tr, '140 g'),
+                  _buildNutritionRow('- of which Sugars'.tr, '90 g'),
+                  _buildNutritionRow('Fibre'.tr, '40 g'),
+                  _buildNutritionRow('Protein'.tr, '110 g'),
+                  _buildNutritionRow('Salt'.tr, '9 g'),
                 ],
               ),
             ),
@@ -1218,7 +1298,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
         children: [
           Expanded(
             child: Text(
-              'Recipes to prepare on $formattedDate',
+              '${'Recipes to prepare on'.tr} $formattedDate',
               style: TextStyle(
                 fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
@@ -1234,7 +1314,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
               children: [
                 if (cooker.isNotEmpty)
                   Text(
-                    'Cooked by $cooker  ',
+                    '${'Cooked by'.tr} $cooker  ',
                     style: TextStyle(
                       fontSize: 11.sp,
                       color: AppColors.textLight,
@@ -1243,7 +1323,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                 GestureDetector(
                   onTap: () => _showFinishedPopup(),
                   child: Text(
-                    'Finished?',
+                    'Finished?'.tr,
                     style: TextStyle(
                       fontSize: 11.sp,
                       color: AppColors.buttonColor,
@@ -1285,7 +1365,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 40.h),
                 child: Text(
-                  'No prep list for this date',
+                  'No prep list for this date'.tr,
                   style: TextStyle(
                     fontSize: 14.sp,
                     color: AppColors.textLight,
@@ -1339,23 +1419,37 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
 
           SizedBox(height: 16.h),
 
-          // Create shopping list button (show only when there's prep list data)
+          // Create/View shopping list button (show only when there's prep list data)
           if (hasPrepList)
-            Obx(() => CustomButton(
-              text: _controller.isLoading.value
-                  ? 'Creating...'
-                  : 'Create shopping list for $formattedDate',
-              color: _controller.isLoading.value
-                  ? AppColors.buttonColor.withOpacity(0.6)
-                  : AppColors.buttonColor,
-              onTap: () async {
-                if (_controller.isLoading.value) return;
-                final success = await _controller.createShoppingListFromPrepList(selectedDate);
-                if (success) {
-                  print("✅ Shopping list created for $formattedDate");
-                }
-              },
-            )),
+            Obx(() {
+              final hasShoppingList = _controller.prepListHasShoppingList.value;
+              final isLoading = _controller.isLoading.value;
+
+              return CustomButton(
+                text: isLoading
+                    ? 'Creating...'
+                    : hasShoppingList
+                        ? 'View Shopping List'.tr
+                        : 'Create shopping list for $formattedDate'.tr,
+                color: isLoading
+                    ? AppColors.buttonColor.withOpacity(0.6)
+                    : AppColors.buttonColor,
+                onTap: () async {
+                  if (isLoading) return;
+
+                  if (hasShoppingList) {
+                    // Navigate to shopping list screen
+                    Get.to(() => ShoppingScreen());
+                  } else {
+                    // Create new shopping list
+                    final success = await _controller.createShoppingListFromPrepList(selectedDate);
+                    if (success) {
+                      print("✅ Shopping list created for $formattedDate");
+                    }
+                  }
+                },
+              );
+            }),
         ],
       );
     });
@@ -1428,8 +1522,8 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                     top: 4.h,
                     right: 4.w,
                     child: Container(
-                      width: 16.w,
-                      height: 16.h,
+                      width: 20.w,
+                      height: 20.h,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         shape: BoxShape.circle,
@@ -1441,7 +1535,13 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                           ),
                         ],
                       ),
-                      child: Icon(Icons.edit, size: 16, color: Color(0xFF757575)),
+                      child: Padding(
+                        padding: EdgeInsets.all(3.w),
+                        child: Image.asset(
+                          AppImages.edit_icon,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -1498,24 +1598,45 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
               child: Icon(Icons.person, color: Color(0xFF9E9E9E), size: 18),
             ),
             SizedBox(width: 16.w),
-            // Check icon (clickable)
+            // Check icon (clickable) - Different style: rounded square with gradient
             GestureDetector(
               onTap: () {
                 _controller.togglePrepItemDone(index);
+                // Check if all items are done and trigger confetti
+                if (_controller.areAllPrepItemsDone()) {
+                  _confettiController.play();
+                }
               },
-              child: Container(
-                width: 24.w,
-                height: 24.h,
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 200),
+                width: 28.w,
+                height: 28.h,
                 decoration: BoxDecoration(
-                  color: isDone ? AppColors.buttonColor : Colors.transparent,
-                  shape: BoxShape.circle,
+                  gradient: isDone
+                      ? LinearGradient(
+                          colors: [Color(0xFF4CAF50), Color(0xFF8BC34A)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : null,
+                  color: isDone ? null : Colors.white,
+                  borderRadius: BorderRadius.circular(8.r),
                   border: Border.all(
-                    color: isDone ? AppColors.buttonColor : Color(0xFFE0E0E0),
+                    color: isDone ? Colors.transparent : Color(0xFFBDBDBD),
                     width: 2,
                   ),
+                  boxShadow: isDone
+                      ? [
+                          BoxShadow(
+                            color: Color(0xFF4CAF50).withOpacity(0.3),
+                            blurRadius: 6,
+                            offset: Offset(0, 2),
+                          ),
+                        ]
+                      : null,
                 ),
                 child: isDone
-                    ? Icon(Icons.check, color: Colors.white, size: 18)
+                    ? Icon(Icons.check_rounded, color: Colors.white, size: 20)
                     : null,
               ),
             ),

@@ -34,7 +34,7 @@ class ShoppingScreen extends StatelessWidget {
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: SafeArea(
           child: CustomAppBar(
-            title: 'Shopping',
+            title: 'Shopping'.tr,
             titleAlignment: AppBarTitleAlignment.center,
             showBackButton: true,
             onLeadingPressed: () {
@@ -195,11 +195,11 @@ class ShoppingScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Shopping Lists for $formatted",
+                          "${'Shopping Lists for'.tr} $formatted",
                           style: AppTextStyles.heading3.copyWith(fontSize: 14.sp),
                         ),
                         Text(
-                          "Shopped by  Finished?",
+                          "${'Shopped by'.tr}  ${'Finished?'.tr}",
                           style: AppTextStyles.caption.copyWith(
                             fontSize: 11.sp,
                             color: AppColors.textLight,
@@ -226,7 +226,7 @@ class ShoppingScreen extends StatelessWidget {
                       if (controller.shoppingLists.isEmpty) {
                         return Center(
                           child: Text(
-                            'No shopping lists yet',
+                            'No shopping lists yet'.tr,
                             style: AppTextStyles.body.copyWith(
                               color: AppColors.textLight,
                             ),
@@ -386,7 +386,7 @@ class _ShoppingListTile extends StatelessWidget {
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    "created by ${item.coocker}, on ${item.getFormattedDate()}",
+                    "${'created by'.tr} ${item.coocker}, ${'on'.tr} ${item.getFormattedDate()}",
                     style: AppTextStyles.caption.copyWith(
                       fontSize: 10.sp,
                       color: AppColors.textLight,
@@ -508,7 +508,7 @@ void showCreateShoppingListPopup(BuildContext context, ShoppingController contro
 
               // TITLE
               Text(
-                "How would you like to create your shopping list?",
+                "How would you like to create your shopping list?".tr,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
@@ -523,7 +523,7 @@ void showCreateShoppingListPopup(BuildContext context, ShoppingController contro
               // FROM PREP LIST (CustomTextButton)
               // ==============================
               CustomTextButton(
-                text: "FROM PREP LIST",
+                text: "FROM PREP LIST".tr,
                 onTap: () async {
                   Navigator.pop(context); // close popup first
                   await Get.to(() => SelectPrepListScreen());
@@ -539,7 +539,7 @@ void showCreateShoppingListPopup(BuildContext context, ShoppingController contro
               // CUSTOM (CustomTextButton)
               // ==============================
               CustomTextButton(
-                text: "CUSTOM",
+                text: "CUSTOM".tr,
                 onTap: () async {
                   Navigator.pop(context);
                   await Get.to(() => CreateShoppingScreen());
@@ -554,7 +554,7 @@ void showCreateShoppingListPopup(BuildContext context, ShoppingController contro
               // CANCEL (PrimaryButton)
               // ==============================
               PrimaryButton(
-                text: "CANCEL",
+                text: "CANCEL".tr,
                 onPressed: () {
                   Navigator.pop(context);
                 },

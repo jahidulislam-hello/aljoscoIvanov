@@ -37,7 +37,7 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: SafeArea(
           child: CustomAppBar(
-            title: 'Recipe Search',
+            title: 'Recipe Search'.tr,
             titleAlignment: AppBarTitleAlignment.center,
             showBackButton: true,
             onLeadingPressed: () {
@@ -87,19 +87,19 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
                           ),
 
                         // Everyday Section
-                        _buildSectionHeader("EveryDay"),
+                        _buildSectionHeader("EveryDay".tr),
                         SizedBox(height: 12.h),
                         _buildRecipeGrid(controller.everydayRecipes),
                         SizedBox(height: 24.h),
 
                         // Meal Prep Section
-                        _buildSectionHeader("Meal Prep"),
+                        _buildSectionHeader("Meal Prep".tr),
                         SizedBox(height: 12.h),
                         _buildRecipeGrid(controller.mealPrepRecipes),
                         SizedBox(height: 24.h),
 
                         // Emergency Section
-                        _buildSectionHeader("Emergency"),
+                        _buildSectionHeader("Emergency".tr),
                         SizedBox(height: 12.h),
                         _buildRecipeGrid(controller.emergencyRecipes),
                         SizedBox(height: 24.h),
@@ -165,7 +165,7 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
                   child: TextField(
                     controller: controller.searchController,
                     decoration: InputDecoration(
-                      hintText: "Search recipes",
+                      hintText: "Search recipes".tr,
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(horizontal: 10.w),
                     ),
@@ -276,7 +276,7 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
           onTap: () {
 
           },
-          child: Text("See All", style: AppTextStyles.bioText),
+          child: Text("See All".tr, style: AppTextStyles.bioText),
         ),
       ],
     );
@@ -288,7 +288,7 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(20.h),
           child: Text(
-            "No recipes available",
+            "No recipes available".tr,
             style: AppTextStyles.bioText,
           ),
         ),
@@ -463,7 +463,7 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(bottom: 12.h),
             child: Text(
-              "Found ${controller.totalSearchResults.value} recipes for \"${controller.searchQuery.value}\"",
+              "${'Found'.tr} ${controller.totalSearchResults.value} ${'recipes for'.tr} \"${controller.searchQuery.value}\"",
               style: AppTextStyles.bioText.copyWith(
                 color: AppColors.mainTextColor.withOpacity(0.7),
               ),
@@ -484,7 +484,7 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 16.h),
                   Text(
-                    "No recipes found for \"${controller.searchQuery.value}\"",
+                    "${'No recipes found for'.tr} \"${controller.searchQuery.value}\"",
                     style: AppTextStyles.bioText.copyWith(
                       color: AppColors.mainTextColor.withOpacity(0.7),
                     ),
@@ -644,7 +644,7 @@ class RecipeRecipeSearchScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Text(
-                    "Load More",
+                    "Load More".tr,
                     style: AppTextStyles.buttonRegular.copyWith(color: Colors.white),
                   ),
                 ),
