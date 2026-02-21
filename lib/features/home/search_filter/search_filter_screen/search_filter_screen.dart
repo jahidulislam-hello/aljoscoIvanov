@@ -23,7 +23,7 @@ class SearchFilterScreen extends StatelessWidget {
         backgroundColor: AppColors.background,
         centerTitle: true,
         title: Text(
-          "Filter",
+          "Filter".tr,
           style: TextStyle(
             fontSize: 17.sp,
             fontWeight: FontWeight.w600,

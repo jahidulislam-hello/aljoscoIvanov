@@ -25,7 +25,7 @@ class NewlyMealScreen extends StatelessWidget {
     ScreenUtil.init(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Meal Plan')),
+      appBar: AppBar(title: Text('Meal Plan'.tr)),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(12.w),
         child: Column(
@@ -33,7 +33,7 @@ class NewlyMealScreen extends StatelessWidget {
               .map((m) => Obx(() {
             final key = m['key']!;
             return NewMealSection(
-              title: m['label']!,
+              title: m['label']!.tr,
               isExpanded: ctrl.expanded[key]!.value,
               onEyeTap: () => ctrl.toggleExpand(key),
               recipes: ctrl.meals[key]!.toList(),
