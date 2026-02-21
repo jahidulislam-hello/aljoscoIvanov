@@ -55,6 +55,7 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
   }
 
   void _toggleMenu() {
+    if (!mounted) return;
     setState(() {
       _isMenuOpen = !_isMenuOpen;
       if (_isMenuOpen) {
@@ -66,7 +67,7 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
   }
 
   void _closeMenu() {
-    if (_isMenuOpen) {
+    if (_isMenuOpen && mounted) {
       setState(() {
         _isMenuOpen = false;
         _animationController.reverse();
@@ -286,8 +287,7 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
       }) {
     return InkWell(
       onTap: () {
-        _closeMenu(); // close sidebar animation first
-        Get.back(); // close the menu dialog/overlay
+        Get.back(); // close the menu dialog/overlay first
         if (onTap != null) {
           onTap();
         }

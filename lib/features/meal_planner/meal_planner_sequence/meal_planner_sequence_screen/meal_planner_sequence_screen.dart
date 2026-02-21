@@ -21,7 +21,7 @@ class MealPlanSequence extends StatelessWidget {
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {},
         ),
-        title: Text('Meal Planner', style: TextStyle(color: Colors.black, fontSize: 18.sp)),
+        title: Text('Meal Planner'.tr, style: TextStyle(color: Colors.black, fontSize: 18.sp)),
         actions: [
           IconButton(
             icon: Icon(Icons.menu, color: Colors.black),
@@ -75,17 +75,17 @@ class MealPlanSequence extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12.r),
                 ),
               ),
-              child: Text('CREATE MEAL PLAN', style: TextStyle(fontSize: 16.sp)),
+              child: Text('Create Meal Plan'.tr, style: TextStyle(fontSize: 16.sp)),
             ),
             SizedBox(height: 16.h),
             Expanded(
               child: ListView(
                 children: [
-                  buildMealSection('Breakfast', controller.breakfastRecipes),
-                  buildMealSection('Snack', controller.snackRecipes),
-                  buildMealSection('Lunch', controller.lunchRecipes),
-                  buildMealSection('Snack', controller.snackRecipes),
-                  buildMealSection('Dinner', controller.dinnerRecipes),
+                  buildMealSection('Breakfast'.tr, controller.breakfastRecipes),
+                  buildMealSection('Snack'.tr, controller.snackRecipes),
+                  buildMealSection('Lunch'.tr, controller.lunchRecipes),
+                  buildMealSection('Snack'.tr, controller.snackRecipes),
+                  buildMealSection('Dinner'.tr, controller.dinnerRecipes),
                 ],
               ),
             ),
@@ -104,7 +104,7 @@ class MealPlanSequence extends StatelessWidget {
             children: [
               Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp)),
               SizedBox(width: 8.w),
-              Text('Base, Vegetable, Protein, Connector, Finisher',
+              Text('Base, Vegetable, Protein, Connector, Topping'.tr,
                   style: TextStyle(color: Colors.grey, fontSize: 12.sp)),
               Spacer(),
               Icon(Icons.check_circle, color: recipes.isNotEmpty ? Colors.green : Colors.grey, size: 20.sp),

@@ -105,7 +105,7 @@ class HomeScreen extends StatelessWidget {
                             style: AppTextStyles.heading2.copyWith(
                                 color: AppColors.buttonColor),
                           )),
-                          Text("Ready to cook?",
+                          Text("Ready to cook?".tr,
                               style: AppTextStyles.body.copyWith(
                                   color: AppColors.mainTextColor)),
                         ],
@@ -159,7 +159,7 @@ class HomeScreen extends StatelessWidget {
                             child: TextField(
                               controller: controller.searchController,
                               decoration: InputDecoration(
-                                hintText: "Search recipes",
+                                hintText: "Search recipes".tr,
                                 border: InputBorder.none,
                                 contentPadding:
                                 EdgeInsets.symmetric(horizontal: 10.w),
@@ -323,7 +323,7 @@ class HomeScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Let's cook!",
+                          "Let's cook!".tr,
                           style: AppTextStyles.heading2.copyWith(fontWeight: FontWeight.w500),
                         ),
                         GestureDetector(
@@ -332,7 +332,7 @@ class HomeScreen extends StatelessWidget {
                             Get.find<BottomNavbarController>().changeIndex(3);
                           },
                           child: Text(
-                            "See all",
+                            "See all".tr,
                             style: AppTextStyles.bioText.copyWith(color: AppColors.buttonColor),
                           ),
                         ),
@@ -404,7 +404,7 @@ class HomeScreen extends StatelessWidget {
 
                     // Next Planned Prep List Section
                     Text(
-                      "Next planned Prep List:",
+                      "Next planned Prep List:".tr,
                       style: AppTextStyles.heading2.copyWith(
                           fontWeight: FontWeight.w600, color: AppColors.black),
                     ),
@@ -427,7 +427,7 @@ class HomeScreen extends StatelessWidget {
                             ],
                           ),
                           child: Text(
-                            "You don't have a meal plan yet. Go to the meal planning section to create one.",
+                            "You don't have a meal plan yet. Go to the meal planning section to create one.".tr,
                             style: AppTextStyles.body.copyWith(
                               color: AppColors.mainTextColor.withOpacity(0.7),
                               height: 1.4,
@@ -471,7 +471,7 @@ class HomeScreen extends StatelessWidget {
 
                     // Next Planned Shopping Section
                     Text(
-                      "Next Planned Shopping:",
+                      "Next planned Shopping:".tr,
                       style: AppTextStyles.heading2.copyWith(
                           fontWeight: FontWeight.w600, color: AppColors.black),
                     ),
@@ -494,7 +494,7 @@ class HomeScreen extends StatelessWidget {
                             ],
                           ),
                           child: Text(
-                            "You don't have a meal plan yet. Go to the meal planning section to create one.",
+                            "You don't have a meal plan yet. Go to the meal planning section to create one.".tr,
                             style: AppTextStyles.body.copyWith(
                               color: AppColors.mainTextColor.withOpacity(0.7),
                               height: 1.4,
@@ -600,7 +600,7 @@ class HomeScreen extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(bottom: 12.h),
             child: Text(
-              "Found ${controller.totalSearchResults.value} recipes for \"${controller.searchQuery.value}\"",
+              "Found @count recipes for \"@query\"".tr.replaceAll('@count', controller.totalSearchResults.value.toString()).replaceAll('@query', controller.searchQuery.value),
               style: AppTextStyles.bioText.copyWith(
                 color: AppColors.mainTextColor.withOpacity(0.7),
               ),
@@ -621,7 +621,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 16.h),
                   Text(
-                    "No recipes found for \"${controller.searchQuery.value}\"",
+                    "No recipes found for \"@query\"".tr.replaceAll('@query', controller.searchQuery.value),
                     style: AppTextStyles.bioText.copyWith(
                       color: AppColors.mainTextColor.withOpacity(0.7),
                     ),
@@ -743,7 +743,7 @@ class HomeScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Text(
-                    "Load More",
+                    "Load More".tr,
                     style: AppTextStyles.buttonRegular.copyWith(color: Colors.white),
                   ),
                 ),

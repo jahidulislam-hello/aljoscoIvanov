@@ -92,12 +92,12 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
       'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'
     ];
-    return '${months[date.month - 1]} ${date.year}';
+    return '${months[date.month - 1].tr} ${date.year}';
   }
 
   String _getDayOfWeek(DateTime date) {
     const days = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
-    return days[date.weekday - 1];
+    return days[date.weekday - 1].tr;
   }
 
   @override
@@ -194,7 +194,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
               children: [
                 // Title
                 Text(
-                  'Add a comment to your planned Meal.',
+                  'Add a comment to your planned Meal.'.tr,
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.w600,
@@ -205,22 +205,22 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                 // Comment text field
                 CustomTextField(
                   controller: _commentController,
-                  hintText: 'Write anything here...',
+                  hintText: 'Write anything here...'.tr,
                   keyboardType: 'multiline',
                   boxHeight: 12,
                 ),
                 SizedBox(height: 16.h),
                 // Post button
                 CustomButton(
-                  text: _isPostingComment ? 'Posting...' : 'Post',
+                  text: _isPostingComment ? 'Posting...'.tr : 'Post'.tr,
                   color: AppColors.buttonColor,
                   onTap: () async {
                     if (_isPostingComment) return;
 
                     if (_commentController.text.trim().isEmpty) {
                       Get.snackbar(
-                        'Error',
-                        'Please enter a comment',
+                        'Error'.tr,
+                        'Please enter a comment'.tr,
                         backgroundColor: Colors.orange,
                         colorText: Colors.white,
                         snackPosition: SnackPosition.BOTTOM,
@@ -230,8 +230,8 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
 
                     if (_currentMealPlanId == null) {
                       Get.snackbar(
-                        'Error',
-                        'No meal plan selected',
+                        'Error'.tr,
+                        'No meal plan selected'.tr,
                         backgroundColor: Colors.orange,
                         colorText: Colors.white,
                         snackPosition: SnackPosition.BOTTOM,
@@ -251,16 +251,16 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                     if (success) {
                       Navigator.pop(context);
                       Get.snackbar(
-                        'Success',
-                        'Comment added successfully',
+                        'Success'.tr,
+                        'Comment added successfully'.tr,
                         backgroundColor: Colors.green,
                         colorText: Colors.white,
                         snackPosition: SnackPosition.BOTTOM,
                       );
                     } else {
                       Get.snackbar(
-                        'Error',
-                        'Failed to add comment',
+                        'Error'.tr,
+                        'Failed to add comment'.tr,
                         backgroundColor: Colors.red,
                         colorText: Colors.white,
                         snackPosition: SnackPosition.BOTTOM,
@@ -271,7 +271,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                 SizedBox(height: 12.h),
                 // Info text
                 Text(
-                  'Your comment will be visible to all family members. Only you can remove it.',
+                  'Your comment will be visible to all family members. Only you can remove it.'.tr,
                   style: TextStyle(
                     fontSize: 11.sp,
                     color: AppColors.textLight,
@@ -315,7 +315,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
               SizedBox(height: 16.h),
               // Question text
               Text(
-                'Are you done cooking this recipe?',
+                'Are you done cooking this recipe?'.tr,
                 style: TextStyle(
                   fontSize: 16.sp,
                   fontWeight: FontWeight.w600,
@@ -340,7 +340,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                         ),
                         child: Center(
                           child: Text(
-                            'Not Yet',
+                            'Not Yet'.tr,
                             style: TextStyle(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
@@ -367,7 +367,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                         ),
                         child: Center(
                           child: Text(
-                            'Finished',
+                            'Finished'.tr,
                             style: TextStyle(
                               fontSize: 14.sp,
                               fontWeight: FontWeight.w600,
@@ -585,7 +585,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                   PopupMenuItem<int>(
                     value: 0,
                     child: Text(
-                      'Apply Saved Meal Plan',
+                      'Apply Saved Meal Plan'.tr,
                       style: TextStyle(
                         fontSize: 14.sp,
                         color: AppColors.pureWhite,
@@ -596,7 +596,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                   PopupMenuItem<int>(
                     value: 1,
                     child: Text(
-                      'Create Meal Plan',
+                      'Create Meal Plan'.tr,
                       style: TextStyle(
                         fontSize: 14.sp,
                         color: AppColors.pureWhite,
@@ -607,7 +607,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                   PopupMenuItem<int>(
                     value: 2,
                     child: Text(
-                      'Invite Family',
+                      'Invite Family'.tr,
                       style: TextStyle(
                         fontSize: 14.sp,
                         color: AppColors.pureWhite,
@@ -838,7 +838,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                   child: Row(
                     children: [
                       Text(
-                        meal.title,
+                        meal.title.tr,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -851,7 +851,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                           spacing: 4,
                           children: meal.tags.map((tag) {
                             return Text(
-                              tag + (meal.tags.last != tag ? ', ' : ''),
+                              tag.tr + (meal.tags.last != tag ? ', ' : ''),
                               style: TextStyle(
                                 fontSize: 11,
                                 color: Color(0xFF757575),
@@ -1103,23 +1103,30 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
           ),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.add,
-              color: Color(0xFF757575),
-              size: 20,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.add,
+                  color: Color(0xFF757575),
+                  size: 20,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Add Recipe'.tr,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF757575),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(width: 8),
-            Text(
-              'Add Recipe'.tr,
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF757575),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -1427,10 +1434,10 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
 
               return CustomButton(
                 text: isLoading
-                    ? 'Creating...'
+                    ? 'Creating...'.tr
                     : hasShoppingList
-                        ? 'View Shopping List'.tr
-                        : 'Create shopping list for $formattedDate'.tr,
+                        ? 'View shopping list'.tr
+                        : '${'Create shopping list for'.tr} $formattedDate',
                 color: isLoading
                     ? AppColors.buttonColor.withOpacity(0.6)
                     : AppColors.buttonColor,

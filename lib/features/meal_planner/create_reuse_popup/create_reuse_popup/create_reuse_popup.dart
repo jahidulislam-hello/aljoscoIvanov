@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/features/meal_planner/create_reuse_popup/create_reuse_popup_controller/create_reuse_popup_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:get/get.dart';
 
 
 class CreateReusePopup extends StatelessWidget {
@@ -24,7 +25,7 @@ class CreateReusePopup extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      "Please select the start date",
+                      "Please select the start date".tr,
                       style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
                     ),
                     SizedBox(height: 16.h),
@@ -34,14 +35,14 @@ class CreateReusePopup extends StatelessWidget {
                     SizedBox(height: 20.h),
                     _buildTextField(
                       controller: controller.titleController,
-                      hintText: 'e.g. "My Monday Menu"',
-                      label: "Add Title",
+                      hintText: 'e.g. "My Monday Menu"'.tr,
+                      label: "Add Title".tr,
                     ),
                     SizedBox(height: 12.h),
                     _buildTextField(
                       controller: controller.descriptionController,
-                      hintText: 'e.g. "usual Breakfast, family Dinner"',
-                      label: "Add Description",
+                      hintText: 'e.g. "Usual Breakfast and family dinner"'.tr,
+                      label: "Add Description".tr,
                     ),
                     SizedBox(height: 20.h),
                     SizedBox(
@@ -54,14 +55,14 @@ class CreateReusePopup extends StatelessWidget {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
                         ),
                         child: Text(
-                          "APPLY TO THE MEAL PLANER",
+                          "Apply to the Meal Planer".tr,
                           style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      "Your saved meal plan will start on the chosen date.",
+                      "Your saved meal plan will start on the chosen date.".tr,
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
                     ),
@@ -75,19 +76,30 @@ class CreateReusePopup extends StatelessWidget {
     );
   }
 
+  String _getMonthName(int month) {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return months[month - 1].tr;
+  }
+
   Widget _buildMonthDropdown(CreateReuseController controller) {
-    return DropdownButton<String>(
-      value: DateFormat.yMMMM().format(controller.selectedDate),
+    final currentMonthIndex = controller.selectedDate.month;
+
+    return DropdownButton<int>(
+      value: currentMonthIndex,
       isExpanded: true,
       underline: const SizedBox(),
       items: List.generate(
         12,
             (index) {
-          final month = DateTime(DateTime.now().year, index + 1);
+          final monthNum = index + 1;
+          final year = DateTime.now().year;
           return DropdownMenuItem(
-            value: DateFormat.yMMMM().format(month),
+            value: monthNum,
             child: Text(
-              DateFormat.yMMMM().format(month),
+              '${_getMonthName(monthNum)} $year',
               style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600),
             ),
           );
@@ -95,11 +107,15 @@ class CreateReusePopup extends StatelessWidget {
       ),
       onChanged: (value) {
         if (value != null) {
-          final newMonth = DateFormat.yMMMM().parse(value);
-          controller.selectDate(DateTime(newMonth.year, newMonth.month, controller.selectedDate.day));
+          controller.selectDate(DateTime(DateTime.now().year, value, controller.selectedDate.day));
         }
       },
     );
+  }
+
+  String _getDayOfWeek(DateTime date) {
+    const days = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+    return days[date.weekday - 1].tr;
   }
 
   Widget _buildDateRow(CreateReuseController controller) {
@@ -114,7 +130,7 @@ class CreateReusePopup extends StatelessWidget {
           child: Column(
             children: [
               Text(
-                DateFormat.E().format(date),
+                _getDayOfWeek(date),
                 style: TextStyle(fontSize: 12.sp),
               ),
               SizedBox(height: 4.h),

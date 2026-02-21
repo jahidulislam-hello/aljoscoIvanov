@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 
 class SearchSelectableChip extends StatelessWidget {
   final String label;
@@ -40,7 +41,7 @@ class SearchSelectableChip extends StatelessWidget {
               SizedBox(width: 6.w),
             ],
             Text(
-              label,
+              label.tr,
               style: TextStyle(
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w500,
