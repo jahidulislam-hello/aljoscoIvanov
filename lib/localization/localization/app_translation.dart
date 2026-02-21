@@ -240,6 +240,9 @@ class AppTranslations extends Translations {
       'Red bell pepper': 'Red bell pepper',
       'Garlic cloves': 'Garlic cloves',
 
+      // ==================== PREFERENCES ====================
+      'Preferences': 'Preferences',
+
       // ==================== COOKING SKILLS ====================
       'Cooking Skills': 'Cooking Skills',
       'How to Chop Herbs': 'How to Chop Herbs',
@@ -765,6 +768,9 @@ class AppTranslations extends Translations {
       'Onion': 'Zwiebel',
       'Red bell pepper': 'Rote Paprika',
       'Garlic cloves': 'Knoblauchzehen',
+
+      // ==================== PREFERENCES ====================
+      'Preferences': 'Einstellungen',
 
       // ==================== COOKING SKILLS ====================
       'Cooking Skills': 'Kochkenntnisse',

@@ -19,9 +19,14 @@ class MealPlanController extends GetxController {
   var isLoading = false.obs;
   var isCreatingMealPlan = false.obs;
 
-  // Track dates with meal plans and shopping lists
+  // Track if shopping list exists for current prep list
+  var prepListHasShoppingList = false.obs;
+  var currentPrepListShoppingListId = ''.obs;
+
+  // Track dates with meal plans, shopping lists, and prep lists
   var datesWithMealPlans = <String>{}.obs; // Stores date strings (YYYY-MM-DD)
   var datesWithShoppingLists = <String>{}.obs;
+  var datesWithPrepLists = <String>{}.obs;
 
   // Store all meal plans by date
   var mealPlansByDate = <String, List<MealPlanApiModel>>{}.obs;
@@ -98,10 +103,17 @@ class MealPlanController extends GetxController {
       isLoading.value = true;
 
       final normalizedDateStr = _toDateString(dateStr);
+      print("═══════════════════════════════════════════");
       print("📅 Fetching meal plans for date: $normalizedDateStr");
+      print("   Input date string: $dateStr");
 
       // Fetch from API
       final response = await MealPlannerService.getMealPlan(normalizedDateStr);
+
+      print("📥 API Response received:");
+      print("   success: ${response['success']}");
+      print("   data type: ${response['data']?.runtimeType}");
+      print("   data length: ${(response['data'] as List?)?.length ?? 0}");
 
       if (response['success'] == true && response['data'] != null) {
         final List<dynamic> mealPlansJson = response['data'];
@@ -115,26 +127,39 @@ class MealPlanController extends GetxController {
           mealPlansByDate[normalizedDateStr] = mealPlans;
           datesWithMealPlans.add(normalizedDateStr);
 
-          mealPlansByDate.refresh();
-          datesWithMealPlans.refresh();
-
-          // Save to local storage
-          await saveMealPlansToLocalStorage();
-
           print("✅ Fetched ${mealPlans.length} meal plans for $normalizedDateStr");
+          for (var plan in mealPlans) {
+            print("   - ${plan.mealTime}: ${plan.recipes.length} recipes, ${plan.serving} servings");
+          }
         } else {
           print("ℹ️ No meal plans found for $normalizedDateStr");
           mealPlansByDate[normalizedDateStr] = [];
+          // Remove from datesWithMealPlans since there are no meal plans
+          datesWithMealPlans.remove(normalizedDateStr);
         }
+
+        mealPlansByDate.refresh();
+        datesWithMealPlans.refresh();
+
+        // Save to local storage
+        await saveMealPlansToLocalStorage();
       } else {
-        print("⚠️ API returned no success, using cached data");
+        print("⚠️ API returned no success: ${response['message']}");
+        // Still try to clear old data for this date
+        mealPlansByDate[normalizedDateStr] = [];
+        datesWithMealPlans.remove(normalizedDateStr);
+        mealPlansByDate.refresh();
+        datesWithMealPlans.refresh();
       }
 
       // Load into UI sections
+      print("📊 Loading meal plans into UI sections...");
       loadMealPlansForDate(normalizedDateStr);
+      print("═══════════════════════════════════════════");
 
-    } catch (e) {
+    } catch (e, stackTrace) {
       print("❌ Error fetching meal plans: $e");
+      print("   Stack trace: $stackTrace");
       // Try to load from cache on error
       loadMealPlansForDate(_toDateString(dateStr));
     } finally {
@@ -156,14 +181,22 @@ class MealPlanController extends GetxController {
     // Get meal plans for this date
     final plansForDate = mealPlansByDate[normalizedDateStr] ?? [];
 
-    // Clear existing recipes from all meal sections
+    // Create new meal sections list with cleared recipes
+    final updatedMeals = <MealSection>[];
     for (var meal in meals) {
-      meal.recipe = null;
+      updatedMeals.add(MealSection(
+        id: meal.id,
+        title: meal.title,
+        tags: meal.tags,
+        recipe: null, // Clear recipe
+        comments: meal.comments,
+        isExpanded: meal.isExpanded,
+      ));
     }
 
     if (plansForDate.isEmpty) {
       print("ℹ️ No meal plans to display for $normalizedDateStr");
-      meals.refresh();
+      meals.assignAll(updatedMeals);
       return;
     }
 
@@ -171,22 +204,22 @@ class MealPlanController extends GetxController {
 
     // Update meal sections with data for this date
     for (var mealPlan in plansForDate) {
-      final mealTime = mealPlan.mealTime.toLowerCase();
+      final mealTime = mealPlan.mealTime.toLowerCase().trim();
       print("   🍽️ Processing: meal_time='$mealTime', serving=${mealPlan.serving}");
 
       // Find matching meal section (breakfast, lunch, dinner, snack)
       int index = -1;
       if (mealTime == 'breakfast') {
-        index = meals.indexWhere((m) => m.id == 'breakfast');
+        index = updatedMeals.indexWhere((m) => m.id == 'breakfast');
       } else if (mealTime == 'lunch') {
-        index = meals.indexWhere((m) => m.id == 'lunch');
+        index = updatedMeals.indexWhere((m) => m.id == 'lunch');
       } else if (mealTime == 'dinner') {
-        index = meals.indexWhere((m) => m.id == 'dinner');
+        index = updatedMeals.indexWhere((m) => m.id == 'dinner');
       } else if (mealTime == 'snack') {
         // Find first empty snack slot
-        index = meals.indexWhere((m) => m.id.startsWith('snack') && m.recipe == null);
+        index = updatedMeals.indexWhere((m) => m.id.startsWith('snack') && m.recipe == null);
         if (index == -1) {
-          index = meals.indexWhere((m) => m.id == 'snack1');
+          index = updatedMeals.indexWhere((m) => m.id == 'snack1');
         }
       }
 
@@ -199,6 +232,7 @@ class MealPlanController extends GetxController {
         int servings = mealPlan.serving;
 
         print("   📋 Recipes count: ${mealPlan.recipes.length}");
+        print("   📋 Recipes data: ${mealPlan.recipes}");
 
         if (mealPlan.recipes.isNotEmpty) {
           final recipe = mealPlan.recipes[0];
@@ -206,7 +240,7 @@ class MealPlanController extends GetxController {
 
           if (recipe is Map<String, dynamic>) {
             // Full recipe data from API
-            recipeName = recipe['title'] ?? 'Recipe';
+            recipeName = recipe['title']?.toString() ?? 'Recipe';
 
             // Get image from images array
             if (recipe['images'] != null && recipe['images'] is List) {
@@ -216,26 +250,49 @@ class MealPlanController extends GetxController {
               }
             }
 
-            print("   ✅ Setting ${meals[index].title}: $recipeName (image: ${imageUrl != null})");
+            print("   ✅ Setting ${updatedMeals[index].title}: $recipeName (image: ${imageUrl != null})");
           } else if (recipe is String) {
             // Just recipe ID
             recipeName = 'Recipe';
-            print("   ✅ Setting ${meals[index].title}: Recipe ID $recipe");
+            print("   ✅ Setting ${updatedMeals[index].title}: Recipe ID $recipe");
+          } else {
+            // Try to cast to Map in case it's a different Map type
+            try {
+              final recipeMap = recipe as Map;
+              recipeName = recipeMap['title']?.toString() ?? 'Recipe';
+              if (recipeMap['images'] != null && recipeMap['images'] is List) {
+                final images = recipeMap['images'] as List;
+                if (images.isNotEmpty) {
+                  imageUrl = images[0]?.toString();
+                }
+              }
+              print("   ✅ Setting ${updatedMeals[index].title}: $recipeName (cast from Map)");
+            } catch (e) {
+              print("   ⚠️ Could not parse recipe: $e");
+            }
           }
         }
 
-        meals[index].recipe = MealRecipe(
-          name: recipeName,
-          servings: '$servings servings',
-          imageUrl: imageUrl,
+        // Create new MealSection with recipe
+        updatedMeals[index] = MealSection(
+          id: updatedMeals[index].id,
+          title: updatedMeals[index].title,
+          tags: updatedMeals[index].tags,
+          recipe: MealRecipe(
+            name: recipeName,
+            servings: '$servings servings',
+            imageUrl: imageUrl,
+          ),
+          comments: updatedMeals[index].comments,
+          isExpanded: updatedMeals[index].isExpanded,
         );
       } else {
         print("   ⚠️ No matching section found for meal_time: $mealTime");
       }
     }
 
-    print("   🔄 Refreshing meals list...");
-    meals.refresh();
+    print("   🔄 Updating meals list with ${updatedMeals.length} sections...");
+    meals.assignAll(updatedMeals);
     print("   ✅ Done loading meal plans into UI");
   }
 
@@ -252,6 +309,10 @@ class MealPlanController extends GetxController {
         final prepList = PrepListApiModel.fromJson(response['data']);
         prepListItems.value = [prepList];
 
+        // Track this date as having a prep list
+        datesWithPrepLists.add(normalizedDateStr);
+        datesWithPrepLists.refresh();
+
         print("✅ Loaded prep list for $normalizedDateStr");
         print("   Serving: ${prepList.serving}");
         print("   Cooker: ${prepList.cooker}");
@@ -262,13 +323,53 @@ class MealPlanController extends GetxController {
           final recipe = prepList.recipes[i];
           print("   Recipe ${i + 1}: ${recipe.recipeTitle ?? recipe.recipeId ?? 'Unknown'} (Done: ${recipe.isDone})");
         }
+
+        // Check if shopping list exists for this date
+        await checkShoppingListForDate(normalizedDateStr);
       } else {
         print("⚠️ No prep list found for $normalizedDateStr");
         prepListItems.clear();
+        datesWithPrepLists.remove(normalizedDateStr);
+        datesWithPrepLists.refresh();
+        prepListHasShoppingList.value = false;
+        currentPrepListShoppingListId.value = '';
       }
     } catch (e) {
       print("❌ Error fetching prep list: $e");
       prepListItems.clear();
+      prepListHasShoppingList.value = false;
+      currentPrepListShoppingListId.value = '';
+    }
+  }
+  /// Check if shopping list exists for a specific date
+  Future<void> checkShoppingListForDate(String dateStr) async {
+    try {
+      final response = await ShoppingService.getMyShoppingLists();
+
+      if (response['success'] == true && response['data'] != null) {
+        final List<dynamic> shoppingLists = response['data'];
+
+        // Check if any shopping list matches this date
+        for (var list in shoppingLists) {
+          final listDate = list['date'] ?? '';
+          final normalizedListDate = _toDateString(listDate);
+
+          if (normalizedListDate == dateStr) {
+            prepListHasShoppingList.value = true;
+            currentPrepListShoppingListId.value = list['_id'] ?? '';
+            print("✅ Found existing shopping list for $dateStr: ${currentPrepListShoppingListId.value}");
+            return;
+          }
+        }
+
+        prepListHasShoppingList.value = false;
+        currentPrepListShoppingListId.value = '';
+        print("ℹ️ No shopping list found for $dateStr");
+      }
+    } catch (e) {
+      print("⚠️ Error checking shopping list: $e");
+      prepListHasShoppingList.value = false;
+      currentPrepListShoppingListId.value = '';
     }
   }
 
@@ -435,7 +536,16 @@ class MealPlanController extends GetxController {
   void toggleMealExpansion(String mealId) {
     final index = meals.indexWhere((meal) => meal.id == mealId);
     if (index != -1) {
-      meals[index].isExpanded = !meals[index].isExpanded;
+      // Create new MealSection with toggled expansion to trigger UI update
+      final oldMeal = meals[index];
+      meals[index] = MealSection(
+        id: oldMeal.id,
+        title: oldMeal.title,
+        tags: oldMeal.tags,
+        recipe: oldMeal.recipe,
+        comments: oldMeal.comments,
+        isExpanded: !oldMeal.isExpanded,
+      );
       meals.refresh();
     }
   }
@@ -447,7 +557,16 @@ class MealPlanController extends GetxController {
   void addRecipeToMeal(String mealId, MealRecipe recipe) {
     final index = meals.indexWhere((meal) => meal.id == mealId);
     if (index != -1) {
-      meals[index].recipe = recipe;
+      // Create new MealSection with recipe to trigger UI update
+      final oldMeal = meals[index];
+      meals[index] = MealSection(
+        id: oldMeal.id,
+        title: oldMeal.title,
+        tags: oldMeal.tags,
+        recipe: recipe,
+        comments: oldMeal.comments,
+        isExpanded: oldMeal.isExpanded,
+      );
       meals.refresh();
     }
   }
@@ -540,10 +659,98 @@ class MealPlanController extends GetxController {
     }
   }
 
+  /// Check if all prep list items are done
+  bool areAllPrepItemsDone() {
+    if (prepListItems.isEmpty || prepListItems.first.recipes.isEmpty) {
+      return false;
+    }
+    return prepListItems.first.recipes.every((recipe) => recipe.isDone);
+  }
+
   /// Check if a date has a meal plan
   bool dateHasMealPlan(String dateStr) {
     final normalizedDateStr = _toDateString(dateStr);
     return datesWithMealPlans.contains(normalizedDateStr);
+  }
+
+  /// Check if a date has a prep list
+  bool dateHasPrepList(String dateStr) {
+    final normalizedDateStr = _toDateString(dateStr);
+    return datesWithPrepLists.contains(normalizedDateStr);
+  }
+
+  /// Fetch prep list status for multiple dates (for calendar icons)
+  Future<void> fetchPrepListStatusForDates(List<DateTime> dates) async {
+    print("📅 Fetching prep list status for ${dates.length} dates...");
+
+    for (var date in dates) {
+      final dateStr = _toDateString(date.toIso8601String());
+
+      // Skip if already fetched
+      if (datesWithPrepLists.contains(dateStr)) {
+        continue;
+      }
+
+      try {
+        final response = await MealPlannerService.getPrepList(dateStr);
+
+        if (response['success'] == true && response['data'] != null) {
+          datesWithPrepLists.add(dateStr);
+          print("   ✅ $dateStr: has prep list");
+        } else {
+          print("   ⭕ $dateStr: no prep list");
+        }
+      } catch (e) {
+        print("   ❌ Error fetching $dateStr: $e");
+      }
+    }
+
+    datesWithPrepLists.refresh();
+    print("✅ Done fetching prep list status for all dates");
+  }
+
+  /// Fetch meal plan status for multiple dates (for calendar icons)
+  Future<void> fetchMealPlanStatusForDates(List<DateTime> dates) async {
+    print("📅 Fetching meal plan status for ${dates.length} dates...");
+
+    for (var date in dates) {
+      final dateStr = _toDateString(date.toIso8601String());
+
+      // Skip if already fetched
+      if (mealPlansByDate.containsKey(dateStr)) {
+        print("   ⏭️ Skipping $dateStr (already cached)");
+        continue;
+      }
+
+      try {
+        final response = await MealPlannerService.getMealPlan(dateStr);
+
+        if (response['success'] == true && response['data'] != null) {
+          final List<dynamic> mealPlansJson = response['data'];
+
+          if (mealPlansJson.isNotEmpty) {
+            final mealPlans = mealPlansJson
+                .map((json) => MealPlanApiModel.fromJson(json))
+                .toList();
+
+            mealPlansByDate[dateStr] = mealPlans;
+            datesWithMealPlans.add(dateStr);
+            print("   ✅ $dateStr: ${mealPlans.length} meal plans");
+          } else {
+            mealPlansByDate[dateStr] = [];
+            datesWithMealPlans.remove(dateStr);
+            print("   ⭕ $dateStr: no meal plans");
+          }
+        }
+      } catch (e) {
+        print("   ❌ Error fetching $dateStr: $e");
+      }
+    }
+
+    mealPlansByDate.refresh();
+    datesWithMealPlans.refresh();
+    await saveMealPlansToLocalStorage();
+    print("✅ Done fetching meal plan status for all dates");
   }
 
   /// Check if a date has a shopping list
@@ -798,6 +1005,12 @@ class MealPlanController extends GetxController {
 
         // Mark the date as having a shopping list
         markDateWithShoppingList(_toDateString(dateStr));
+
+        // Update the prep list shopping list flag
+        prepListHasShoppingList.value = true;
+        if (response['data'] != null && response['data']['_id'] != null) {
+          currentPrepListShoppingListId.value = response['data']['_id'];
+        }
 
         Get.snackbar(
           'Success',
