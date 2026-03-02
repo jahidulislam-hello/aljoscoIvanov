@@ -192,6 +192,167 @@ class MealPlannerService {
     }
   }
 
+  /// Get single sequence meal details
+  static Future<Map<String, dynamic>> getSingleSequenceMeal(String id) async {
+    try {
+      print("📤 GET SINGLE SEQUENCE MEAL REQUEST:");
+      print("   Endpoint: ${Urls.baseUrl}/sequence/get-single-sequence-meal/$id");
+
+      final response = await HttpClient.get(
+        Uri.parse("${Urls.baseUrl}/sequence/get-single-sequence-meal/$id"),
+      );
+
+      print("📥 GET SINGLE SEQUENCE MEAL RESPONSE:");
+      print("   Status Code: ${response.statusCode}");
+      print("   Response Body: ${response.body.substring(0, response.body.length > 500 ? 500 : response.body.length)}...");
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['success'] == true) {
+          print("✅ Single sequence meal fetched successfully");
+        }
+        return responseData;
+      } else {
+        print("❌ API returned error status: ${response.statusCode}");
+        throw Exception("Failed to fetch sequence meal details");
+      }
+    } catch (e) {
+      print("❌ Get single sequence meal error: $e");
+      rethrow;
+    }
+  }
+
+  /// Create nested meal (apply multiple saved meal plans)
+  static Future<Map<String, dynamic>> createNestedMeal({
+    required String title,
+    required String description,
+    required String date,
+    required List<String> mealsId,
+  }) async {
+    try {
+      final body = {
+        "title": title,
+        "description": description,
+        "date": date,
+        "mealsId": mealsId,
+      };
+
+      print("📤 CREATE NESTED MEAL REQUEST:");
+      print("   Endpoint: ${Urls.baseUrl}/sequence/create-nested-meal");
+      print("   Title: $title");
+      print("   Description: $description");
+      print("   Date: $date");
+      print("   Meals IDs: $mealsId");
+
+      final response = await HttpClient.post(
+        Uri.parse("${Urls.baseUrl}/sequence/create-nested-meal"),
+        body: jsonEncode(body),
+      );
+
+      print("📥 CREATE NESTED MEAL RESPONSE:");
+      print("   Status Code: ${response.statusCode}");
+      print("   Response Body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['success'] == true) {
+          print("✅ Nested meal created successfully");
+        }
+        return responseData;
+      } else {
+        print("❌ API returned error status: ${response.statusCode}");
+        final errorResponse = jsonDecode(response.body);
+        throw Exception("Failed to create nested meal: ${errorResponse['message']}");
+      }
+    } catch (e) {
+      print("❌ Create nested meal error: $e");
+      rethrow;
+    }
+  }
+
+  /// Get saved sequence meals
+  static Future<Map<String, dynamic>> getSequenceMeals() async {
+    try {
+      print("📤 GET SEQUENCE MEALS REQUEST:");
+      print("   Endpoint: ${Urls.baseUrl}/sequence/get-sequence-meal");
+
+      final response = await HttpClient.get(
+        Uri.parse("${Urls.baseUrl}/sequence/get-sequence-meal"),
+      );
+
+      print("📥 GET SEQUENCE MEALS RESPONSE:");
+      print("   Status Code: ${response.statusCode}");
+      print("   Response Body: ${response.body.substring(0, response.body.length > 500 ? 500 : response.body.length)}...");
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['success'] == true) {
+          print("✅ Sequence meals fetched successfully");
+          final data = responseData['data'] as List? ?? [];
+          print("   Total saved meal plans: ${data.length}");
+        }
+        return responseData;
+      } else {
+        print("❌ API returned error status: ${response.statusCode}");
+        throw Exception("Failed to fetch sequence meals");
+      }
+    } catch (e) {
+      print("❌ Get sequence meals error: $e");
+      rethrow;
+    }
+  }
+
+  /// Create sequence meal plan (save meal plan for multiple dates)
+  static Future<Map<String, dynamic>> createSequenceMeal({
+    required String title,
+    required String description,
+    required List<Map<String, dynamic>> plans,
+  }) async {
+    try {
+      final body = {
+        "title": title,
+        "description": description,
+        "plans": plans,
+      };
+
+      print("📤 CREATE SEQUENCE MEAL REQUEST:");
+      print("   Endpoint: ${Urls.baseUrl}/sequence/create-sequence-meal");
+      print("   Title: $title");
+      print("   Description: $description");
+      print("   Plans Count: ${plans.length}");
+      for (var i = 0; i < plans.length; i++) {
+        print("   Plan ${i + 1}: date=${plans[i]['date']}, meals=${plans[i]['meals']}");
+      }
+
+      final response = await HttpClient.post(
+        Uri.parse("${Urls.baseUrl}/sequence/create-sequence-meal"),
+        body: jsonEncode(body),
+      );
+
+      print("📥 CREATE SEQUENCE MEAL RESPONSE:");
+      print("   Status Code: ${response.statusCode}");
+      print("   Response Body: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['success'] == true) {
+          print("✅ Sequence meal plan created successfully");
+        } else {
+          print("⚠️ API returned status 200/201 but success=false");
+        }
+        return responseData;
+      } else {
+        print("❌ API returned error status: ${response.statusCode}");
+        final errorResponse = jsonDecode(response.body);
+        print("   Error Message: ${errorResponse['message']}");
+        throw Exception("Failed to create sequence meal: ${errorResponse['message']}");
+      }
+    } catch (e) {
+      print("❌ Create sequence meal error: $e");
+      rethrow;
+    }
+  }
+
   /// Get prep list
   static Future<Map<String, dynamic>> getPrepList(String date) async {
     try {

@@ -32,23 +32,93 @@ class SavedMealPlanDetails extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: SafeArea(
-          child: Obx(() => CustomAppBar(
-            title: controller.getAppBarTitle(),
-            titleAlignment: AppBarTitleAlignment.center,
-            showBackButton: true,
-            actionButtons: [
-              AppBarAction(imagePath: 'assets/icons/charm_menu.png', onPressed: () {}),
-            ],
-          )),
+          child: Obx(() {
+            // Get the title - prioritize from API response
+            String title = 'Meal Plan Details';
+            if (controller.sequenceMealDetails.value != null) {
+              title = controller.sequenceMealDetails.value!.title;
+            } else if (selectedMealPlans != null && selectedMealPlans!.isNotEmpty) {
+              if (selectedMealPlans!.length == 1) {
+                title = selectedMealPlans!.first.title;
+              } else {
+                title = '${selectedMealPlans!.length} Meal Plans';
+              }
+            }
+
+            return CustomAppBar(
+              title: title,
+              titleAlignment: AppBarTitleAlignment.center,
+              showBackButton: true,
+              actionButtons: [
+                AppBarAction(imagePath: 'assets/icons/charm_menu.png', onPressed: () {}),
+              ],
+            );
+          }),
         ),
       ),
 
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         child: Obx(() {
+          // Show loading indicator
+          if (controller.isLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFF1C2D07),
+              ),
+            );
+          }
+
+          // Show empty state if no plans and no sequence details
+          if (controller.dailyPlans.isEmpty && controller.sequenceMealDetails.value == null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.restaurant_menu,
+                    size: 64.sp,
+                    color: Colors.grey.shade400,
+                  ),
+                  SizedBox(height: 16.h),
+                  Text(
+                    "No meal plan details",
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          // Get description from sequence meal details
+          final description = controller.sequenceMealDetails.value?.description ?? '';
+
           return ListView(
             children: [
               SizedBox(height: 10.h),
+
+              // Show description if available
+              if (description.isNotEmpty) ...[
+                Container(
+                  padding: EdgeInsets.all(12.w),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 13.sp,
+                      color: const Color(0xFF666666),
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16.h),
+              ],
 
               // Print Button
               Align(
@@ -84,75 +154,116 @@ class SavedMealPlanDetails extends StatelessWidget {
               SizedBox(height: 20.h),
 
               // ====== DAILY SECTIONS ======
-              for (var day in controller.dailyPlans)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Plan title if available
-                    if (day.planTitle != null) ...[
+              if (controller.dailyPlans.isEmpty && controller.sequenceMealDetails.value != null) ...[
+                // Show message when there are no meals
+                Container(
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 40.sp,
+                        color: Colors.grey.shade400,
+                      ),
+                      SizedBox(height: 8.h),
                       Text(
-                        day.planTitle!,
+                        "No meals in this plan yet",
                         style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF1C2D07),
+                          fontSize: 14.sp,
+                          color: Colors.grey.shade600,
                         ),
                       ),
-                      SizedBox(height: 4.h),
                     ],
-                    Text(
-                      day.date,
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF2D2D2D),
+                  ),
+                ),
+              ] else
+                for (var day in controller.dailyPlans)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Plan title if available
+                      if (day.planTitle != null) ...[
+                        Text(
+                          day.planTitle!,
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF1C2D07),
+                          ),
+                        ),
+                        SizedBox(height: 4.h),
+                      ],
+                      Text(
+                        day.date,
+                        style: TextStyle(
+                          fontSize: 15.sp,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF2D2D2D),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 10.h),
+                      SizedBox(height: 10.h),
 
-                    // Meals under each day
-                    ...day.meals.map(
-                          (meal) => Padding(
-                        padding: EdgeInsets.only(bottom: 14.h),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              meal.mealType,
-                              style: TextStyle(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF2D2D2D),
-                              ),
+                      // Show message if no meals for this day
+                      if (day.meals.isEmpty)
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 14.h),
+                          child: Text(
+                            "No meals planned for this day",
+                            style: TextStyle(
+                              fontSize: 13.sp,
+                              color: Colors.grey.shade500,
+                              fontStyle: FontStyle.italic,
                             ),
-                            SizedBox(height: 4.h),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          ),
+                        )
+                      else
+                        // Meals under each day
+                        ...day.meals.map(
+                              (meal) => Padding(
+                            padding: EdgeInsets.only(bottom: 14.h),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                Text(
+                                  meal.mealType,
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF2D2D2D),
+                                  ),
+                                ),
+                                SizedBox(height: 4.h),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      meal.title,
-                                      style: TextStyle(fontSize: 13.sp, color: Colors.black87),
-                                    ),
-                                    Text(
-                                      meal.servings,
-                                      style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          meal.title,
+                                          style: TextStyle(fontSize: 13.sp, color: Colors.black87),
+                                        ),
+                                        Text(
+                                          meal.servings,
+                                          style: TextStyle(fontSize: 12.sp, color: Colors.grey),
+                                        ),
+                                      ],
                                     ),
                                   ],
-                                ),
+                                )
                               ],
-                            )
-                          ],
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
 
-                    Divider(color: Colors.grey.shade300),
-                    SizedBox(height: 10.h),
-                  ],
-                ),
+                      Divider(color: Colors.grey.shade300),
+                      SizedBox(height: 10.h),
+                    ],
+                  ),
 
               SizedBox(height: 40.h),
             ],
