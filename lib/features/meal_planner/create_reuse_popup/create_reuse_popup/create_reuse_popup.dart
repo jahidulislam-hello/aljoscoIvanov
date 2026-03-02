@@ -7,12 +7,21 @@ import 'package:get/get.dart';
 
 
 class CreateReusePopup extends StatelessWidget {
-  const CreateReusePopup({Key? key}) : super(key: key);
+  final List<String> selectedMealIds;
+
+  const CreateReusePopup({
+    Key? key,
+    required this.selectedMealIds,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => CreateReuseController(),
+      create: (_) {
+        final controller = CreateReuseController();
+        controller.setSelectedMealIds(selectedMealIds);
+        return controller;
+      },
       child: Consumer<CreateReuseController>(
         builder: (context, controller, child) {
           return Dialog(
@@ -48,16 +57,27 @@ class CreateReusePopup extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: controller.applyMealPlan,
+                        onPressed: controller.isLoading ? null : () => controller.applyMealPlan(),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2B3A0B),
+                          backgroundColor: controller.isLoading
+                              ? const Color(0xFF2B3A0B).withOpacity(0.5)
+                              : const Color(0xFF2B3A0B),
                           padding: EdgeInsets.symmetric(vertical: 14.h),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
                         ),
-                        child: Text(
-                          "Apply to the Meal Planer".tr,
-                          style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
-                        ),
+                        child: controller.isLoading
+                            ? SizedBox(
+                                height: 20.h,
+                                width: 20.w,
+                                child: const CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(
+                                "Apply to the Meal Planer".tr,
+                                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+                              ),
                       ),
                     ),
                     SizedBox(height: 8.h),

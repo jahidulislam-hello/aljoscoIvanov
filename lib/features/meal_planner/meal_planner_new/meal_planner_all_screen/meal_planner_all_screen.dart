@@ -16,6 +16,8 @@ import 'package:freshbite/features/meal_planner/meal_planner_new/select_meal_pop
 import 'package:freshbite/features/meal_planner/meal_planner_new/widget/meal_planner_popup_add.dart';
 import 'package:freshbite/features/meal_planner/reused_meal_plan/reused_meal_plan_screen/reused_meal_plan_screen.dart';
 import 'package:freshbite/features/shopping_list/shopping/shopping_screen/shopping_screen.dart';
+import 'package:freshbite/features/meal_planner/dialog/add_comment.dart';
+import 'package:freshbite/features/meal_planner/dialog/multiple_dialog.dart';
 import 'package:confetti/confetti.dart';
 import 'package:get/get.dart';
 
@@ -30,6 +32,10 @@ class AddMealPlanningScreen extends StatefulWidget {
 class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
   late final MealPlanController _controller;
   late ConfettiController _confettiController;
+
+  // Multi-select mode
+  bool _isMultiSelectMode = false;
+  List<int> _selectedDateIndices = [];
 
   @override
   void initState() {
@@ -459,8 +465,11 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
 
             _buildCalendarHeader(),
 
-            // Tab Buttons
-            _buildTabButtons(),
+            // Tab Buttons or Create Meal Plan Button
+            if (_isMultiSelectMode)
+              _buildCreateMealPlanButton()
+            else
+              _buildTabButtons(),
 
             SizedBox(height: 12.h),
 
@@ -649,7 +658,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
               bool isSelected = i == _selectedDateIndex;
               bool isToday = i == 3; // Middle is always today
 
-              return InkWell(
+              return GestureDetector(
                 onTap: () async {
                   setState(() {
                     _selectedDateIndex = i;
@@ -670,6 +679,15 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                   if (mounted) {
                     setState(() {});
                   }
+                },
+                onLongPress: () {
+                  // Enter multi-select mode
+                  setState(() {
+                    _isMultiSelectMode = true;
+                    _selectedDateIndices = [i];
+                    _selectedDateIndex = i;
+                    _currentMonth = _getMonthYear(_weekDates[i]);
+                  });
                 },
                 child: Container(
                   width: 36.w,
@@ -697,36 +715,102 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
 
           SizedBox(height: 8.h),
 
-          // Icons row under dates
-          Obx(() => Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: List.generate(7, (i) {
-              final dateStr = _weekDates[i].toIso8601String().split('T')[0];
-              final hasMealPlan = _controller.dateHasMealPlan(dateStr);
-              final hasShoppingList = _controller.dateHasShoppingList(dateStr);
-              final hasPrepList = _controller.dateHasPrepList(dateStr);
+          // Icons row under dates OR circle indicators in multi-select mode
+          if (_isMultiSelectMode) ...[
+            // Circle indicators in multi-select mode
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(7, (i) {
+                bool isSelected = _selectedDateIndices.contains(i);
 
-              return SizedBox(
-                width: 36.w,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (hasMealPlan) ...[
-                      Image.asset(AppImages.recipe_icon, width: 10.w, height: 10.h),
-                      if (hasPrepList || hasShoppingList) SizedBox(width: 2.w),
-                    ],
-                    if (hasPrepList) ...[
-                      Image.asset(AppImages.prep_list_icon, width: 10.w, height: 10.h),
-                      if (hasShoppingList) SizedBox(width: 2.w),
-                    ],
-                    if (hasShoppingList) ...[
-                      Image.asset(AppImages.shopping_icon, width: 10.w, height: 10.h),
-                    ],
-                  ],
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      if (isSelected) {
+                        _selectedDateIndices.remove(i);
+                        if (_selectedDateIndices.isEmpty) {
+                          _isMultiSelectMode = false;
+                        }
+                      } else {
+                        _selectedDateIndices.add(i);
+                      }
+                    });
+                  },
+                  child: SizedBox(
+                    width: 36.w,
+                    child: Center(
+                      child: Container(
+                        width: 16.w,
+                        height: 16.h,
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.buttonColor : Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: AppColors.buttonColor,
+                            width: 2,
+                          ),
+                        ),
+                        child: isSelected
+                            ? Icon(Icons.check, color: Colors.white, size: 10)
+                            : null,
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+            SizedBox(height: 8.h),
+            // Clear button
+            Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isMultiSelectMode = false;
+                    _selectedDateIndices.clear();
+                  });
+                },
+                child: Text(
+                  'Clear'.tr,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    color: Color(0xFF757575),
+                  ),
                 ),
-              );
-            }),
-          )),
+              ),
+            ),
+          ] else ...[
+            // Normal icons row under dates
+            Obx(() => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(7, (i) {
+                final dateStr = _weekDates[i].toIso8601String().split('T')[0];
+                final hasMealPlan = _controller.dateHasMealPlan(dateStr);
+                final hasShoppingList = _controller.dateHasShoppingList(dateStr);
+                final hasPrepList = _controller.dateHasPrepList(dateStr);
+
+                return SizedBox(
+                  width: 36.w,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (hasMealPlan) ...[
+                        Image.asset(AppImages.recipe_icon, width: 10.w, height: 10.h),
+                        if (hasPrepList || hasShoppingList) SizedBox(width: 2.w),
+                      ],
+                      if (hasPrepList) ...[
+                        Image.asset(AppImages.prep_list_icon, width: 10.w, height: 10.h),
+                        if (hasShoppingList) SizedBox(width: 2.w),
+                      ],
+                      if (hasShoppingList) ...[
+                        Image.asset(AppImages.shopping_icon, width: 10.w, height: 10.h),
+                      ],
+                    ],
+                  ),
+                );
+              }),
+            )),
+          ],
 
           SizedBox(height: 16.h),
 
@@ -812,6 +896,72 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
     );
   }
 
+  // Create Meal Plan Button (shown in multi-select mode)
+  Widget _buildCreateMealPlanButton() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: GestureDetector(
+        onTap: () {
+          _showMultipleDialogSheet();
+        },
+        child: Container(
+          height: 48.h,
+          decoration: BoxDecoration(
+            color: AppColors.buttonColor,
+            borderRadius: BorderRadius.circular(8.r),
+          ),
+          child: Center(
+            child: Text(
+              "Create Meal Plan".tr,
+              style: AppTextStyles.H6_Regular.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Multiple Dialog Sheet for multi-select mode
+  void _showMultipleDialogSheet() {
+    // Collect selected dates with their meal plan IDs
+    List<Map<String, dynamic>> plansData = [];
+
+    for (int index in _selectedDateIndices) {
+      final date = _weekDates[index];
+      final dateStr = date.toIso8601String().split('T')[0];
+      final isoDate = DateTime.utc(date.year, date.month, date.day, 8, 0, 0).toIso8601String();
+
+      // Get meal plan IDs for this date
+      final mealPlans = _controller.mealPlansByDate[dateStr] ?? [];
+      List<String> mealIds = [];
+
+      for (var plan in mealPlans) {
+        if (plan.id.isNotEmpty) {
+          mealIds.add(plan.id);
+        }
+      }
+
+      if (mealIds.isNotEmpty) {
+        plansData.add({
+          'date': isoDate,
+          'meals': mealIds,
+        });
+      }
+    }
+
+    print("📋 Selected plans data: $plansData");
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => MultipleDialogSheet(plansData: plansData),
+    );
+  }
+
   Widget _buildMealSection(MealSection meal) {
     // Get the meal plan ID for this section
     final dateStr = _weekDates[_selectedDateIndex].toIso8601String().split('T')[0];
@@ -863,14 +1013,35 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                     ],
                   ),
                 ),
-                GestureDetector(
-                  onTap: () => _controller.toggleMealExpansion(meal.id),
-                  child: Icon(
-                    meal.isExpanded ? Icons.visibility : Icons.visibility_off,
-                    color: Color(0xFF757575),
-                    size: 20,
+                if (_isMultiSelectMode)
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _controller.toggleMealExpansion(meal.id);
+                      });
+                    },
+                    child: Container(
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        color: meal.isExpanded ? AppColors.buttonColor : Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.buttonColor, width: 2),
+                      ),
+                      child: meal.isExpanded
+                          ? Icon(Icons.check, color: Colors.white, size: 14)
+                          : null,
+                    ),
+                  )
+                else
+                  GestureDetector(
+                    onTap: () => _controller.toggleMealExpansion(meal.id),
+                    child: Icon(
+                      meal.isExpanded ? Icons.visibility : Icons.visibility_off,
+                      color: Color(0xFF757575),
+                      size: 20,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -898,20 +1069,26 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                     )),
                   ],
 
-                  // Comment Icon (aligned to left) - only show if there's a meal plan
-                  if (mealPlanId != null)
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: GestureDetector(
-                        onTap: () => _showAddCommentPopup(mealPlanId: mealPlanId),
-                        child: Image.asset(
-                          AppImages.chatIcon,
-                          height: 24,
-                          width: 24,
-                          color: AppColors.buttonColor,
-                        ),
+                  // Comment Icon (aligned to left) - always show
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: GestureDetector(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => AddCommentSheet(),
+                        );
+                      },
+                      child: Image.asset(
+                        AppImages.chatIcon,
+                        height: 24,
+                        width: 24,
+                        color: AppColors.buttonColor,
                       ),
                     ),
+                  ),
 
                 ],
               ),
@@ -1224,14 +1401,35 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                     color: Color(0xFF1A1A1A),
                   ),
                 ),
-                GestureDetector(
-                  onTap: () => _controller.toggleNutritionExpansion(),
-                  child: Icon(
-                    _controller.nutritionExpanded.value ? Icons.visibility : Icons.visibility_off,
-                    color: Color(0xFF757575),
-                    size: 20,
+                if (_isMultiSelectMode)
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _controller.toggleNutritionExpansion();
+                      });
+                    },
+                    child: Container(
+                      width: 22,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        color: _controller.nutritionExpanded.value ? AppColors.buttonColor : Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.buttonColor, width: 2),
+                      ),
+                      child: _controller.nutritionExpanded.value
+                          ? Icon(Icons.check, color: Colors.white, size: 14)
+                          : null,
+                    ),
+                  )
+                else
+                  GestureDetector(
+                    onTap: () => _controller.toggleNutritionExpansion(),
+                    child: Icon(
+                      _controller.nutritionExpanded.value ? Icons.visibility : Icons.visibility_off,
+                      color: Color(0xFF757575),
+                      size: 20,
+                    ),
                   ),
-                ),
               ],
             ),
           ),
