@@ -1803,7 +1803,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
               child: Icon(Icons.person, color: Color(0xFF9E9E9E), size: 18),
             ),
             SizedBox(width: 16.w),
-            // Check icon (clickable) - Different style: rounded square with gradient
+            // Check icon (clickable) - Rounded filled button
             GestureDetector(
               onTap: () {
                 _controller.togglePrepItemDone(index);
@@ -1812,36 +1812,19 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                   _confettiController.play();
                 }
               },
-              child: AnimatedContainer(
-                duration: Duration(milliseconds: 200),
+              child: Container(
                 width: 28.w,
                 height: 28.h,
                 decoration: BoxDecoration(
-                  gradient: isDone
-                      ? LinearGradient(
-                          colors: [Color(0xFF4CAF50), Color(0xFF8BC34A)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        )
-                      : null,
-                  color: isDone ? null : Colors.white,
-                  borderRadius: BorderRadius.circular(8.r),
+                  color: isDone ? AppColors.buttonColor : Colors.white,
+                  shape: BoxShape.circle,
                   border: Border.all(
-                    color: isDone ? Colors.transparent : Color(0xFFBDBDBD),
+                    color: isDone ? AppColors.buttonColor : Color(0xFFBDBDBD),
                     width: 2,
                   ),
-                  boxShadow: isDone
-                      ? [
-                          BoxShadow(
-                            color: Color(0xFF4CAF50).withOpacity(0.3),
-                            blurRadius: 6,
-                            offset: Offset(0, 2),
-                          ),
-                        ]
-                      : null,
                 ),
                 child: isDone
-                    ? Icon(Icons.check_rounded, color: Colors.white, size: 20)
+                    ? Icon(Icons.check_rounded, color: Colors.white, size: 18)
                     : null,
               ),
             ),

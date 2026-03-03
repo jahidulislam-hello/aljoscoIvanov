@@ -42,9 +42,12 @@ class SignUpController extends GetxController {
     return RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(email);
   }
 
-  // Validate phone number (exactly 10 digits)
+  // Validate phone number (allows + prefix and 8-15 digits)
   bool _isValidPhone(String phone) {
-    return RegExp(r"^[0-9]{10}$").hasMatch(phone);
+    // Remove + prefix for length check
+    final digitsOnly = phone.replaceAll('+', '');
+    if (digitsOnly.length < 8 || digitsOnly.length > 15) return false;
+    return RegExp(r"^\+?[0-9]{8,15}$").hasMatch(phone);
   }
 
   void toggleTerms(bool? value) {
@@ -93,7 +96,7 @@ class SignUpController extends GetxController {
       phoneError.value = 'Please enter your phone number';
       hasError = true;
     } else if (!_isValidPhone(phone)) {
-      phoneError.value = 'Please enter a valid 10-digit phone number';
+      phoneError.value = 'Phone number must be 8-15 digits';
       hasError = true;
     }
 
@@ -130,7 +133,7 @@ class SignUpController extends GetxController {
       final body = {
         "fullName": name,
         "email": email,
-        "phoneNumber": int.parse(phone),
+        "phoneNumber": phone,
         "password": password,
       };
 
@@ -175,7 +178,7 @@ class SignUpController extends GetxController {
             final message = error["message"]?.toString() ?? 'Invalid input';
 
             if (path.contains('phone')) {
-              phoneError.value = 'Please enter a valid 10-digit phone number';
+              phoneError.value = 'Phone number must be 8-15 digits';
             } else if (path.contains('email')) {
               emailError.value = message;
             } else if (path.contains('password')) {
@@ -203,11 +206,7 @@ class SignUpController extends GetxController {
       }
     } catch (e) {
       print("❌ Register error: $e");
-      if (e.toString().contains('FormatException')) {
-        phoneError.value = 'Please enter a valid 10-digit phone number';
-      } else {
-        emailError.value = 'Unable to connect. Please check your internet connection.';
-      }
+      emailError.value = 'Unable to connect. Please check your internet connection.';
     } finally {
       isLoading.value = false;
     }

@@ -36,11 +36,11 @@ class ProfileScreen extends StatelessWidget {
                     physics: AlwaysScrollableScrollPhysics(),
                     child: Column(
                       children: [
-                        SizedBox(height: 24.h),
+                        SizedBox(height: 8.h),
                         _buildProfileHeader(),
-                        SizedBox(height: 32.h),
+                        SizedBox(height: 22.h),
                         _buildProfileInformation(),
-                        SizedBox(height: 32.h),
+                        SizedBox(height: 12.h),
                         _buildTabs(),
                         SizedBox(height: 16.h),
                         _buildContent(),

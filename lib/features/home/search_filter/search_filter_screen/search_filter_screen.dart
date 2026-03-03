@@ -32,7 +32,7 @@ class SearchFilterScreen extends StatelessWidget {
         ),
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.black),
-          onPressed: () => Get.back(),
+          onPressed: () => Navigator.of(context).pop(),
         ),
       ),
 
