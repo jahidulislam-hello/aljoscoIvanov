@@ -767,7 +767,7 @@ class _SidebarMenuOverlay extends StatelessWidget {
       children: [
         // BLUR BACKGROUND + CLOSE TAP
         GestureDetector(
-          onTap: () => Get.back(),
+          onTap: () => Navigator.of(context).pop(),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
             child: Container(
