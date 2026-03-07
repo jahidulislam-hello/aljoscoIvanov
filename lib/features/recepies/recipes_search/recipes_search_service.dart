@@ -74,30 +74,39 @@ class RecipesSearchService {
     }
   }
 
-  /// Toggle favorite status for a recipe
-  static Future<bool> toggleFavoriteRecipe(String recipeId, bool isFavorite) async {
+  /// Save recipe to collection
+  static Future<bool> saveRecipeToCollection(String recipeId, String collectionName) async {
     try {
       final token = await SharedPreferencesHelper.getAccessToken();
 
-      // TODO: Update with actual endpoint when available
-      print("📤 Toggling favorite for recipe: $recipeId to $isFavorite");
+      print("📤 Saving recipe to collection: $recipeId in $collectionName");
 
-      // Placeholder - replace with actual API call
-      // final response = await http.post(
-      //   Uri.parse("${Urls.baseUrl}/recipe/toggle-favorite"),
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     if (token != null) "Authorization": "Bearer $token",
-      //   },
-      //   body: jsonEncode({
-      //     "recipeId": recipeId,
-      //     "isFavorite": isFavorite,
-      //   }),
-      // );
+      final response = await HttpClient.post(
+        Uri.parse("${Urls.baseUrl}/user/saved-recipe"),
+        headers: {
+          "Content-Type": "application/json",
+          if (token != null) "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "recipeId": recipeId,
+          "collactionName": collectionName,
+        }),
+      );
 
-      return true; // Return success for now
+      print("📥 Save recipe response (${response.statusCode})");
+      print("📄 Response: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['success'] == true) {
+          print("✅ Recipe saved successfully to collection: $collectionName");
+          return true;
+        }
+      }
+      print("❌ Failed to save recipe: ${response.body}");
+      return false;
     } catch (e) {
-      print("❌ Toggle favorite error: $e");
+      print("❌ Save recipe error: $e");
       return false;
     }
   }

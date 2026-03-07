@@ -635,7 +635,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: List.generate(7, (i) {
               return SizedBox(
-                width: 36.w,
+                width: 26.w,
                 child: Center(
                   child: Text(
                     _getDayOfWeek(_weekDates[i]),
@@ -690,11 +690,11 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                   });
                 },
                 child: Container(
-                  width: 36.w,
-                  height: 36.h,
+                  width: 26.w,
+                  height: 26.h,
                   decoration: BoxDecoration(
                     color: isSelected ? AppColors.buttonColor : Colors.transparent,
-                    borderRadius: BorderRadius.circular(18.r),
+                    borderRadius: BorderRadius.circular(24.r),
                     border: isToday && !isSelected
                         ? Border.all(color: AppColors.buttonColor, width: 1)
                         : null,
@@ -737,7 +737,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                     });
                   },
                   child: SizedBox(
-                    width: 36.w,
+                    width: 26.w,
                     child: Center(
                       child: Container(
                         width: 16.w,
@@ -790,7 +790,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                 final hasPrepList = _controller.dateHasPrepList(dateStr);
 
                 return SizedBox(
-                  width: 36.w,
+                  width: 26.w,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

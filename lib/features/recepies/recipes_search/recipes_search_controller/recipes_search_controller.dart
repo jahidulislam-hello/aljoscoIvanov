@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:freshbite/features/home/favourites/favourite_collection.dart';
 import 'package:freshbite/features/recepies/recipes_search/recipe_search_model.dart';
 import 'package:freshbite/features/recepies/recipes_search/recipes_search_service.dart';
 import 'package:get/get.dart';
@@ -209,59 +210,48 @@ class RecipeRecipeSearchController extends GetxController {
   }
 
   void toggleFavorite(String recipeId) {
-    // Find and toggle in everydayRecipes
+    RecipeRecipeSearchModel? recipe;
+
+    // Find recipe in everydayRecipes
     final everydayIndex = everydayRecipes.indexWhere((r) => r.id == recipeId);
     if (everydayIndex != -1) {
-      everydayRecipes[everydayIndex].isFavorite = !everydayRecipes[everydayIndex].isFavorite;
-      everydayRecipes.refresh();
-
-      // Call API to update favorite status
-      RecipesSearchService.toggleFavoriteRecipe(
-        recipeId,
-        everydayRecipes[everydayIndex].isFavorite,
-      );
-      return;
+      recipe = everydayRecipes[everydayIndex];
     }
 
-    // Find and toggle in mealPrepRecipes
-    final mealPrepIndex = mealPrepRecipes.indexWhere((r) => r.id == recipeId);
-    if (mealPrepIndex != -1) {
-      mealPrepRecipes[mealPrepIndex].isFavorite = !mealPrepRecipes[mealPrepIndex].isFavorite;
-      mealPrepRecipes.refresh();
-
-      // Call API to update favorite status
-      RecipesSearchService.toggleFavoriteRecipe(
-        recipeId,
-        mealPrepRecipes[mealPrepIndex].isFavorite,
-      );
-      return;
+    // Find recipe in mealPrepRecipes
+    if (recipe == null) {
+      final mealPrepIndex = mealPrepRecipes.indexWhere((r) => r.id == recipeId);
+      if (mealPrepIndex != -1) {
+        recipe = mealPrepRecipes[mealPrepIndex];
+      }
     }
 
-    // Find and toggle in emergencyRecipes
-    final emergencyIndex = emergencyRecipes.indexWhere((r) => r.id == recipeId);
-    if (emergencyIndex != -1) {
-      emergencyRecipes[emergencyIndex].isFavorite = !emergencyRecipes[emergencyIndex].isFavorite;
-      emergencyRecipes.refresh();
-
-      // Call API to update favorite status
-      RecipesSearchService.toggleFavoriteRecipe(
-        recipeId,
-        emergencyRecipes[emergencyIndex].isFavorite,
-      );
-      return;
+    // Find recipe in emergencyRecipes
+    if (recipe == null) {
+      final emergencyIndex = emergencyRecipes.indexWhere((r) => r.id == recipeId);
+      if (emergencyIndex != -1) {
+        recipe = emergencyRecipes[emergencyIndex];
+      }
     }
 
-    // Also update in deprecated lists for backward compatibility
-    final recentIndex = recentFavorites.indexWhere((r) => r.id == recipeId);
-    if (recentIndex != -1) {
-      recentFavorites[recentIndex].isFavorite = !recentFavorites[recentIndex].isFavorite;
-      recentFavorites.refresh();
+    // Find recipe in deprecated lists
+    if (recipe == null) {
+      final recentIndex = recentFavorites.indexWhere((r) => r.id == recipeId);
+      if (recentIndex != -1) {
+        recipe = recentFavorites[recentIndex];
+      }
     }
 
-    final collectionIndex = collections.indexWhere((r) => r.id == recipeId);
-    if (collectionIndex != -1) {
-      collections[collectionIndex].isFavorite = !collections[collectionIndex].isFavorite;
-      collections.refresh();
+    if (recipe == null) {
+      final collectionIndex = collections.indexWhere((r) => r.id == recipeId);
+      if (collectionIndex != -1) {
+        recipe = collections[collectionIndex];
+      }
+    }
+
+    // Navigate to AddToCollectionScreen if recipe found
+    if (recipe != null) {
+      AddToCollectionScreen.show(Get.context!, recipe);
     }
   }
 

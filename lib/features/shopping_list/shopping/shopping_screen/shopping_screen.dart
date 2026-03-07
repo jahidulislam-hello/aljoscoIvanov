@@ -97,9 +97,9 @@ class ShoppingScreen extends StatelessWidget {
                   Obx(() => Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(7, (i) {
-                      if (controller.weekDates.isEmpty) return SizedBox(width: 36.w);
+                      if (controller.weekDates.isEmpty) return SizedBox(width: 26.w);
                       return SizedBox(
-                        width: 36.w,
+                        width: 26.w,
                         child: Center(
                           child: Text(
                             controller.getDayOfWeek(controller.weekDates[i]),
@@ -119,7 +119,7 @@ class ShoppingScreen extends StatelessWidget {
                   Obx(() => Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(7, (i) {
-                      if (controller.weekDates.isEmpty) return SizedBox(width: 36.w);
+                      if (controller.weekDates.isEmpty) return SizedBox(width: 26.w);
 
                       bool isSelected = i == controller.selectedDateIndex.value;
                       bool isToday = i == 3; // Middle is always today
@@ -129,11 +129,11 @@ class ShoppingScreen extends StatelessWidget {
                           controller.selectDate(i);
                         },
                         child: Container(
-                          width: 36.w,
-                          height: 36.h,
+                          width: 26.w,
+                          height: 26.h,
                           decoration: BoxDecoration(
                             color: isSelected ? AppColors.buttonColor : Colors.transparent,
-                            borderRadius: BorderRadius.circular(18.r),
+                            borderRadius: BorderRadius.circular(24.r),
                             border: isToday && !isSelected
                                 ? Border.all(color: AppColors.buttonColor, width: 1)
                                 : null,
@@ -158,7 +158,7 @@ class ShoppingScreen extends StatelessWidget {
                   Obx(() => Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(7, (i) {
-                      if (controller.weekDates.isEmpty) return SizedBox(width: 36.w);
+                      if (controller.weekDates.isEmpty) return SizedBox(width: 26.w);
 
                       final date = controller.weekDates[i];
                       final dateStr = '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
@@ -166,7 +166,7 @@ class ShoppingScreen extends StatelessWidget {
                       final hasShoppingList = controller.dateHasShoppingList(dateStr);
 
                       return SizedBox(
-                        width: 36.w,
+                        width: 26.w,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
