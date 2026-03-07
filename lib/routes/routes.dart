@@ -4,7 +4,6 @@ import 'package:freshbite/features/auth/sign_up/signUp_screen/signUp_screen.dart
 import 'package:freshbite/features/home/cooking_skill/cooking_skill_Screen.dart';
 import 'package:freshbite/features/new/controller/new_recipe_controller.dart';
 import 'package:freshbite/features/new/screen/new_recipe.dart';
-import 'package:freshbite/features/recepies/cooking/cooking_details_screen/cooking_details_screen.dart';
 import 'package:freshbite/features/recepies/recipes_details/recipes_details_controller/recipes_details_controller.dart';
 import 'package:freshbite/features/recepies/recipes_details/recipes_details_screen/recipes_details_screen.dart' hide NewRecipeDetailScreen;
 import 'package:freshbite/features/splash/onboarding/onboarding_screen/onboarding_screen.dart';
