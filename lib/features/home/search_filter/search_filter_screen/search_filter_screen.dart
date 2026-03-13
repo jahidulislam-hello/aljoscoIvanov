@@ -175,32 +175,36 @@ class SearchFilterScreen extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(width: 12.w),
-          Image.asset(
-            AppImages.search,
+          SizedBox(
             width: 24.w,
             height: 24.h,
-            color: AppColors.mainTextColor,
+            child: Image.asset(
+              AppImages.search,
+              color: AppColors.mainTextColor,
+            ),
           ),
+          SizedBox(width: 8.w),
           Expanded(
             child: TextField(
               controller: controller.searchController,
               decoration: InputDecoration(
                 hintText: "Search recipes...".tr,
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 10.w),
+                contentPadding: EdgeInsets.symmetric(horizontal: 4.w),
               ),
               onChanged: (value) => controller.updateSearchQuery(value),
             ),
           ),
           Obx(() {
-            if (controller.searchController.text.isNotEmpty) {
+            if (controller.searchQuery.value.isNotEmpty) {
               return GestureDetector(
                 onTap: () {
                   controller.searchController.clear();
                   controller.updateSearchQuery('');
                 },
-                child: Padding(
-                  padding: EdgeInsets.only(right: 12.w),
+                child: SizedBox(
+                  width: 40.w,
+                  height: 40.h,
                   child: Icon(
                     Icons.close,
                     size: 20.sp,
@@ -209,8 +213,9 @@ class SearchFilterScreen extends StatelessWidget {
                 ),
               );
             }
-            return const SizedBox.shrink();
+            return SizedBox(width: 40.w, height: 40.h);
           }),
+          SizedBox(width: 4.w),
         ],
       ),
     );
