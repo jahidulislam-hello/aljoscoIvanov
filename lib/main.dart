@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           theme: ThemeData(useMaterial3: false),
           debugShowCheckedModeBanner: false,
+
           title: 'FreshBite',
           translations: AppTranslations(),
           locale: Get.find<LocalizationController>().locale,

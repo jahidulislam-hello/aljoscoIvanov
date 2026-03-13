@@ -36,6 +36,7 @@ class HomeController extends GetxController {
   var totalSearchResults = 0.obs;
   Timer? _debounceTimer;
   Timer? _autoSwipeTimer;
+  var _isDisposed = false;
 
   @override
   void onInit() {
@@ -51,6 +52,7 @@ class HomeController extends GetxController {
 
   @override
   void onClose() {
+    _isDisposed = true;
     _debounceTimer?.cancel();
     _autoSwipeTimer?.cancel();
     featuredPageController?.dispose();
@@ -62,7 +64,16 @@ class HomeController extends GetxController {
   /// Start auto-swipe timer for featured recipes
   void _startAutoSwipe() {
     _autoSwipeTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
-      if (featuredRecipes.isNotEmpty && featuredPageController != null) {
+      if (_isDisposed) {
+        timer.cancel();
+        return;
+      }
+      if (featuredRecipes.isNotEmpty && 
+          featuredPageController != null && 
+          !featuredPageController!.hasClients) {
+        return;
+      }
+      if (featuredPageController != null) {
         int nextIndex = (currentFeaturedIndex.value + 1) % featuredRecipes.length;
         featuredPageController!.animateToPage(
           nextIndex,

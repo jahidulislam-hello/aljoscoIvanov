@@ -799,7 +799,7 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                         if (hasPrepList || hasShoppingList) SizedBox(width: 2.w),
                       ],
                       if (hasPrepList) ...[
-                        Image.asset(AppImages.prep_list_icon, width: 10.w, height: 10.h),
+                        Image.asset(AppImages.shopping_icon, width: 10.w, height: 10.h),
                         if (hasShoppingList) SizedBox(width: 2.w),
                       ],
                       if (hasShoppingList) ...[

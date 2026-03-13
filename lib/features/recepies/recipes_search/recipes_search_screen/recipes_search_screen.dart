@@ -16,12 +16,30 @@ import 'package:get/get.dart';
 
 
 
-class RecipeRecipeSearchScreen extends StatelessWidget {
-  final controller = Get.put(RecipeRecipeSearchController());
-  RecipeRecipeSearchScreen({super.key});
+class RecipeRecipeSearchScreen extends StatefulWidget {
+  const RecipeRecipeSearchScreen({super.key});
+
+  @override
+  State<RecipeRecipeSearchScreen> createState() => _RecipeRecipeSearchScreenState();
+}
+
+class _RecipeRecipeSearchScreenState extends State<RecipeRecipeSearchScreen> {
+  late final RecipeRecipeSearchController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(RecipeRecipeSearchController());
+  }
+
+  @override
+  void dispose() {
+    Get.delete<RecipeRecipeSearchController>();
+    super.dispose();
+  }
 
   // Filter chips data
-  final List<String> filterChips = [
+  List<String> filterChips = [
     'Gluten-free',
     'Meal Type',
     'Savory',
