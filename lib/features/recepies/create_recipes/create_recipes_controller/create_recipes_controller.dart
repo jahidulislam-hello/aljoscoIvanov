@@ -124,11 +124,6 @@ class RecipeController extends ChangeNotifier {
         return false;
       }
 
-      if (servings.trim().isEmpty) {
-        print('❌ Servings is required');
-        return false;
-      }
-
       // Get only non-null images
       final validImages = recipeImages.where((img) => img != null).cast<File>().toList();
 
@@ -155,31 +150,32 @@ class RecipeController extends ChangeNotifier {
           .take(10) // Maximum 10 tags
           .toList();
 
-      // Build ingredients list
+      // Build ingredients list matching API structure
       final ingredientsList = ingredients
           .where((ing) => ing.name.isNotEmpty)
           .map((ing) => {
                 'name': ing.name,
-                'unit': ing.unit,
-                'unit2': ing.unit2,
-                'value': ing.quantity,
-                'value2': ing.quantity2,
-                'category': ing.category,
-                'manualInput': ing.manualInput,
+                'unit': ing.unit.isNotEmpty ? ing.unit : 'g',
+                'value': ing.quantity.isNotEmpty ? ing.quantity : '0',
+                'categories': ing.category.isNotEmpty ? ing.category : 'Other',
+                'household': {
+                  'unit': ing.unit2.isNotEmpty ? ing.unit2 : ing.unit.isNotEmpty ? ing.unit : 'g',
+                  'value': ing.quantity2.isNotEmpty ? ing.quantity2 : ing.quantity.isNotEmpty ? ing.quantity : '0',
+                },
               })
           .toList();
 
-      // Build nutrition values list
+      // Build nutrition values list matching API structure
       final nutritionList = nutritionalValues
           .where((nutr) => nutr.name.isNotEmpty)
           .map((nutr) => {
                 'name': nutr.name,
-                'unit': nutr.unit,
-                'value': nutr.quantity,
+                'unit': nutr.unit.isNotEmpty ? nutr.unit : 'kcal',
+                'value': nutr.quantity.isNotEmpty ? nutr.quantity : '0',
               })
           .toList();
 
-      // Build instructions list
+      // Build instructions list matching API structure
       final instructionsList = instructions
           .where((inst) => inst.text.isNotEmpty)
           .map((inst) => {
@@ -188,26 +184,29 @@ class RecipeController extends ChangeNotifier {
               })
           .toList();
 
-      // Build time object
+      // Build time object matching API structure
       final timeData = {
-        'totalTime': totalTime.replaceAll(RegExp(r'[^0-9]'), ''), // Extract numbers only
+        'totalTime': totalTime.replaceAll(RegExp(r'[^0-9]'), ''),
         'prepTime': prepTime.replaceAll(RegExp(r'[^0-9]'), ''),
         'cookTime': cookTime.replaceAll(RegExp(r'[^0-9]'), ''),
       };
 
+      // Map cooking mode to lowercase
+      final cookingModeLower = selectedCookingMode.toLowerCase();
+
       // Call API
-      final response = await CreateRecipesService.createRecipe(
+      await CreateRecipesService.createRecipe(
         title: recipeName.trim(),
         description: description.trim(),
         allergens: allergensList,
         tags: tagsList,
-        serving: int.tryParse(servings) ?? 1,
+        serving: int.tryParse(servings.replaceAll(RegExp(r'[^0-9]'), '')) ?? 1,
         ingredients: ingredientsList,
         nutritionValue: nutritionList,
         requiredSkill: selectedComponents,
         instruction: instructionsList,
         time: timeData,
-        cookingMode: selectedCookingMode,
+        cookingMode: cookingModeLower,
         images: validImages,
       );
 

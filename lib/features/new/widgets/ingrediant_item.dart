@@ -93,7 +93,7 @@ class IngredientItem extends StatelessWidget {
 
                       /// buttons (UNCHANGED DESIGN)
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 3.w),
+                        padding: EdgeInsets.symmetric(horizontal: 2.w),
                         decoration: BoxDecoration(
                           color: AppColors.starYellow,
                           borderRadius: BorderRadius.circular(30.r),
@@ -117,7 +117,7 @@ class IngredientItem extends StatelessWidget {
                         ),
                       ),
                     ],
-                  ).paddingSymmetric(horizontal: 8.w),
+                  ).paddingSymmetric(horizontal: 5.w),
                 ),
 
                 /// bottom border

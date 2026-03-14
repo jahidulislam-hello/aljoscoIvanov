@@ -21,6 +21,8 @@ import 'package:freshbite/features/new/popup/popup_screen/rating_popup.dart';
 import 'package:freshbite/features/video/instruction_video.dart';
 import 'package:freshbite/features/shopping_list/create_shopping/create_shopping_controller/create_shopping_controller.dart';
 import 'package:freshbite/features/shopping_list/create_shopping/create_shopping_screen/create_shopping_screen.dart';
+import 'package:freshbite/features/home/favourites/favourite_collection.dart';
+import 'package:freshbite/features/recepies/recipes_search/recipe_search_model.dart';
 import 'package:get/get.dart';
 
 class RecipesDetailsRecipeScreen extends StatefulWidget {
@@ -91,6 +93,22 @@ class _RecipesDetailsRecipeScreenState extends State<RecipesDetailsRecipeScreen>
     ));
   }
 
+  /// Show add to collection bottom sheet
+  void _showCreateCollectionPopup(RecipesDetailsModel recipe) {
+    // Convert recipe to RecipeRecipeSearchModel format
+    final recipeSearchModel = RecipeRecipeSearchModel(
+      id: recipe.id,
+      title: recipe.title,
+      image: recipe.images.isNotEmpty ? recipe.images.first : '',
+      timeMinutes: recipe.totalTime.inMinutes,
+      rating: recipe.rating,
+      cookingMode: 'everyday',
+      isFavorite: false,
+    );
+
+    AddToCollectionScreen.show(context, recipeSearchModel);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,7 +123,15 @@ class _RecipesDetailsRecipeScreenState extends State<RecipesDetailsRecipeScreen>
             actionButtons: [
               AppBarAction(imagePath: 'assets/icons/share.png', onPressed: () {}),
               AppBarAction(imagePath: 'assets/icons/calender.png', onPressed: () {}),
-              AppBarAction(imagePath: 'assets/icons/heart-outline.png', onPressed: () {}),
+              AppBarAction(
+                imagePath: 'assets/icons/heart-outline.png',
+                onPressed: () {
+                  final recipeDetails = controller.recipeDetails.value;
+                  if (recipeDetails != null) {
+                    _showCreateCollectionPopup(recipeDetails);
+                  }
+                },
+              ),
             ],
           ),
         ),
