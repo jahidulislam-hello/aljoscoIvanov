@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 
 class CreateRecipesService {
   /// Create a new recipe with images
+  /// POST {{baseUrl}}/user-recipe/create-recipe
   static Future<Map<String, dynamic>> createRecipe({
     required String title,
     required String description,
@@ -42,7 +43,7 @@ class CreateRecipesService {
       // Create multipart request for image upload
       var request = http.MultipartRequest(
         'POST',
-        Uri.parse(Urls.createUserRecipe),
+        Uri.parse("${Urls.baseUrl}/user-recipe/create-recipe"),
       );
 
       // Add headers
@@ -57,7 +58,7 @@ class CreateRecipesService {
       request.fields['allergens'] = jsonEncode(allergens);
       request.fields['tags'] = jsonEncode(tags);
       request.fields['serving'] = serving.toString();
-      request.fields['coocking_mode'] = cookingMode.toLowerCase();
+      request.fields['coocking_mode'] = cookingMode;
       request.fields['ingredients'] = jsonEncode(ingredients);
       request.fields['nutritionValue'] = jsonEncode(nutritionValue);
       request.fields['required_skill'] = jsonEncode(requiredSkill);
@@ -85,17 +86,19 @@ class CreateRecipesService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
         if (responseData['success'] == true) {
-          print("Recipe created successfully");
+          print("✅ Recipe created successfully");
           return responseData;
         } else {
+          print("❌ Failed to create recipe: ${responseData['message']}");
           throw Exception("Failed to create recipe: ${responseData['message']}");
         }
       } else {
         final errorResponse = jsonDecode(response.body);
+        print("❌ Failed to create recipe: ${errorResponse['message'] ?? 'Unknown error'}");
         throw Exception("Failed to create recipe: ${errorResponse['message'] ?? 'Unknown error'}");
       }
     } catch (e) {
-      print("Create recipe error: $e");
+      print("❌ Create recipe error: $e");
       rethrow;
     }
   }

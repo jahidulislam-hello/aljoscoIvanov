@@ -7,6 +7,7 @@ import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/features/recepies/create_recipes/create_recipes_controller/create_recipes_controller.dart';
 import 'package:freshbite/features/recepies/create_recipes/text_editor/rich_text_editor.dart';
+import 'package:get/get.dart';
 
 
 
@@ -129,31 +130,29 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                                 text: 'SAVE RECIPE',
                                 onTap: () async {
                                   final success = await controller.saveRecipe();
-                                  if (success) {
-                                    if (mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Recipe created successfully!',
-                                            style: GoogleFonts.rubik(),
-                                          ),
-                                          backgroundColor: const Color(0xFF1C2D07),
-                                        ),
-                                      );
-                                      Navigator.pop(context, true);
-                                    }
-                                  } else {
-                                    if (mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Failed to create recipe. Please check all required fields.',
-                                            style: GoogleFonts.rubik(),
-                                          ),
-                                          backgroundColor: const Color(0xFFA63005),
-                                        ),
-                                      );
-                                    }
+                                  if (success && mounted) {
+                                    Get.snackbar(
+                                      'Success'.tr,
+                                      'Recipe created successfully!',
+                                      snackPosition: SnackPosition.BOTTOM,
+                                      backgroundColor: const Color(0xFF1C2D07),
+                                      colorText: Colors.white,
+                                      margin: const EdgeInsets.all(16),
+                                      borderRadius: 12,
+                                      duration: const Duration(seconds: 2),
+                                    );
+                                    Navigator.pop(context, true);
+                                  } else if (mounted) {
+                                    Get.snackbar(
+                                      'Error'.tr,
+                                      'Failed to create recipe. Please check all required fields.',
+                                      snackPosition: SnackPosition.BOTTOM,
+                                      backgroundColor: const Color(0xFFA63005),
+                                      colorText: Colors.white,
+                                      margin: const EdgeInsets.all(16),
+                                      borderRadius: 12,
+                                      duration: const Duration(seconds: 2),
+                                    );
                                   }
                                 },
                               ),
