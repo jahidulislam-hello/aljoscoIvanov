@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:freshbite/core/appbar/custom_appbar.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
 import 'package:freshbite/features/meal_planner/meal_planner/meal_planner_controller/meal_planner_controller.dart';
@@ -15,26 +16,40 @@ class MealPlannerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: Icon(Icons.arrow_back_ios_new, color: AppColors.textPrimary),
-        title: Text("Meal Planner", style: AppTextStyles.H5_Regular),
-        centerTitle: true,
-        actions: [
-          Icon(Icons.menu, color: AppColors.textPrimary),
-          SizedBox(width: 12.w),
-        ],
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: SafeArea(
+          child: CustomAppBar(
+            title: 'Meal Planner',
+            titleAlignment: AppBarTitleAlignment.center,
+            showBackButton: true,
+            actionButtons: [
+              AppBarAction(
+                imagePath: 'assets/icons/charm_menu.png',
+                onPressed: () {},
+              ),
+            ],
+          ),
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 16.h),
-            _buildMonthHeader(),
-            SizedBox(height: 8.h),
-            _buildDateSelector(),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.border.withOpacity(0.5)),
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              child: Column(
+                children: [
+                  _buildMonthHeader(),
+                  SizedBox(height: 16.h),
+                  _buildDateSelector(),
+                ],
+              ),
+            ),
             SizedBox(height: 16.h),
             _buildTabButtons(),
             SizedBox(height: 24.h),
@@ -56,68 +71,88 @@ class MealPlannerScreen extends StatelessWidget {
   Widget _buildMonthHeader() {
     final now = DateTime.now();
     final month = _getMonthName(now.month);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          "$month ${now.year}",
-          style: AppTextStyles.H6_Regular,
-        ),
-        Row(
-          children: [
-            Icon(Icons.arrow_drop_down, color: AppColors.textPrimary),
-            SizedBox(width: 4.w),
-            Icon(Icons.more_vert, color: AppColors.textPrimary),
-          ],
-        ),
-      ],
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Text(
+                "$month ${now.year}",
+                style: AppTextStyles.H6_Regular.copyWith(fontSize: 16.sp),
+              ),
+              SizedBox(width: 4.w),
+              Icon(Icons.arrow_drop_down, color: AppColors.grey),
+            ],
+          ),
+          Row(
+            children: [
+              Icon(Icons.more_vert, color: AppColors.grey),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildDateSelector() {
     final today = DateTime.now();
     final weekDates = List.generate(7, (i) => today.add(Duration(days: i - 2)));
-    return SizedBox(
-      height: 60.h,
-      child: Obx(() => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: weekDates.map((date) {
-          final isSelected = date.day == controller.selectedDate.value.day &&
-              date.month == controller.selectedDate.value.month;
-          return GestureDetector(
-            onTap: () => controller.selectDate(date),
-            child: Container(
-              width: 42.w,
-              decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : Colors.transparent,
-                borderRadius: BorderRadius.circular(22.r),
-                border: Border.all(
-                  color: isSelected ? AppColors.primary : AppColors.textSecondary.withOpacity(0.2),
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        /// Weekday labels
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: List.generate(7, (i) {
+            return SizedBox(
+              width: 26.w,
+              child: Center(
+                child: Text(
+                  _getWeekday(weekDates[i].weekday),
+                  style: AppTextStyles.H6_Regular.copyWith(
+                    fontSize: 12.sp,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ),
-              padding: EdgeInsets.symmetric(vertical: 6.h),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _getWeekday(date.weekday),
-                    style: AppTextStyles.H6_Regular.copyWith(
-                      color: isSelected ? Colors.white : AppColors.textSecondary,
-                    ),
+            );
+          }),
+        ),
+        SizedBox(height: 8.h),
+        /// Dates row
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: weekDates.map((date) {
+            final isSelected = date.day == controller.selectedDate.value.day &&
+                date.month == controller.selectedDate.value.month;
+            return GestureDetector(
+              onTap: () => controller.selectDate(date),
+              child: Container(
+                width: 26.w,
+                height: 26.h,
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(24.r),
+                  border: Border.all(
+                    color: isSelected ? AppColors.primary : AppColors.textSecondary.withOpacity(0.2),
                   ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    date.day.toString(),
-                    style: AppTextStyles.H6_Regular.copyWith(
-                      color: isSelected ? Colors.white : AppColors.textPrimary,
-                    ),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  date.day.toString(),
+                  style: AppTextStyles.H6_Regular.copyWith(
+                    fontSize: 14.sp,
+                    color: isSelected ? Colors.white : AppColors.textPrimary,
                   ),
-                ],
+                ),
               ),
-            ),
-          );
-        }).toList(),
-      )),
+            );
+          }).toList(),
+        ),
+      ],
     );
   }
 
@@ -144,6 +179,7 @@ class MealPlannerScreen extends StatelessWidget {
                   child: Text(
                     "MEAL PLAN",
                     style: AppTextStyles.H6_Regular.copyWith(
+                      fontSize: 14.sp,
                       color: controller.selectedTab.value == 0
                           ? Colors.white
                           : AppColors.textPrimary,
@@ -172,6 +208,7 @@ class MealPlannerScreen extends StatelessWidget {
                   child: Text(
                     "PREP LIST",
                     style: AppTextStyles.H6_Regular.copyWith(
+                      fontSize: 14.sp,
                       color: controller.selectedTab.value == 1
                           ? Colors.white
                           : AppColors.textPrimary,
