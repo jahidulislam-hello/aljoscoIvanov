@@ -145,30 +145,27 @@ class FamilyMemberScreen extends StatelessWidget {
               GestureDetector(
                 onTap: () => Get.to(() => AddMemberScreen()),
                 child: Container(
-                  width: 150.w,
                   height: 44.h,
-                  padding: EdgeInsets.all(12.w),
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8.r),
                     border: Border.all(color: Colors.grey.shade300),
                   ),
-                  child: Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.add, size: 20.sp),
-                        SizedBox(width: 6.w),
-                        Text(
-                          "Add Member ".tr,
-                          style: TextStyle(
-                            fontFamily: "Rubik",
-                            fontWeight: FontWeight.w500,
-                            fontSize: 15.sp,
-                          ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add, size: 20.sp),
+                      SizedBox(width: 6.w),
+                      Text(
+                        "Add Member ".tr,
+                        style: TextStyle(
+                          fontFamily: "Rubik",
+                          fontWeight: FontWeight.w500,
+                          fontSize: 15.sp,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),

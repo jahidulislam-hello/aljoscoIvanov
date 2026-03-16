@@ -30,6 +30,10 @@ class LanguageController extends GetxController {
       await _localizationController.setLanguage(const Locale('de', 'DE'));
     }
 
+    // Close snackbar if any before navigating back
+    if (Get.isSnackbarOpen) {
+      Get.closeCurrentSnackbar();
+    }
     Get.back();
   }
 }
