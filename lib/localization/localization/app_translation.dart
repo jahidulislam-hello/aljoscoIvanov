@@ -569,6 +569,27 @@ class AppTranslations extends Translations {
       'An error occurred:': 'An error occurred:',
       'Network error': 'Network error',
       'Check your internet connection': 'Check your internet connection',
+
+
+      //// ==================== Menu ====================
+
+      'My Profile': 'My Profile',
+      'Subscription': 'Subscription',
+      'Favorites': 'Favorites',
+      'Preferences': 'Preferences',
+      'Cooking Skills': 'Cooking Skills',
+      'About freshbite': 'About freshbite',
+      'FAQ': 'FAQ',
+      'Privacy Policy': 'Privacy Policy',
+      'Terms & Conditions': 'Terms & Conditions',
+      'Sign Out': 'Sign Out',
+
+
+
+
+
+
+
     },
 
     'de_DE': {
@@ -618,7 +639,7 @@ class AppTranslations extends Translations {
       // ==================== ONBOARDING ====================
       'Welcome to FreshBite!': 'Willkommen bei FreshBite!',
       'Wellcome to FreshBite !': 'Willkommen bei FreshBite!',
-      'Log in to start cooking!': 'Melde dich an und leg los!',
+      'Log in to start cooking!': 'Anmelden und loslegen!',
       'Continue as Guest': 'Als Gast fortfahren',
       'or': 'oder',
       'FreshBite': 'FreshBite',
@@ -627,7 +648,7 @@ class AppTranslations extends Translations {
       'LOGIN': 'ANMELDEN',
       'Log In': 'Anmelden',
       'Login': 'Anmelden',
-      'Enter your email and password to continue': 'Gib deine E-Mail und dein Passwort ein, um fortzufahren',
+      'Enter your email and password to continue': 'Gib deine E-Mail und dein Passwort ein',
       'Email': 'E-Mail',
       'Password': 'Passwort',
       'Remember me': 'Angemeldet bleiben',
@@ -639,7 +660,7 @@ class AppTranslations extends Translations {
       'SIGN UP': 'REGISTRIEREN',
 
       // ==================== AUTH - SIGNUP ====================
-      'Create your account to get started': 'Erstelle dein Konto, um loszulegen',
+      'Create your account to get started': 'Gib deine Daten ein, um ein Konto zu erstellen',
       'Full Name': 'Vollständiger Name',
       'Name': 'Name',
       'Phone Number': 'Telefonnummer',
@@ -650,7 +671,7 @@ class AppTranslations extends Translations {
       'Terms & Conditions and Privacy Policy.': 'AGB und Datenschutzerklärung.',
       'By creating an account, I accept the Terms & Conditions and Privacy Policy.': 'Mit der Erstellung eines Kontos akzeptiere ich die AGB und Datenschutzerklärung.',
       'Create Account': 'Konto erstellen',
-      'Already have an account?': 'Bereits ein Konto?',
+      'Already have an account?': 'Hast du bereits ein Konto?',
 
       // ==================== AUTH - PASSWORD RESET ====================
       'Forgot Password': 'Passwort vergessen',
@@ -658,7 +679,7 @@ class AppTranslations extends Translations {
       'SEND CODE': 'CODE SENDEN',
       'Send Code': 'Code senden',
       'Verify Code': 'Code bestätigen',
-      'Enter the code we sent to your email.': 'Gib den Code ein, den wir an deine E-Mail gesendet haben.',
+      'Enter the code we sent to your email.': 'Gib den Code ein, den du per E-Mail erhalten hast.',
       'VERIFY': 'BESTÄTIGEN',
       'Verify': 'Bestätigen',
       'Didn\'t receive a code?': 'Keinen Code erhalten?',
@@ -692,7 +713,7 @@ class AppTranslations extends Translations {
 
       // ==================== HOME SCREEN ====================
       'Hi': 'Hallo',
-      'Ready to cook?': 'Bereit zu kochen?',
+      'Ready to cook?': 'Was willst du kochen?',
       'Guest': 'Gast',
       'Newly added': 'Neu hinzugefügt',
       'Let\'s cook!': 'Lass uns kochen!',
@@ -702,7 +723,7 @@ class AppTranslations extends Translations {
       'EveryDay': 'Alltag',
       'Meal Prep': 'Meal Prep',
       'Emergency': 'Notfall',
-      'Next planned Prep List:': 'Nächste geplante Vorbereitung:',
+      'Next planned Prep List:': 'Nächste geplante Prep-Liste:',
       'Regular meal plan': 'Regulärer Essensplan',
       'Next planned Shopping:': 'Nächster geplanter Einkauf:',
       'You don\'t have a meal plan yet. Go to the meal planning section to create one.': 'Du hast noch keinen Essensplan. Gehe zum Essensplaner, um einen zu erstellen.',
@@ -891,7 +912,7 @@ class AppTranslations extends Translations {
       'Add a short description about this shopping list': 'Füge eine kurze Beschreibung für diese Einkaufsliste hinzu',
       'Plan your shopping': 'Plane deinen Einkauf',
       'No shopping lists yet': 'Noch keine Einkaufslisten',
-      'Shopped by': 'Eingekauft von',
+      'Shopped by': 'Wer kauft ein?',
       'Finished?': 'Fertig?',
       'created by': 'erstellt von',
       'on': 'am',
@@ -1137,6 +1158,23 @@ class AppTranslations extends Translations {
       'An error occurred:': 'Ein Fehler ist aufgetreten:',
       'Network error': 'Netzwerkfehler',
       'Check your internet connection': 'Überprüfe deine Internetverbindung',
+
+
+
+      //// ==================== Menu ====================
+
+      'My Profile': 'Mein Profil',
+      'Subscription': 'Abonnement',
+      'Favorites': 'Favoriten',
+      'Preferences': 'Präferenzen',
+      'Cooking Skills': 'Koch-Skills',
+      'About freshbite': 'Über freshbite',
+      'FAQ': 'FAQ',
+      'Privacy Policy': 'Datenschutzerklärung',
+      'Terms & Conditions': 'AGB',
+      'Sign Out': 'Abmelden',
+
+
     },
   };
 }
