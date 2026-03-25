@@ -47,9 +47,9 @@ class ResetPasswordScreen extends StatelessWidget {
                        child: const Icon(Icons.arrow_back_ios, color: Colors.black),
                      ),
                    ),
-                   const Text(
-                     "Reset Password",
-                     style: TextStyle(
+                   Text(
+                     "Reset Password".tr,
+                     style: const TextStyle(
                        color: Colors.black,
                        fontSize: 18,
                        fontWeight: FontWeight.w600,
@@ -75,7 +75,7 @@ class ResetPasswordScreen extends StatelessWidget {
                /// New Password Field
                Obx(() => CustomTextField(
                  controller: controller.newPasswordController,
-                 hintText: "Set New Password",
+                 hintText: "Set New Password".tr,
                  keyboardType: "visiblePassword",
                  errorText: controller.newPasswordError.value,
                )),
@@ -85,7 +85,7 @@ class ResetPasswordScreen extends StatelessWidget {
                /// Confirm Password Field
                Obx(() => CustomTextField(
                  controller: controller.confirmPasswordController,
-                 hintText: "Confirm New Password",
+                 hintText: "Confirm New Password".tr,
                  keyboardType: "visiblePassword",
                  errorText: controller.confirmPasswordError.value,
                )),
@@ -94,7 +94,7 @@ class ResetPasswordScreen extends StatelessWidget {
 
                /// Submit Button
                Obx(() => CustomTextButton(
-                 text: controller.isLoading.value ? "Resetting..." : "Submit Now",
+                 text: controller.isLoading.value ? "Resetting...".tr : "Submit Now".tr,
                  onTap: () {
                    if (!controller.isLoading.value) {
                      controller.resetPassword();

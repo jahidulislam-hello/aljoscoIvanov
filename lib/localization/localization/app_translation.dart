@@ -48,8 +48,7 @@ class AppTranslations extends Translations {
       'Su': 'Su',
 
       // ==================== ONBOARDING ====================
-      'Welcome to FreshBite!': 'Welcome to FreshBite!',
-      'Wellcome to FreshBite !': 'Welcome to FreshBite!',
+      'Welcome to freshbite!': 'Welcome to freshbite!',
       'Log in to start cooking!': 'Log in to start cooking!',
       'Continue as Guest': 'Continue as Guest',
       'or': 'or',
@@ -637,8 +636,8 @@ class AppTranslations extends Translations {
       'Su': 'So',
 
       // ==================== ONBOARDING ====================
-      'Welcome to FreshBite!': 'Willkommen bei FreshBite!',
-      'Wellcome to FreshBite !': 'Willkommen bei FreshBite!',
+
+      'Welcome to freshbite !': 'Willkommen bei freshbite!',
       'Log in to start cooking!': 'Anmelden und loslegen!',
       'Continue as Guest': 'Als Gast fortfahren',
       'or': 'oder',

@@ -544,26 +544,31 @@ class EditShoppingController extends GetxController {
       }
 
       isSaving.value = false;
-      Get.back();
 
-      Future.delayed(Duration(milliseconds: 300), () {
-        Get.snackbar(
-          "Success",
-          "Shopping list marked as complete!",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      });
+      // Show success message and navigate back
+      Get.snackbar(
+        "Success".tr,
+        "Shopping list marked as complete!".tr,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(milliseconds: 1500),
+      );
+
+      // Navigate back immediately
+      await Future.delayed(const Duration(milliseconds: 100));
+      Get.back();
+      
     } catch (e) {
       debugPrint('❌ Error marking as complete: $e');
       isSaving.value = false;
       Get.snackbar(
-        "Error",
-        "Failed to mark as complete",
+        "Error".tr,
+        "Failed to mark as complete".tr,
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
+        duration: const Duration(milliseconds: 2000),
       );
     }
   }

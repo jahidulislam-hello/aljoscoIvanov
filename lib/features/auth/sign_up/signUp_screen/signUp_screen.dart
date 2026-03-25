@@ -28,14 +28,14 @@ class SignUpScreen extends StatelessWidget {
 
 
               /// Title
-              const Text(
-                "Sign Up",
-                style: TextStyle(fontSize: 24, color: AppColors.text, fontWeight: FontWeight.w600),
+              Text(
+                "Sign Up".tr,
+                style: const TextStyle(fontSize: 24, color: AppColors.text, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 10),
-              const Text(
-                "Create your account to get started",
-                style: TextStyle(fontSize: 16, color: AppColors.mainTextColor, fontWeight: FontWeight.normal),
+              Text(
+                "Create your account to get started".tr,
+                style: const TextStyle(fontSize: 16, color: AppColors.mainTextColor, fontWeight: FontWeight.normal),
               ),
               const SizedBox(height: 60),
 
@@ -45,7 +45,7 @@ class SignUpScreen extends StatelessWidget {
                   /// Name
                   Obx(() => CustomTextField(
                     controller: controller.nameController,
-                    hintText: "Name",
+                    hintText: "Name".tr,
                     errorText: controller.nameError.value,
                   )),
                   const SizedBox(height: 16),
@@ -53,7 +53,7 @@ class SignUpScreen extends StatelessWidget {
                   /// Email
                   Obx(() => CustomTextField(
                     controller: controller.emailController,
-                    hintText: "Email",
+                    hintText: "Email".tr,
                     keyboardType: "email",
                     errorText: controller.emailError.value,
                   )),
@@ -62,7 +62,7 @@ class SignUpScreen extends StatelessWidget {
                   /// Phone
                   Obx(() => CustomTextField(
                     controller: controller.phoneController,
-                    hintText: "Phone Number",
+                    hintText: "Phone Number".tr,
                     keyboardType: "phone",
                     errorText: controller.phoneError.value,
                   )),
@@ -73,7 +73,7 @@ class SignUpScreen extends StatelessWidget {
                   Obx(
                         () => CustomTextField(
                       controller: controller.passwordController,
-                      hintText: "Password",
+                      hintText: "Password".tr,
                       keyboardType: "visiblePassword",
                       errorText: controller.passwordError.value,
                     ),
@@ -84,7 +84,7 @@ class SignUpScreen extends StatelessWidget {
                   Obx(
                         () => CustomTextField(
                       controller: controller.confirmPasswordController,
-                      hintText: "Confirm Password",
+                      hintText: "Confirm Password".tr,
                       keyboardType: "visiblePassword",
                       errorText: controller.confirmPasswordError.value,
                     ),
@@ -111,13 +111,13 @@ class SignUpScreen extends StatelessWidget {
                             activeColor: AppColors.borderSecondary,
                             checkColor: Colors.white,
                             title: RichText(
-                              text: const TextSpan(
-                                style: TextStyle(color: AppColors.defaultTextColor, fontSize: 14),
+                              text: TextSpan(
+                                style: const TextStyle(color: AppColors.defaultTextColor, fontSize: 14),
                                 children: [
-                                  TextSpan(text: "By creating an account, I accept the", ),
+                                  TextSpan(text: "By creating an account, I accept the".tr),
                                   TextSpan(
-                                    text: "Terms & Conditions and Privacy Policy.",
-                                    style: TextStyle(color: AppColors.mainTextColor),
+                                    text: "Terms & Conditions and Privacy Policy.".tr,
+                                    style: const TextStyle(color: AppColors.mainTextColor),
                                   ),
                                 ],
                               ),
@@ -143,7 +143,7 @@ class SignUpScreen extends StatelessWidget {
 
                   /// Sign Up button
                   CustomTextButton(
-                    text: "Sign Up",
+                    text: "Sign Up".tr,
                     onTap: () {
                       controller.registerUser();
 
@@ -157,7 +157,7 @@ class SignUpScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Already have an account?",
+                        "Already have an account?".tr,
                         style: TextStyle(fontSize: 16, color: AppColors.defaultTextColor),
                       ),
                       GestureDetector(
@@ -165,7 +165,7 @@ class SignUpScreen extends StatelessWidget {
                           Get.to(() => LoginScreen());
                         },
                         child:  Text(
-                          "Login",
+                          "Login".tr,
                           style: TextStyle(
                             fontSize: 16,
                             color: AppColors.buttonColor,

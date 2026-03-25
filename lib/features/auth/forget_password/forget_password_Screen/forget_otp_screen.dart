@@ -46,9 +46,9 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
                       child: const Icon(Icons.arrow_back_ios, color: Colors.black),
                     ),
                   ),
-                  const Text(
-                    "Verify Code",
-                    style: TextStyle(
+                  Text(
+                    "Verify Code".tr,
+                    style: const TextStyle(
                       color: Colors.black,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -74,7 +74,7 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
               /// Email info
               Center(
                 child: Obx(() => Text(
-                  "We sent a reset link to ${controller.email.value}\nEnter 6 digit code from email",
+                  "We sent a reset link to ${controller.email.value}\nEnter 6 digit code from email".tr,
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 14, color: Colors.black),
                 )),
@@ -150,9 +150,9 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
                   if (controller.secondsRemaining.value == 0) {
                     return GestureDetector(
                       onTap: controller.resendCode,
-                      child: const Text(
-                        "Resend OTP",
-                        style: TextStyle(
+                      child: Text(
+                        "Resend OTP".tr,
+                        style: const TextStyle(
                           fontSize: 14,
                           color: Colors.black,
                           decoration: TextDecoration.underline,
@@ -166,9 +166,9 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
                       text: TextSpan(
                         style: const TextStyle(fontSize: 14),
                         children: [
-                          const TextSpan(
-                            text: 'Resend OTP ',
-                            style: TextStyle(
+                          TextSpan(
+                            text: 'Resend OTP '.tr,
+                            style: const TextStyle(
                               color: Colors.black,
                               fontWeight: FontWeight.w500,
                             ),
@@ -193,7 +193,7 @@ class ForgotPasswordOtpScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: CustomTextButton(
-                  text: "Verify OTP",
+                  text: "Verify OTP".tr,
                   onTap: controller.verifyOtp,
                 ),
               ),

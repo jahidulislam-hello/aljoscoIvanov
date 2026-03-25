@@ -67,15 +67,15 @@ class _LoginScreenState extends State<LoginScreen> {
               alignment: Alignment.center,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [
+                children: [
                   Text(
-                    "Log In",
-                    style: TextStyle(fontSize: 24, color: Colors.black, fontWeight: FontWeight.w500),
+                    "Log In".tr,
+                    style: const TextStyle(fontSize: 24, color: Colors.black, fontWeight: FontWeight.w500),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Text(
-                    "Enter your email and password to continue",
-                    style: TextStyle(fontSize: 16, color: Color(0xFF4A4A4A)),
+                    "Enter your email and password to continue".tr,
+                    style: const TextStyle(fontSize: 16, color: Color(0xFF4A4A4A)),
                   ),
                 ],
               ),
@@ -89,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
             /// Email Field
             Obx(() => CustomTextField(
               controller: _controller.emailController,
-              hintText: "Email",
+              hintText: "Email".tr,
               keyboardType: "email",
               errorText: _controller.emailError.value,
             )),
@@ -98,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
             /// Password Field
             Obx(() => CustomTextField(
               controller: _controller.passwordController,
-              hintText: "Password",
+              hintText: "Password".tr,
               keyboardType: "visiblePassword",
               errorText: _controller.passwordError.value,
             )),
@@ -126,8 +126,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
 
-                    const Text(
-                      "Remember Me",
+                    Text(
+                      "Remember Me".tr,
                       style: TextStyle(color: Color(0xFF6E6E6E)),
                     ),
                   ],
@@ -136,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   onPressed: () { Get.to(() => ForgotPasswordScreen()); },
                   child:  Text(
-                    'Forgot Password?',
+                    'Forgot Password?'.tr,
                     style: TextStyle(color: Colors.black),
                   ),
                 ),
@@ -146,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             /// Login Button
             CustomTextButton(
-              text: "Log In",
+              text: "Log In".tr,
               onTap: (
               ){
                _controller.login();
@@ -155,20 +155,20 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 20),
 
-            /// Don’t have an account? Register
+            /// Don't have an account? Register
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text(
-                  "Don’t have an account? ",
-                  style: TextStyle(color: Colors.blueGrey),
+                Text(
+                  "Don't have an account? ".tr,
+                  style: const TextStyle(color: Colors.blueGrey),
                 ),
                 GestureDetector(
                   onTap: () {
                     Get.to(() => SignUpScreen());
                   },
                   child: Text(
-                    "Sign Up",
+                    "Sign Up".tr,
                     style: TextStyle(
                       color: AppColors.mainTextColor,
                       fontWeight: FontWeight.bold,
