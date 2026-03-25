@@ -55,7 +55,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                   SizedBox(height: 10.h),
                   Text(
-                    'Wellcome to FreshBite !'.tr,
+                    'Welcome to freshbite !'.tr,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Baste B', // your custom font

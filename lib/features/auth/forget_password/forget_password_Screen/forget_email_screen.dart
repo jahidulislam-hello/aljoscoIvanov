@@ -38,9 +38,9 @@ class ForgotPasswordScreen extends StatelessWidget {
                   ),
 
                   /// Centered title
-                  const Text(
-                    "Forget Pass",
-                    style: TextStyle(
+                  Text(
+                    "Forgot Password".tr,
+                    style: const TextStyle(
                       color: Colors.black,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -71,11 +71,11 @@ class ForgotPasswordScreen extends StatelessWidget {
                     const SizedBox(height: 40),
 
                     /// Description
-                    const Center(
+                    Center(
                       child: Text(
-                        "Enter email address to reset your password",
+                        "Enter email address to reset your password.".tr,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Colors.black,
                         ),
@@ -87,7 +87,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                     /// Email input
                     Obx(() => CustomTextField(
                       controller: controller.emailController,
-                      hintText: "Email",
+                      hintText: "Email".tr,
                       keyboardType: 'email',
                       errorText: controller.emailError.value,
                       prefixSvg: Padding(
@@ -107,7 +107,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: CustomTextButton(
-                        text: "Send Code",
+                        text: "Send Code".tr,
                         onTap: controller.forgetPass,
                       ),
                     ),
