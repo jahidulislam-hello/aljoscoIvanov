@@ -14,6 +14,7 @@ import 'package:freshbite/features/home/terms_condition/terms_conditions.dart';
 import 'package:freshbite/features/subscription/subscription_screen.dart';
 import 'package:freshbite/features/auth/sign_in/signin_screen/signin_screen.dart';
 import 'package:freshbite/core/utils/shared_preference_helper.dart';
+import 'package:freshbite/core/navbar/controller/navbar_controller.dart';
 import 'package:get/get.dart';
 
 
@@ -166,12 +167,7 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
                 SizedBox(height: 4.h),
 
                 _buildMenuItem('assets/icons/menu1.png', 'My Profile'.tr, onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => AboutUs(),
-                    ),
-                  );
+                  Get.find<BottomNavbarController>().changeIndex(4);
                 },),
                 _buildMenuItem('assets/icons/menu2.png', 'Subscription'.tr, onTap: () {
                   Navigator.push(

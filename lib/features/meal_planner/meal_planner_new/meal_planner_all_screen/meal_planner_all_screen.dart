@@ -20,6 +20,8 @@ import 'package:freshbite/features/meal_planner/dialog/add_comment.dart';
 import 'package:freshbite/features/meal_planner/dialog/multiple_dialog.dart';
 import 'package:confetti/confetti.dart';
 import 'package:get/get.dart';
+import 'package:freshbite/features/splash/create_account/create_account_prompt.dart';
+import 'package:freshbite/core/utils/shared_preference_helper.dart';
 
 import '../meal_planner_all_controller/meal_planner_all_controller.dart';
 import '../meal_planner_all_model/meal_planner_all_model.dart';
@@ -576,10 +578,15 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.r),
                 ),
-                onSelected: (value) {
+                onSelected: (value) async {
                   switch (value) {
                     case 0:
                       // Apply Saved Meal Plan
+                      bool isGuest = await SharedPreferencesHelper.isGuest();
+                      if (isGuest) {
+                        Get.dialog(const CreateAccountPromptPage(), barrierDismissible: true);
+                        return;
+                      }
                       Get.to(() => const ReusedMealPlanScreen());
                       break;
                     case 1:
@@ -1641,6 +1648,12 @@ class _MealPlanningScreenState extends State<AddMealPlanningScreen> {
                     : AppColors.buttonColor,
                 onTap: () async {
                   if (isLoading) return;
+                  
+                  bool isGuest = await SharedPreferencesHelper.isGuest();
+                  if (isGuest) {
+                    Get.dialog(const CreateAccountPromptPage(), barrierDismissible: true);
+                    return;
+                  }
 
                   if (hasShoppingList) {
                     // Navigate to shopping list screen
