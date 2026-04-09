@@ -6,6 +6,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/localization/localization/localization_controller.dart';
+import 'package:freshbite/core/navbar/navbar/navbar_screen.dart';
+import 'package:freshbite/routes/routes.dart';
+import 'package:freshbite/core/utils/shared_preference_helper.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -124,7 +127,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Text('or'.tr, style: TextStyle(fontSize: 14.sp, color: Colors.black54)),
                   SizedBox(width: 8.w),
                   InkWell(
-                    onTap: () {},
+                    onTap: () async {
+                      await SharedPreferencesHelper.setGuestMode(true);
+                      Get.offAll(() => BottomNavbar());
+                    },
                     child: Text(
                       'Continue as Guest'.tr,
                       style: TextStyle(

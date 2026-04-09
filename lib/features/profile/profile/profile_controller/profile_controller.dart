@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:freshbite/core/utils/shared_preference_helper.dart';
 import 'package:freshbite/features/profile/profile/model/profile_recipe_model.dart';
 import 'package:freshbite/features/profile/profile/model/user_model.dart';
@@ -17,6 +17,17 @@ class ProfileController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _initializeProfile();
+  }
+
+  Future<void> _initializeProfile() async {
+    // Skip API calls for guest users
+    bool isGuest = await SharedPreferencesHelper.isGuest();
+    if (isGuest) {
+      debugPrint('👤 Guest mode: Skipping profile API calls');
+      return;
+    }
+    
     fetchProfileData();
     fetchUserRecipes();
   }

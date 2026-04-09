@@ -4,6 +4,7 @@ class SharedPreferencesHelper {
   // Keys
   static const String _accessTokenKey = 'token';
   static const String _isLoginKey = 'isLogin';
+  static const String _isGuestKey = 'isGuest';
   static const String _userIdKey = 'userId';
   static const String _userEmailKey = 'userEmail';
   static const String _userPhoneKey = 'userPhone';
@@ -87,6 +88,18 @@ class SharedPreferencesHelper {
   static Future<bool> isLoggedIn() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_isLoginKey) ?? false;
+  }
+
+  /// ✅ Set guest mode
+  static Future<void> setGuestMode(bool isGuest) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_isGuestKey, isGuest);
+  }
+
+  /// ✅ Check if user is in guest mode
+  static Future<bool> isGuest() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_isGuestKey) ?? false;
   }
 
   /// ✅ Clear all stored data

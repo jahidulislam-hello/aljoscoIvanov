@@ -12,6 +12,8 @@ import 'package:freshbite/core/navbar/controller/navbar_controller.dart';
 import 'package:freshbite/features/recepies/recipes_details/recipes_details_screen/recipes_details_screen.dart';
 import 'package:freshbite/features/recepies/recipes_details/recipes_details_controller/recipes_details_controller.dart';
 import 'package:get/get.dart';
+import 'package:freshbite/features/splash/create_account/create_account_prompt.dart';
+import 'package:freshbite/core/utils/shared_preference_helper.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -647,7 +649,13 @@ class HomeScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final recipe = controller.searchResults[index];
               return GestureDetector(
-                onTap: () {
+                onTap: () async {
+                  bool isGuest = await SharedPreferencesHelper.isGuest();
+                  if (isGuest) {
+                    Get.dialog(const CreateAccountPromptPage(), barrierDismissible: true);
+                    return;
+                  }
+                  
                   if (recipe.recipeId != null && recipe.recipeId!.isNotEmpty) {
                     Get.delete<RecipesDetailsRecipeController>();
                     Get.put(RecipesDetailsRecipeController(recipeId: recipe.recipeId!));

@@ -15,6 +15,8 @@ import 'package:freshbite/features/shopping_list/shopping/shopping_model/shoppin
 import 'package:get/get.dart';
 
 import '../../../new/widgets/primary_button.dart';
+import 'package:freshbite/features/splash/create_account/create_account_prompt.dart';
+import 'package:freshbite/core/utils/shared_preference_helper.dart';
 
 
 class ShoppingScreen extends StatelessWidget {
@@ -245,6 +247,12 @@ class ShoppingScreen extends StatelessWidget {
                               item: item,
                               onToggle: () => controller.toggleFinished(index),
                               onTap: () async {
+                                bool isGuest = await SharedPreferencesHelper.isGuest();
+                                if (isGuest) {
+                                  Get.dialog(const CreateAccountPromptPage(), barrierDismissible: true);
+                                  return;
+                                }
+                                
                                 await Get.to(
                                   () => EditShoppingListScreen(),
                                   arguments: {'shoppingListId': item.id},
@@ -525,6 +533,13 @@ void showCreateShoppingListPopup(BuildContext context, ShoppingController contro
               CustomTextButton(
                 text: "FROM PREP LIST".tr,
                 onTap: () async {
+                  bool isGuest = await SharedPreferencesHelper.isGuest();
+                  if (isGuest) {
+                    Navigator.pop(context);
+                    Get.dialog(const CreateAccountPromptPage(), barrierDismissible: true);
+                    return;
+                  }
+                  
                   Navigator.pop(context); // close popup first
                   await Get.to(() => SelectPrepListScreen());
                   // Refresh list after returning
@@ -541,6 +556,13 @@ void showCreateShoppingListPopup(BuildContext context, ShoppingController contro
               CustomTextButton(
                 text: "CUSTOM".tr,
                 onTap: () async {
+                  bool isGuest = await SharedPreferencesHelper.isGuest();
+                  if (isGuest) {
+                    Navigator.pop(context);
+                    Get.dialog(const CreateAccountPromptPage(), barrierDismissible: true);
+                    return;
+                  }
+                  
                   Navigator.pop(context);
                   await Get.to(() => CreateShoppingScreen());
                   // Refresh list after returning

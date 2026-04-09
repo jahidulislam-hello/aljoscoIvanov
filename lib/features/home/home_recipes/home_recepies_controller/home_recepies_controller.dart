@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:freshbite/core/network_celler/endpoints.dart';
 import 'package:freshbite/core/network_celler/http_client.dart';
 import 'package:freshbite/core/themes/app_images.dart';
+import 'package:freshbite/core/utils/shared_preference_helper.dart';
 import 'package:freshbite/features/home/home_recipes/home_recepies_model.dart';
 import 'package:get/get.dart';
 
@@ -193,6 +194,13 @@ class HomeController extends GetxController {
 
   /// Fetch all data in parallel for faster loading
   Future<void> _fetchAllData() async {
+    // Skip API calls for guest users
+    bool isGuest = await SharedPreferencesHelper.isGuest();
+    if (isGuest) {
+      debugPrint('👤 Guest mode: Skipping API calls');
+      return;
+    }
+
     isLoading.value = true;
     try {
       // Run all API calls in parallel

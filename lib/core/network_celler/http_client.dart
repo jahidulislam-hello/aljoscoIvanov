@@ -11,6 +11,12 @@ class HttpClient {
 
   /// Handles HTTP responses and checks for token expiration
   static Future<void> _handleTokenExpiration(http.Response response) async {
+    // Skip handling for guest users
+    bool isGuest = await SharedPreferencesHelper.isGuest();
+    if (isGuest) {
+      return;
+    }
+
     if (response.statusCode == 400 || response.statusCode == 401) {
       try {
         final responseData = jsonDecode(response.body);

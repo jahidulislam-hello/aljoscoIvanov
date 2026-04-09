@@ -584,6 +584,14 @@ class AppTranslations extends Translations {
       'Sign Out': 'Sign Out',
 
 
+      //// ==================== Create Account PopUp ====================
+
+      'To access this feature,\nplease sign up.': 'To access this feature,\nplease sign up.',
+      'To enjoy the full functionality of the app, create an account here.': 'To enjoy the full functionality of the app, create an account here.',
+      'Create Account': 'Create Account',
+
+
+
 
 
 
@@ -1172,6 +1180,14 @@ class AppTranslations extends Translations {
       'Privacy Policy': 'Datenschutzerklärung',
       'Terms & Conditions': 'AGB',
       'Sign Out': 'Abmelden',
+
+
+
+      //// ==================== Acount Create PopUP ====================
+
+      'To access this feature,\nplease sign up.': 'Um diese Funktion zu nutzen,\n melde dich bitte an.',
+      'To enjoy the full functionality of the app, create an account here.': 'Um alle Funktionen der App freizuschalten, erstelle hier einen Account.',
+      'Create Account': 'REGISTRIEREN',
 
 
     },

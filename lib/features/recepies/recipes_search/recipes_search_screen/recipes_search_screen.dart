@@ -12,6 +12,8 @@ import 'package:freshbite/features/recepies/recipes_details/recipes_details_scre
 import 'package:freshbite/features/recepies/recipes_details/recipes_details_controller/recipes_details_controller.dart';
 import 'package:freshbite/features/recepies/recipes_search/recipes_search_controller/recipes_search_controller.dart';
 import 'package:get/get.dart';
+import 'package:freshbite/features/splash/create_account/create_account_prompt.dart';
+import 'package:freshbite/core/utils/shared_preference_helper.dart';
 
 
 
@@ -135,8 +137,13 @@ class _RecipeRecipeSearchScreenState extends State<RecipeRecipeSearchScreen> {
             bottom: 20.h,
             right: 16.w,
             child: GestureDetector(
-              onTap: () {
-               Get.to(()=> CreateRecipeScreen());
+              onTap: () async {
+                bool isGuest = await SharedPreferencesHelper.isGuest();
+                if (isGuest) {
+                  Get.dialog(const CreateAccountPromptPage(), barrierDismissible: true);
+                  return;
+                }
+                Get.to(()=> CreateRecipeScreen());
               },
               child: Container(
                 width: 50.w,
@@ -211,7 +218,12 @@ class _RecipeRecipeSearchScreenState extends State<RecipeRecipeSearchScreen> {
         ),
         SizedBox(width: 10.w),
         GestureDetector(
-          onTap: () {
+          onTap: () async {
+            bool isGuest = await SharedPreferencesHelper.isGuest();
+            if (isGuest) {
+              Get.dialog(const CreateAccountPromptPage(), barrierDismissible: true);
+              return;
+            }
             Get.to(() => SearchFilterScreen());
           },
           child: Container(
@@ -322,7 +334,13 @@ class _RecipeRecipeSearchScreenState extends State<RecipeRecipeSearchScreen> {
         itemBuilder: (_, i) {
           final recipe = recipes[i];
           return GestureDetector(
-            onTap: () {
+            onTap: () async {
+              bool isGuest = await SharedPreferencesHelper.isGuest();
+              if (isGuest) {
+                Get.dialog(const CreateAccountPromptPage(), barrierDismissible: true);
+                return;
+              }
+              
               // Navigate to details screen with recipe ID
               Get.delete<RecipesDetailsRecipeController>();
               Get.put(RecipesDetailsRecipeController(recipeId: recipe.id));
@@ -528,7 +546,13 @@ class _RecipeRecipeSearchScreenState extends State<RecipeRecipeSearchScreen> {
             itemBuilder: (context, index) {
               final recipe = controller.searchResults[index];
               return GestureDetector(
-                onTap: () {
+                onTap: () async {
+                  bool isGuest = await SharedPreferencesHelper.isGuest();
+                  if (isGuest) {
+                    Get.dialog(const CreateAccountPromptPage(), barrierDismissible: true);
+                    return;
+                  }
+                  
                   Get.delete<RecipesDetailsRecipeController>();
                   Get.put(RecipesDetailsRecipeController(recipeId: recipe.id));
                   Get.to(() => RecipesDetailsRecipeScreen());

@@ -23,27 +23,63 @@ class TermsConditions extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-              SectionBody(
-                "1. What is FreshBite?\n"
-                "FreshBite is a platform that connects businesses with qualified, on-demand professionals for temporary or part-time work. Our app makes it easy for businesses to find professionals when they need extra help or to cover staff shortages.\n\n"
-                "2. How does FreshBite work for employers?\n"
-                "Employers can sign up, browse available professionals, and book them for specific time slots. Employers can also mark professionals as favorites to easily select from their preferred list for future bookings.\n\n"
-                "3. How does FreshBite work for service providers?\n"
-                "Service providers create a profile detailing their qualifications and availability. Once approved, they can offer their services during their available times. Service providers do not book jobs but make themselves available to be booked by employers.\n\n"
-                "4. How do payments work?\n"
-                "Payments are handled directly through the app. Employers are charged when a booking is confirmed, and funds are held in escrow until both parties confirm the completion of the service. The service provider will then receive their payment minus the platform fee.\n\n"
-                "5. What if there is a dispute between an employer and a service provider?\n"
-                "Shpitze offers a dispute resolution process in case any issues arise between an employer and a service provider. However, we encourage both parties to communicate and resolve issues directly when possible.\n\n"
-                "6. Is Shpitze responsible for verifying the qualifications of service providers?\n"
-                "Shpitze conducts a verification process to the extent possible, but ultimate responsibility for ensuring the qualifications and suitability of service providers lies with the employers. We encourage employers to perform their own due diligence before making a booking.\n\n"
-                "7. What industries does Shpitze serve?\n"
-                "Shpitze connects professionals with employers across various industries for temporary or part-time work. The platform is designed to be flexible and scalable, meeting the needs of multiple sectors.\n\n"
-                "8. How do I contact Shpitze for support?\n"
-                "For support, you can reach out to us via the 'Contact Us' section within the app or email us at contact@shpitze.com. Our team will respond as soon as possible.\n\n"
-                "9. What is the difference between Instant Booking and Request to Book?\n"
-                "Instant Booking allows you to secure a service provider immediately. Once you confirm the booking, it's automatically scheduled and confirmed without needing further approval from the provider.\n\n"
-                "Request to Book gives the service provider the option to accept or decline the booking. After submitting your request, the provider will review the details and confirm whether they can accommodate your booking. This method is ideal for non-urgent needs where more control over scheduling is preferred.",
-              ),
+                SectionBody(
+                    "1. Scope of Application\n\n"
+                        "These Terms & Conditions (“T&C”) govern the use of the freshbite App (“App”) by registered users (“Users”).\n"
+                        "The App is operated by:\n\n"
+                        "freshBITE Ivanov, Zurlindenstrasse 303, 8003 Zurich, Switzerland\n"
+                        "(hereinafter referred to as “freshbite”).\n\n"
+                        "By registering and using the App, Users accept these T&C.\n\n"
+
+                        "2. Services of the App\n\n"
+                        "The App in particular provides the following functions:\n"
+                        "• Access to cooking recipes, cooking videos, and a how-to video library\n"
+                        "• Meal planner with portion adjustment, daily overview, and nutritional information\n"
+                        "• Creation of automatic or individual shopping lists\n"
+                        "• Storage of personal preferences (e.g., filters for recipe searches)\n"
+                        "• Push notifications (optional), e.g., reminders of meal planner entries or shopping lists \n"
+                        "• Possibility to create and upload own recipes (including photos and links) \n"
+                        "• Data synchronization (for Family Accounts) \n\n"
+                        "freshbite reserves the right to expand, restrict, or modify features at any time.\n\n"
+
+                        "3. Account Models\n\n"
+                        "• Free Account: Limited functionality\n"
+                        "• Premium Account: Full access for one person\n"
+                        "• Family Account: Full access for one person plus the option to invite additional users and synchronize data \n"
+                        "• VIP Account:  Free full access, granted only by freshbite\n\n"
+                        "Subscriptions are subject to charges unless they are Free or VIP Accounts. Prices and payment terms are based on the information provided in the App Store (Apple/Google).\n\n"
+
+                        "4. Registration and User Obligations\n\n"
+                        "• During registration, Users must provide complete and accurate information. \n"
+                        "• Login credentials must be kept confidential and not shared with third parties. \n"
+                        "• Users who upload their own recipes, photos, or links confirm that they hold the necessary rights and do not infringe on copyrights or other rights of third parties.\n"
+                        "• It is prohibited to upload illegal, offensive, discriminatory, or harmful content to the App. \n"
+                        "• Users may enable or disable push notifications at any time in their device settings.\n\n"
+                        "freshbite reserves the right to remove content or suspend accounts in case of violations. \n\n"
+
+                        "5. Disclaimer of Liability\n\n"
+                        "• The contents of the App (recipes, nutritional information, videos, etc.) are provided for general informational and educational purposes only. They do not constitute medical or nutritional advice and are not a substitute for consulting a physician or qualifiedprofessional.\n"
+                        "• Despite careful preparation, freshbite assumes no liability for the accuracy, completeness, or timeliness of the content. \n"
+                        "• Use of the App is at the User’s own risk. freshbite shall not be liable for damages resulting from improper use, intolerances, allergies, or external links. \n\n"
+
+
+                        "6. Term and Termination\n\n"
+                        "• All subscriptions (Premium, Family) automatically renew on a monthly basis unless cancelled in time via the App Store (Apple/Google). \n"
+                        "• Subscriptions can be cancelled at any time in the account settings of the respective App Store and will end at the close of the current billing period. \n"
+                        "• Users are not entitled to a prorated refund of fees already paid. \n\n"
+
+                        "7. Intellectual Property\n\n"
+                        "All contents of the App (texts, images, recipes, videos, graphics, logos) are protected by copyright and are the property of freshBITE Ivanov, unless otherwise indicated.Without express written consent from freshBITE Ivanov, contents may not be copied, reproduced, modified, or distributed.\n"
+                        "The names freshbite® and FRESH Methode® are registered trademarks and legally protected. \n\n"
+
+                        "8. Data Protection\n\n"
+                        "The protection of personal data is important to freshbite. Details are set out in the Privacy Policy, which forms an integral part of these T&C. \n\n"
+
+                        "9. Final Provisions\n\n"
+                        "• Swiss law shall apply exclusively, excluding conflict-of-law rules. \n"
+                        "• The place of jurisdiction for all disputes arising from or in connection with the use of the App is Zurich, Switzerland, unless mandatory law provides otherwise. \n"
+                        "• Should individual provisions of these T&C be invalid, the validity of the remainingprovisions shall not be affected.\n"
+                ),
               const SizedBox(height: 28),
             ],
           ),
