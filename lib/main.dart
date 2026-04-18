@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:freshbite/localization/localization/app_translation.dart';
 import 'package:freshbite/routes/routes.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,11 @@ import 'package:freshbite/localization/localization/localization_controller.dart
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Stripe
+  Stripe.publishableKey = 'pk_test_51Sc2RyJFE0G3dpbM443Q7nmngbU8sW3KUATGLTTEnYEHzYcAaRlCoweeIThMxMMbf037sjbQetOf97cMKbr2odCF009RKE7jeP';
+  await Stripe.instance.applySettings();
+  
   final sharedPreferences = await SharedPreferences.getInstance();
   Get.put(LocalizationController(sharedPreferences: sharedPreferences));
   runApp(const MyApp());

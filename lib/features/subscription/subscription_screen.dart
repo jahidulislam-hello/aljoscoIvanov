@@ -4,6 +4,7 @@ import 'package:freshbite/core/appbar/custom_appbar.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/features/subscription/subscription_controller/subscription_controller.dart';
+import 'package:freshbite/features/subscription/payment/payment.dart';
 import 'package:freshbite/routes/routes.dart';
 import 'package:get/get.dart';
 import '../../core/themes/app_colors.dart';
@@ -108,7 +109,7 @@ class SubscriptionScreen extends StatelessWidget{
                 if (controller.selectedPlan.value == -1) {
                   Get.snackbar("Alert", "Please select a plan first");
                 } else {
-                  Get.offAllNamed(AppRoute.getBottomNavbar());
+                  Get.to(()=>PaymentScreen());
                 }
               },
             ),
