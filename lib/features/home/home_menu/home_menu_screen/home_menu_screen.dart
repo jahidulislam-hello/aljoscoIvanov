@@ -25,103 +25,14 @@ class HomeScreenMenu extends StatefulWidget {
   State<HomeScreenMenu> createState() => _HomeScreenMenuState();
 }
 
-class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _slideAnimation;
-  bool _isMenuOpen = false;
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.85).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-
-    _slideAnimation = Tween<double>(begin: 0.0, end: 0.6).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-
-
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-  void _toggleMenu() {
-    if (!mounted) return;
-    setState(() {
-      _isMenuOpen = !_isMenuOpen;
-      if (_isMenuOpen) {
-        _animationController.forward();
-      } else {
-        _animationController.reverse();
-      }
-    });
-  }
-
-  void _closeMenu() {
-    if (_isMenuOpen && mounted) {
-      setState(() {
-        _isMenuOpen = false;
-        _animationController.reverse();
-      });
-    }
-  }
-
+class _HomeScreenMenuState extends State<HomeScreenMenu> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      body: Stack(
-        children: [
-          // Sidebar Menu
-          _buildSidebar(),
-
-          // Main Content with Animation
-          AnimatedBuilder(
-            animation: _animationController,
-            builder: (context, child) {
-              return Transform.scale(
-                scale: _scaleAnimation.value,
-                child: Transform.translate(
-                  offset: Offset(
-                    MediaQuery.of(context).size.width * _slideAnimation.value,
-                    0,
-                  ),
-                  child: GestureDetector(
-                    onTap: _closeMenu,
-                    child: AbsorbPointer(
-                      absorbing: _isMenuOpen,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(_isMenuOpen ? 20.r : 0),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(
-                            sigmaX: _isMenuOpen ? 5.0 : 0.0,
-                            sigmaY: _isMenuOpen ? 5.0 : 0.0,
-                          ),
-
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+      backgroundColor: Colors.white,
+      body: SafeArea(child: _buildSidebar()),
     );
   }
-
-
 
 
   Widget _buildSidebar() {
@@ -146,15 +57,23 @@ class _HomeScreenMenuState extends State<HomeScreenMenu> with SingleTickerProvid
                 bottomRight: Radius.circular(10.r),
               ),
             ),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'freshbite',
-              style: TextStyle(
-                fontSize: 28.sp,
-                fontWeight: FontWeight.w900,
-                fontFamily: "BasteB",
-                color: AppColors.buttonColor,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'freshbite',
+                  style: TextStyle(
+                    fontSize: 28.sp,
+                    fontWeight: FontWeight.w900,
+                    fontFamily: "BasteB",
+                    color: AppColors.buttonColor,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Get.back(),
+                  icon: const Icon(Icons.close, color: AppColors.buttonColor),
+                ),
+              ],
             ),
           ),
 

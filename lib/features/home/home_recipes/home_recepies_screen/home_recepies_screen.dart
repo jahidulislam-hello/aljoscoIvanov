@@ -771,46 +771,7 @@ class HomeScreen extends StatelessWidget {
 class _SidebarMenuOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        // BLUR BACKGROUND + CLOSE TAP
-        GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 3, sigmaY: 3),
-            child: Container(
-              color: Colors.black.withOpacity(0.3),
-            ),
-          ),
-        ),
-
-        // SIDEBAR
-        Align(
-          alignment: Alignment.centerLeft,
-          child: TweenAnimationBuilder(
-            tween: Tween<double>(begin: -250, end: 0),
-            duration: const Duration(milliseconds: 250),
-            builder: (context, value, child) {
-              return Transform.translate(
-                offset: Offset(value, 0),
-                child: child,
-              );
-            },
-            child: SafeArea(
-              child: Container(
-                width: 300,
-                height: Get.height,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10.r), // FULL 10
-                ),
-                child: HomeScreenMenu(),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+    return const HomeScreenMenu();
   }
 }
 

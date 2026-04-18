@@ -49,6 +49,7 @@ dependencies:
   pdf:
   printing:
   confetti:
+  flutter_stripe:
 
 
 
@@ -81,7 +82,6 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/svg/
-    - assets/audio/
     - assets/video/
     - assets/navbar/
 
