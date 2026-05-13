@@ -116,6 +116,22 @@ class RecipeController extends ChangeNotifier {
     }
   }
 
+  String _normalizeUnit(String unit) {
+    final u = unit.trim().toLowerCase();
+    if (u == 'piece' || u == 'pcs' || u == 'pcs.') return 'pcs';
+    if (u == 'g' || u == 'gram' || u == 'grams') return 'g';
+    if (u == 'ml' || u == 'milliliter' || u == 'milliliters') return 'ml';
+    if (u == 'tbsp' || u == 'tablespoon' || u == 'tablespoons') return 'tbsp';
+    if (u == 'tsp' || u == 'teaspoon' || u == 'teaspoons') return 'tsp';
+    if (u == 'pinch') return 'pinch';
+    if (u == 'slice') return 'slice';
+    if (u == 'handful') return 'handful';
+    if (u == 'can') return 'can';
+    if (u == 'cup') return 'cup';
+    if (u.isEmpty) return 'g';
+    return unit;
+  }
+
   Future<bool> saveRecipe() async {
     try {
       // Validation
@@ -158,16 +174,20 @@ class RecipeController extends ChangeNotifier {
       // Build ingredients list matching API structure
       final ingredientsList = ingredients
           .where((ing) => ing.name.isNotEmpty)
-          .map((ing) => {
-                'name': ing.name,
-                'unit': ing.unit.isNotEmpty ? ing.unit : 'g',
-                'value': ing.quantity.isNotEmpty ? ing.quantity : '0',
-                'categories': ing.category.isNotEmpty ? ing.category : 'Other',
-                'household': {
-                  'unit': ing.unit2.isNotEmpty ? ing.unit2 : ing.unit.isNotEmpty ? ing.unit : 'g',
-                  'value': ing.quantity2.isNotEmpty ? ing.quantity2 : ing.quantity.isNotEmpty ? ing.quantity : '0',
-                },
-              })
+          .map((ing) {
+                  final unit = _normalizeUnit(ing.unit);
+                  final unit2 = _normalizeUnit(ing.unit2.isNotEmpty ? ing.unit2 : (ing.unit.isNotEmpty ? ing.unit : 'g'));
+                  return {
+                    'name': ing.name,
+                    'unit': unit,
+                    'value': ing.quantity.isNotEmpty ? ing.quantity : '0',
+                    'categories': ing.category.isNotEmpty ? ing.category : 'Other',
+                    'household': {
+                      'unit': unit2,
+                      'value': ing.quantity2.isNotEmpty ? ing.quantity2 : (ing.quantity.isNotEmpty ? ing.quantity : '0'),
+                    },
+                  };
+                })
           .toList();
 
       // Build nutrition values list matching API structure
