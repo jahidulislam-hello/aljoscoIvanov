@@ -219,6 +219,13 @@ class RecipeController extends ChangeNotifier {
       // Map cooking mode to lowercase
       final cookingModeLower = selectedCookingMode.toLowerCase();
 
+      // Normalize requiredSkill: backend expects IDs (24-hex) — prefer sending IDs
+      final requiredSkillIds = selectedComponents
+          .map((s) => s.trim())
+          .where((s) => RegExp(r'^[0-9a-fA-F]{24}\$').hasMatch(s))
+          .toList();
+      final requiredSkillPayload = requiredSkillIds.isNotEmpty ? requiredSkillIds : (selectedComponents.isNotEmpty ? selectedComponents : <String>[]);
+
       // Call API
       await CreateRecipesService.createRecipe(
         title: recipeName.trim(),
@@ -228,7 +235,7 @@ class RecipeController extends ChangeNotifier {
         serving: int.tryParse(servings.replaceAll(RegExp(r'[^0-9]'), '')) ?? 1,
         ingredients: ingredientsList,
         nutritionValue: nutritionList,
-        requiredSkill: selectedComponents,
+        requiredSkill: requiredSkillPayload,
         instruction: instructionsList,
         time: timeData,
         cookingMode: cookingModeLower,
