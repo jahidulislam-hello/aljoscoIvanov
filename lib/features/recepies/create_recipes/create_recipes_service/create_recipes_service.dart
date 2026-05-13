@@ -96,10 +96,12 @@ class CreateRecipesService {
           return responseData;
         } else {
           print("❌ Failed to create recipe: ${responseData['message']}");
+          print("Response body: ${response.body}");
           throw Exception("${responseData['message']}");
         }
       } else {
         print("❌ Failed to create recipe: ${responseData['message'] ?? 'Unknown error'}");
+        print("Response body: ${response.body}");
         throw Exception("${responseData['message'] ?? 'Unknown error'}");
       }
     } catch (e) {
