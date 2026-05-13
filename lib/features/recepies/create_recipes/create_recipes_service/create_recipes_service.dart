@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:freshbite/core/network_celler/endpoints.dart';
-import 'package:freshbite/core/utils/shared_preference_helper.dart';
+import 'package:freshbite/core/network_celler/http_client.dart';
 import 'package:http/http.dart' as http;
 
 class CreateRecipesService {
@@ -22,8 +22,6 @@ class CreateRecipesService {
     required List<File> images,
   }) async {
     try {
-      final token = await SharedPreferencesHelper.getAccessToken();
-
       print("======================================");
       print("Creating recipe...");
       print("Title: $title");
@@ -46,12 +44,6 @@ class CreateRecipesService {
         Uri.parse("${Urls.baseUrl}/user-recipe/create-recipe"),
       );
 
-      // Add headers
-      request.headers['Content-Type'] = 'multipart/form-data';
-      if (token != null) {
-        request.headers['Authorization'] = 'Bearer $token';
-      }
-
       // Add text fields matching the API structure
       request.fields['title'] = title;
       request.fields['description'] = description;
@@ -68,34 +60,47 @@ class CreateRecipesService {
       // Add images
       for (int i = 0; i < images.length; i++) {
         final image = images[i];
-        var multipartFile = await http.MultipartFile.fromPath(
-          'images',
-          image.path,
-        );
-        request.files.add(multipartFile);
-        print("Added image ${i + 1}: ${image.path.split('/').last}");
+        if (await image.exists()) {
+          var multipartFile = await http.MultipartFile.fromPath(
+            'images',
+            image.path,
+          );
+          request.files.add(multipartFile);
+          print("Added image ${i + 1}: ${image.path.split('/').last}");
+        }
       }
 
-      // Send request
-      final streamedResponse = await request.send();
+      // Send request using HttpClient for unified token management
+      final streamedResponse = await HttpClient.sendMultipart(request);
       final response = await http.Response.fromStream(streamedResponse);
 
       print("Create recipe response (${response.statusCode})");
-      print("Response: ${response.body}");
+
+      if (response.statusCode == 413) {
+        throw Exception("The request is too large. This is usually caused by large images. Please try with smaller images or fewer images.");
+      }
+
+      // Check if response is JSON
+      final contentType = response.headers['content-type'] ?? '';
+      if (!contentType.contains('application/json')) {
+        print("❌ Unexpected response format: $contentType");
+        print("Response body: ${response.body}");
+        throw Exception("Server returned an unexpected response format. Status: ${response.statusCode}");
+      }
+
+      final responseData = jsonDecode(response.body);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final responseData = jsonDecode(response.body);
         if (responseData['success'] == true) {
           print("✅ Recipe created successfully");
           return responseData;
         } else {
           print("❌ Failed to create recipe: ${responseData['message']}");
-          throw Exception("Failed to create recipe: ${responseData['message']}");
+          throw Exception("${responseData['message']}");
         }
       } else {
-        final errorResponse = jsonDecode(response.body);
-        print("❌ Failed to create recipe: ${errorResponse['message'] ?? 'Unknown error'}");
-        throw Exception("Failed to create recipe: ${errorResponse['message'] ?? 'Unknown error'}");
+        print("❌ Failed to create recipe: ${responseData['message'] ?? 'Unknown error'}");
+        throw Exception("${responseData['message'] ?? 'Unknown error'}");
       }
     } catch (e) {
       print("❌ Create recipe error: $e");

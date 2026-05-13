@@ -33,6 +33,8 @@ class _RichTextEditorState extends State<RichTextEditor> {
   @override
   void initState() {
     super.initState();
+    // Initialize editor with existing instruction text (if any)
+    _controller.text = widget.instruction.text;
     _focusNode.addListener(() {
       setState(() {
         _showToolbar = _focusNode.hasFocus;
@@ -125,68 +127,71 @@ class _RichTextEditorState extends State<RichTextEditor> {
                 ),
               ],
             ),
-            child: Row(
-              children: [
-                _buildToolbarButton(
-                  icon: Icons.format_bold,
-                  isActive: _isBold,
-                  onTap: _toggleBold,
-                  tooltip: 'Bold',
-                ),
-                const SizedBox(width: 4),
-                _buildToolbarButton(
-                  icon: Icons.format_italic,
-                  isActive: _isItalic,
-                  onTap: _toggleItalic,
-                  tooltip: 'Italic',
-                ),
-                const SizedBox(width: 4),
-                _buildToolbarButton(
-                  icon: Icons.format_underline,
-                  isActive: _isUnderline,
-                  onTap: _toggleUnderline,
-                  tooltip: 'Underline',
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  width: 1,
-                  height: 24,
-                  color: Colors.grey[300],
-                ),
-                const SizedBox(width: 8),
-                _buildColorButton(Colors.black),
-                const SizedBox(width: 4),
-                _buildColorButton(Colors.red),
-                const SizedBox(width: 4),
-                _buildColorButton(Colors.blue),
-                const SizedBox(width: 4),
-                _buildColorButton(Colors.green),
-                const SizedBox(width: 4),
-                _buildColorButton(Colors.orange),
-                const SizedBox(width: 4),
-                _buildColorButton(Colors.purple),
-                const Spacer(),
-                _buildToolbarButton(
-                  icon: Icons.format_align_left,
-                  isActive: false,
-                  onTap: () {},
-                  tooltip: 'Align Left',
-                ),
-                const SizedBox(width: 4),
-                _buildToolbarButton(
-                  icon: Icons.format_align_center,
-                  isActive: false,
-                  onTap: () {},
-                  tooltip: 'Align Center',
-                ),
-                const SizedBox(width: 4),
-                _buildToolbarButton(
-                  icon: Icons.format_list_bulleted,
-                  isActive: false,
-                  onTap: () {},
-                  tooltip: 'Bullet List',
-                ),
-              ],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildToolbarButton(
+                    icon: Icons.format_bold,
+                    isActive: _isBold,
+                    onTap: _toggleBold,
+                    tooltip: 'Bold',
+                  ),
+                  const SizedBox(width: 4),
+                  _buildToolbarButton(
+                    icon: Icons.format_italic,
+                    isActive: _isItalic,
+                    onTap: _toggleItalic,
+                    tooltip: 'Italic',
+                  ),
+                  const SizedBox(width: 4),
+                  _buildToolbarButton(
+                    icon: Icons.format_underline,
+                    isActive: _isUnderline,
+                    onTap: _toggleUnderline,
+                    tooltip: 'Underline',
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    width: 1,
+                    height: 24,
+                    color: Colors.grey[300],
+                  ),
+                  const SizedBox(width: 8),
+                  _buildColorButton(Colors.black),
+                  const SizedBox(width: 4),
+                  _buildColorButton(Colors.red),
+                  const SizedBox(width: 4),
+                  _buildColorButton(Colors.blue),
+                  const SizedBox(width: 4),
+                  _buildColorButton(Colors.green),
+                  const SizedBox(width: 4),
+                  _buildColorButton(Colors.orange),
+                  const SizedBox(width: 4),
+                  _buildColorButton(Colors.purple),
+                  const SizedBox(width: 16),
+                  _buildToolbarButton(
+                    icon: Icons.format_align_left,
+                    isActive: false,
+                    onTap: () {},
+                    tooltip: 'Align Left',
+                  ),
+                  const SizedBox(width: 4),
+                  _buildToolbarButton(
+                    icon: Icons.format_align_center,
+                    isActive: false,
+                    onTap: () {},
+                    tooltip: 'Align Center',
+                  ),
+                  const SizedBox(width: 4),
+                  _buildToolbarButton(
+                    icon: Icons.format_list_bulleted,
+                    isActive: false,
+                    onTap: () {},
+                    tooltip: 'Bullet List',
+                  ),
+                ],
+              ),
             ),
           ),
         ],

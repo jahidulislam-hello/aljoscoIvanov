@@ -131,27 +131,27 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                                 onTap: () async {
                                   final success = await controller.saveRecipe();
                                   if (success && mounted) {
-                                    Get.snackbar(
-                                      'Success'.tr,
-                                      'Recipe created successfully!',
-                                      snackPosition: SnackPosition.BOTTOM,
-                                      backgroundColor: const Color(0xFF1C2D07),
-                                      colorText: Colors.white,
-                                      margin: const EdgeInsets.all(16),
-                                      borderRadius: 12,
-                                      duration: const Duration(seconds: 2),
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Recipe created successfully!', style: TextStyle(color: Colors.white)),
+                                        backgroundColor: const Color(0xFF1C2D07),
+                                        behavior: SnackBarBehavior.floating,
+                                        margin: const EdgeInsets.all(16),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        duration: const Duration(seconds: 2),
+                                      ),
                                     );
                                     Navigator.pop(context, true);
                                   } else if (mounted) {
-                                    Get.snackbar(
-                                      'Error'.tr,
-                                      'Failed to create recipe. Please check all required fields.',
-                                      snackPosition: SnackPosition.BOTTOM,
-                                      backgroundColor: const Color(0xFFA63005),
-                                      colorText: Colors.white,
-                                      margin: const EdgeInsets.all(16),
-                                      borderRadius: 12,
-                                      duration: const Duration(seconds: 2),
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Failed to create recipe. Please check all required fields.', style: TextStyle(color: Colors.white)),
+                                        backgroundColor: const Color(0xFFA63005),
+                                        behavior: SnackBarBehavior.floating,
+                                        margin: const EdgeInsets.all(16),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        duration: const Duration(seconds: 2),
+                                      ),
                                     );
                                   }
                                 },
@@ -473,11 +473,37 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
         ...controller.instructions.asMap().entries.map((entry) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: RichTextEditor(
-              index: entry.key,
-              hint: 'e.g. Heat oil and sauté onions until translucent...',
-              instruction: entry.value,
-              onChanged: (text) => controller.updateInstruction(entry.key, text: text),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichTextEditor(
+                  index: entry.key,
+                  hint: 'e.g. Heat oil and sauté onions until translucent...',
+                  instruction: entry.value,
+                  onChanged: (text) => controller.updateInstruction(entry.key, text: text),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: TextEditingController(text: controller.instructions[entry.key].videoUrl ?? ''),
+                  onChanged: (v) => controller.updateInstruction(entry.key, videoUrl: v),
+                  style: GoogleFonts.rubik(fontSize: 14, color: Colors.black87),
+                  decoration: InputDecoration(
+                    hintText: 'Video URL (optional)',
+                    hintStyle: GoogleFonts.rubik(color: Colors.grey, fontSize: 14),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(4),
+                      borderSide: const BorderSide(color: Color(0xFFC7C7C7)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(4),
+                      borderSide: const BorderSide(color: Color(0xFFC7C7C7)),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  ),
+                ),
+              ],
             ),
           );
         }).toList(),

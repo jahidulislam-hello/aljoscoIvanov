@@ -37,7 +37,12 @@ class RecipeController extends ChangeNotifier {
   }
 
   Future<void> pickImage(int index) async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1024,
+      maxHeight: 1024,
+      imageQuality: 85,
+    );
     if (image != null) {
       recipeImages[index] = File(image.path);
       notifyListeners();
