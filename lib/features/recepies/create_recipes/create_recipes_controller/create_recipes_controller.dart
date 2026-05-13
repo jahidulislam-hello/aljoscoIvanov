@@ -224,7 +224,8 @@ class RecipeController extends ChangeNotifier {
           .map((s) => s.trim())
           .where((s) => RegExp(r'^[0-9a-fA-F]{24}\$').hasMatch(s))
           .toList();
-      final requiredSkillPayload = requiredSkillIds.isNotEmpty ? requiredSkillIds : (selectedComponents.isNotEmpty ? selectedComponents : <String>[]);
+      // Send only valid IDs; if none, send empty list to avoid backend validation errors
+      final requiredSkillPayload = requiredSkillIds.isNotEmpty ? requiredSkillIds : <String>[];
 
       // Call API
       await CreateRecipesService.createRecipe(
