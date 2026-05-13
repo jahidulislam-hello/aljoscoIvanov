@@ -554,6 +554,20 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
     'Other'
   ];
 
+  // Unit options for ingredient dropdowns
+  final List<String> _unitOptions = [
+    'g',
+    'ml',
+    'piece',
+    'tbsp',
+    'tsp',
+    'pinch',
+    'slice',
+    'handful',
+    'can',
+    'cup',
+  ];
+
   Widget _buildIngredients() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -635,10 +649,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                      child: Text('tsp', style: GoogleFonts.rubik(color: const Color(0xFF868686), fontSize: 12)),
-                    ),
+                    const SizedBox(width: 8),
                     const SizedBox(width: 8),
                     GestureDetector(
                       onTap: () => controller.removeIngredient(entry.key),
@@ -751,10 +762,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                      child: Text('g/ml', style: GoogleFonts.rubik(color: const Color(0xFF868686), fontSize: 12)),
-                    ),
+                    const SizedBox(width: 8),
                     const SizedBox(width: 8),
                     // Placeholder for alignment with delete button above
                     const SizedBox(width: 22),
