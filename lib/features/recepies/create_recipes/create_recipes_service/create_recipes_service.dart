@@ -5,7 +5,105 @@ import 'package:freshbite/core/network_celler/http_client.dart';
 import 'package:http/http.dart' as http;
 
 class CreateRecipesService {
-  /// Create a new recipe with images
+  /// Upload a single image
+  /// POST {{baseUrl}}/recipe/single-upload
+  static Future<String?> uploadImage(File imageFile) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse("${Urls.baseUrl}/recipe/single-upload"),
+      );
+
+      var multipartFile = await http.MultipartFile.fromPath(
+        'image',
+        imageFile.path,
+      );
+      request.files.add(multipartFile);
+
+      final streamedResponse = await HttpClient.sendMultipart(request);
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          return data['url'];
+        }
+      }
+      print("❌ Image upload failed: ${response.body}");
+      return null;
+    } catch (e) {
+      print("❌ Image upload error: $e");
+      return null;
+    }
+  }
+
+  /// Upload a video
+  /// POST {{baseUrl}}/recipe/video-upload
+  static Future<String?> uploadVideo(File videoFile) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse("${Urls.baseUrl}/recipe/video-upload"),
+      );
+
+      var multipartFile = await http.MultipartFile.fromPath(
+        'video',
+        videoFile.path,
+      );
+      request.files.add(multipartFile);
+
+      final streamedResponse = await HttpClient.sendMultipart(request);
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          return data['url'];
+        }
+      }
+      print("❌ Video upload failed: ${response.body}");
+      return null;
+    } catch (e) {
+      print("❌ Video upload error: $e");
+      return null;
+    }
+  }
+
+  /// Upload multiple images
+  /// POST {{baseUrl}}/recipe/multiple-upload
+  static Future<List<String>?> uploadMultipleImages(List<File> imageFiles) async {
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse("${Urls.baseUrl}/recipe/multiple-upload"),
+      );
+
+      for (var file in imageFiles) {
+        var multipartFile = await http.MultipartFile.fromPath(
+          'images',
+          file.path,
+        );
+        request.files.add(multipartFile);
+      }
+
+      final streamedResponse = await HttpClient.sendMultipart(request);
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          return List<String>.from(data['url']);
+        }
+      }
+      print("❌ Multiple images upload failed: ${response.body}");
+      return null;
+    } catch (e) {
+      print("❌ Multiple images upload error: $e");
+      return null;
+    }
+  }
+
+  /// Create a new recipe with image URLs
   /// POST {{baseUrl}}/user-recipe/create-recipe
   static Future<Map<String, dynamic>> createRecipe({
     required String title,
@@ -16,77 +114,35 @@ class CreateRecipesService {
     required String cookingMode,
     required List<Map<String, dynamic>> ingredients,
     required List<Map<String, dynamic>> nutritionValue,
-    required List<String> requiredSkill,
+    required List<String> required_skill,
     required List<Map<String, dynamic>> instruction,
-    required Map<String, String> time,
-    required List<File> images,
+    required Map<String, dynamic> time,
+    required List<String> images,
   }) async {
     try {
-      print("======================================");
-      print("Creating recipe...");
-      print("Title: $title");
-      print("Description: $description");
-      print("Cooking Mode: $cookingMode");
-      print("Serving: $serving");
-      print("Allergens: $allergens");
-      print("Tags: $tags");
-      print("Ingredients: $ingredients");
-      print("Nutrition Value: $nutritionValue");
-      print("Required Skill: $requiredSkill");
-      print("Instructions: $instruction");
-      print("Time: $time");
-      print("Images count: ${images.length}");
-      print("======================================");
+      // Build JSON payload
+      final Map<String, dynamic> payload = {
+        'title': title,
+        'description': description,
+        'allergens': allergens,
+        'tags': tags,
+        'serving': serving,
+        'coocking_mode': cookingMode,
+        'ingredients': ingredients,
+        'nutritionValue': nutritionValue,
+        'required_skill': required_skill,
+        'instruction': instruction,
+        'time': time,
+        'images': images,
+      };
 
-      // Create multipart request for image upload
-      var request = http.MultipartRequest(
-        'POST',
+      final response = await HttpClient.post(
         Uri.parse("${Urls.baseUrl}/user-recipe/create-recipe"),
+        body: jsonEncode(payload),
       );
 
-      // Add text fields matching the API structure
-      request.fields['title'] = title;
-      request.fields['description'] = description;
-      request.fields['allergens'] = jsonEncode(allergens);
-      request.fields['tags'] = jsonEncode(tags);
-      request.fields['serving'] = serving.toString();
-      request.fields['coocking_mode'] = cookingMode;
-      request.fields['ingredients'] = jsonEncode(ingredients);
-      request.fields['nutritionValue'] = jsonEncode(nutritionValue);
-      request.fields['required_skill'] = jsonEncode(requiredSkill);
-      request.fields['instruction'] = jsonEncode(instruction);
-      request.fields['time'] = jsonEncode(time);
-
-      // Add images
-      for (int i = 0; i < images.length; i++) {
-        final image = images[i];
-        if (await image.exists()) {
-          var multipartFile = await http.MultipartFile.fromPath(
-            'images',
-            image.path,
-          );
-          request.files.add(multipartFile);
-          print("Added image ${i + 1}: ${image.path.split('/').last}");
-        }
-      }
-
-      // Send request using HttpClient for unified token management
-      final streamedResponse = await HttpClient.sendMultipart(request);
-      final response = await http.Response.fromStream(streamedResponse);
-
       print("Create recipe response (${response.statusCode})");
-
-      if (response.statusCode == 413) {
-        throw Exception("The request is too large. This is usually caused by large images. Please try with smaller images or fewer images.");
-      }
-
-      // Check if response is JSON
-      final contentType = response.headers['content-type'] ?? '';
-      if (!contentType.contains('application/json')) {
-        print("❌ Unexpected response format: $contentType");
-        print("Response body: ${response.body}");
-        throw Exception("Server returned an unexpected response format. Status: ${response.statusCode}");
-      }
+      print("Response body: ${response.body}");
 
       final responseData = jsonDecode(response.body);
 
@@ -95,13 +151,9 @@ class CreateRecipesService {
           print("✅ Recipe created successfully");
           return responseData;
         } else {
-          print("❌ Failed to create recipe: ${responseData['message']}");
-          print("Response body: ${response.body}");
           throw Exception("${responseData['message']}");
         }
       } else {
-        print("❌ Failed to create recipe: ${responseData['message'] ?? 'Unknown error'}");
-        print("Response body: ${response.body}");
         throw Exception("${responseData['message'] ?? 'Unknown error'}");
       }
     } catch (e) {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:freshbite/features/recepies/create_recipes/create_recipes_service/create_recipes_service.dart';
+import 'package:freshbite/features/home/cooking_skill/cooking_skill_service.dart';
 
 // ==================== RECIPE CONTROLLER ====================
 class RecipeController extends ChangeNotifier {
@@ -24,12 +25,50 @@ class RecipeController extends ChangeNotifier {
     NutritionalValue(name: '', quantity: '', unit: 'g'),
   ];
 
+  List<Map<String, dynamic>> availableSkills = [];
+  List<String> selectedSkillIds = [];
+  String recipeVideoUrl = '';
+  File? recipeVideoFile;
+
   String allergens = '';
   String tagsInput = '';
 
   bool isLoading = false;
 
   final ImagePicker _picker = ImagePicker();
+
+  RecipeController() {
+    fetchSkills();
+  }
+
+  Future<void> fetchSkills() async {
+    try {
+      final response = await CookingSkillService.getAllSkills();
+      if (response['success'] == true && response['data'] != null) {
+        availableSkills = List<Map<String, dynamic>>.from(response['data']);
+        notifyListeners();
+      }
+    } catch (e) {
+      print('❌ Error fetching skills: $e');
+    }
+  }
+
+  Future<void> pickVideo() async {
+    final XFile? video = await _picker.pickVideo(source: ImageSource.gallery);
+    if (video != null) {
+      recipeVideoFile = File(video.path);
+      notifyListeners();
+    }
+  }
+
+  void toggleSkill(String skillId) {
+    if (selectedSkillIds.contains(skillId)) {
+      selectedSkillIds.remove(skillId);
+    } else {
+      selectedSkillIds.add(skillId);
+    }
+    notifyListeners();
+  }
 
   void updateRecipeName(String value) {
     recipeName = value;
@@ -72,6 +111,14 @@ class RecipeController extends ChangeNotifier {
     if (text != null) instructions[index].text = text;
     if (videoUrl != null) instructions[index].videoUrl = videoUrl;
     notifyListeners();
+  }
+
+  Future<void> pickInstructionVideo(int index) async {
+    final XFile? video = await _picker.pickVideo(source: ImageSource.gallery);
+    if (video != null) {
+      instructions[index].videoFile = File(video.path);
+      notifyListeners();
+    }
   }
 
   void addIngredient() {
@@ -119,6 +166,7 @@ class RecipeController extends ChangeNotifier {
   String _normalizeUnit(String unit) {
     final u = unit.trim().toLowerCase();
     if (u == 'piece' || u == 'pcs' || u == 'pcs.') return 'pcs';
+    if (u == 'cloves') return 'cloves';
     if (u == 'g' || u == 'gram' || u == 'grams') return 'g';
     if (u == 'ml' || u == 'milliliter' || u == 'milliliters') return 'ml';
     if (u == 'tbsp' || u == 'tablespoon' || u == 'tablespoons') return 'tbsp';
@@ -146,7 +194,8 @@ class RecipeController extends ChangeNotifier {
       }
 
       // Get only non-null images
-      final validImages = recipeImages.where((img) => img != null).cast<File>().toList();
+      final validImages =
+          recipeImages.where((img) => img != null).cast<File>().toList();
 
       if (validImages.isEmpty) {
         print('❌ At least one image is required');
@@ -156,58 +205,89 @@ class RecipeController extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      // Parse allergens (comma or space separated)
+      // 1. Upload Images
+      List<String> imageUrls = [];
+      if (validImages.length == 1) {
+        final url = await CreateRecipesService.uploadImage(validImages[0]);
+        if (url != null) imageUrls.add(url);
+      } else {
+        final urls =
+            await CreateRecipesService.uploadMultipleImages(validImages);
+        if (urls != null) imageUrls = urls;
+      }
+
+      if (imageUrls.isEmpty) {
+        print('❌ Image upload failed');
+        isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
+      // 2. Prepare data
+      // Parse allergens (comma separated)
       final allergensList = allergens
-          .split(RegExp(r'[,\s]+'))
+          .split(',')
           .map((e) => e.trim())
           .where((e) => e.isNotEmpty)
           .toList();
 
-      // Parse tags (comma or space separated)
+      // Parse tags (comma separated)
       final tagsList = tagsInput
-          .split(RegExp(r'[,\s]+'))
+          .split(',')
           .map((e) => e.trim())
           .where((e) => e.isNotEmpty)
           .take(10) // Maximum 10 tags
           .toList();
 
       // Build ingredients list matching API structure
-      final ingredientsList = ingredients
-          .where((ing) => ing.name.isNotEmpty)
-          .map((ing) {
-                  final unit = _normalizeUnit(ing.unit);
-                  final unit2 = _normalizeUnit(ing.unit2.isNotEmpty ? ing.unit2 : (ing.unit.isNotEmpty ? ing.unit : 'g'));
-                  return {
-                    'name': ing.name,
-                    'unit': unit,
-                    'value': ing.quantity.isNotEmpty ? ing.quantity : '0',
-                    'categories': ing.category.isNotEmpty ? ing.category : 'Other',
-                    'household': {
-                      'unit': unit2,
-                      'value': ing.quantity2.isNotEmpty ? ing.quantity2 : (ing.quantity.isNotEmpty ? ing.quantity : '0'),
-                    },
-                  };
-                })
-          .toList();
+      final ingredientsList =
+          ingredients.where((ing) => ing.name.isNotEmpty).map((ing) {
+        String unit = ing.unit.isNotEmpty ? ing.unit : 'g';
+        if (unit == 'piece') unit = 'pcs';
+
+        String unit2 = ing.unit2.isNotEmpty ? ing.unit2 : 'cup';
+        if (unit2 == 'piece') unit2 = 'pcs';
+
+        return {
+          'name': ing.name,
+          'unit': unit,
+          'value': ing.quantity.isNotEmpty ? ing.quantity : '0',
+          'categories': ing.category.isNotEmpty ? ing.category : 'Other',
+          'household': {
+            'unit': unit2,
+            'value': ing.quantity2.isNotEmpty ? ing.quantity2 : '0',
+          },
+        };
+      }).toList();
 
       // Build nutrition values list matching API structure
-      final nutritionList = nutritionalValues
-          .where((nutr) => nutr.name.isNotEmpty)
-          .map((nutr) => {
+      final nutritionList =
+          nutritionalValues.where((nutr) => nutr.name.isNotEmpty).map((nutr) => {
                 'name': nutr.name,
-                'unit': nutr.unit.isNotEmpty ? nutr.unit : 'kcal',
+                'unit': nutr.unit.isNotEmpty ? nutr.unit : 'g',
                 'value': nutr.quantity.isNotEmpty ? nutr.quantity : '0',
-              })
-          .toList();
+              }).toList();
 
       // Build instructions list matching API structure
-      final instructionsList = instructions
-          .where((inst) => inst.text.isNotEmpty)
-          .map((inst) => {
-                'title': inst.text,
-                'videoUrl': inst.videoUrl ?? '',
-              })
-          .toList();
+      // First, upload all instruction videos
+      final finalInstructions = <Map<String, dynamic>>[];
+      for (var inst in instructions) {
+        if (inst.text.trim().isEmpty) continue;
+
+        String? vUrl = inst.videoUrl;
+        if (inst.videoFile != null) {
+          final uploadedUrl =
+              await CreateRecipesService.uploadVideo(inst.videoFile!);
+          if (uploadedUrl != null) {
+            vUrl = uploadedUrl;
+          }
+        }
+
+        finalInstructions.add({
+          'title': inst.text.trim(),
+          'videoUrl': vUrl ?? '', // Server requires this
+        });
+      }
 
       // Build time object matching API structure
       final timeData = {
@@ -217,17 +297,10 @@ class RecipeController extends ChangeNotifier {
       };
 
       // Map cooking mode to lowercase
-      final cookingModeLower = selectedCookingMode.toLowerCase();
+      String cookingModeLower = selectedCookingMode.toLowerCase();
+      if (cookingModeLower == 'mealprep') cookingModeLower = 'meal-prep';
 
-      // Normalize requiredSkill: backend expects IDs (24-hex) — prefer sending IDs
-      final requiredSkillIds = selectedComponents
-          .map((s) => s.trim())
-          .where((s) => RegExp(r'^[0-9a-fA-F]{24}\$').hasMatch(s))
-          .toList();
-      // Send only valid IDs; if none, send empty list to avoid backend validation errors
-      final requiredSkillPayload = requiredSkillIds.isNotEmpty ? requiredSkillIds : <String>[];
-
-      // Call API
+      // 3. Call Create Recipe API
       await CreateRecipesService.createRecipe(
         title: recipeName.trim(),
         description: description.trim(),
@@ -236,11 +309,11 @@ class RecipeController extends ChangeNotifier {
         serving: int.tryParse(servings.replaceAll(RegExp(r'[^0-9]'), '')) ?? 1,
         ingredients: ingredientsList,
         nutritionValue: nutritionList,
-        requiredSkill: requiredSkillPayload,
-        instruction: instructionsList,
+        required_skill: selectedSkillIds,
+        instruction: finalInstructions,
         time: timeData,
         cookingMode: cookingModeLower,
-        images: validImages,
+        images: imageUrls,
       );
 
       isLoading = false;
@@ -260,6 +333,7 @@ class RecipeController extends ChangeNotifier {
 class InstructionStep {
   String text = '';
   String? videoUrl;
+  File? videoFile;
   bool isBold = false;
   bool isItalic = false;
   bool isUnderline = false;
