@@ -24,7 +24,7 @@ dependencies:
   intl_phone_field:
   # dropdown_button2: ^2.3.9
 
-  google_fonts:
+  google_fonts:  ^6.2.1
   # jwt_decode: ^0.3.1
   shared_preferences:
   # jwt_decoder: ^2.0.1
@@ -32,13 +32,13 @@ dependencies:
   flutter_screenutil:
   flutter_svg:
   image_picker:
-  video_player:
+  video_player: ^2.11.1
   audioplayers:
   intl:
 
   appinio_video_player:
-  chewie:
-  file_picker:
+  chewie: ^1.8.0
+  file_picker: ^8.0.0
   permission_handler:
   provider:
   path_provider:

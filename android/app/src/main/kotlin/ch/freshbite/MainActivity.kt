@@ -1,4 +1,4 @@
-package com.example.freshbite
+package ch.freshbite
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

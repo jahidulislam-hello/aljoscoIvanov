@@ -37,13 +37,11 @@ class SkillData {
 class RecipeInstructionsScreen extends StatefulWidget {
   final List<SkillData> skills;
 
-  const RecipeInstructionsScreen({
-    super.key,
-    required this.skills,
-  });
+  const RecipeInstructionsScreen({super.key, required this.skills});
 
   @override
-  State<RecipeInstructionsScreen> createState() => _RecipeInstructionsScreenState();
+  State<RecipeInstructionsScreen> createState() =>
+      _RecipeInstructionsScreenState();
 }
 
 class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
@@ -85,8 +83,10 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
       _videoController!.addListener(() {
         if (mounted) {
           setState(() {
-            _currentPosition = _videoController!.value.position.inMilliseconds.toDouble();
-            _totalDuration = _videoController!.value.duration.inMilliseconds.toDouble();
+            _currentPosition = _videoController!.value.position.inMilliseconds
+                .toDouble();
+            _totalDuration = _videoController!.value.duration.inMilliseconds
+                .toDouble();
             _isPlaying = _videoController!.value.isPlaying;
           });
         }
@@ -127,7 +127,9 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
 
     final currentPosition = _videoController!.value.position;
     final newPosition = currentPosition - const Duration(seconds: 10);
-    _videoController!.seekTo(newPosition > Duration.zero ? newPosition : Duration.zero);
+    _videoController!.seekTo(
+      newPosition > Duration.zero ? newPosition : Duration.zero,
+    );
   }
 
   void _seekForward() {
@@ -166,7 +168,13 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
 
   SkillData get currentSkill => widget.skills.isNotEmpty
       ? widget.skills[selectedStep]
-      : SkillData(id: '', title: '', description: '', videoUrl: '', coverUrl: '');
+      : SkillData(
+          id: '',
+          title: '',
+          description: '',
+          videoUrl: '',
+          coverUrl: '',
+        );
 
   @override
   Widget build(BuildContext context) {
@@ -255,7 +263,6 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
                   child: VideoPlayer(_videoController!),
                 ),
               )
-
             else
               Container(
                 color: Colors.grey[800],
@@ -297,10 +304,7 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.7),
-                    ],
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
                   ),
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(16.r),
@@ -314,8 +318,12 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
                     SliderTheme(
                       data: SliderThemeData(
                         trackHeight: 4.h,
-                        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.r),
-                        overlayShape: RoundSliderOverlayShape(overlayRadius: 12.r),
+                        thumbShape: RoundSliderThumbShape(
+                          enabledThumbRadius: 6.r,
+                        ),
+                        overlayShape: RoundSliderOverlayShape(
+                          overlayRadius: 12.r,
+                        ),
                         activeTrackColor: AppColors.buttonColor,
                         inactiveTrackColor: Colors.white.withOpacity(0.3),
                         thumbColor: AppColors.buttonColor,
@@ -324,7 +332,9 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
                         value: _currentPosition.clamp(0, _totalDuration),
                         max: _totalDuration > 0 ? _totalDuration : 1,
                         onChanged: (value) {
-                          _videoController?.seekTo(Duration(milliseconds: value.toInt()));
+                          _videoController?.seekTo(
+                            Duration(milliseconds: value.toInt()),
+                          );
                         },
                       ),
                     ),
@@ -399,7 +409,11 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
     );
   }
 
-  Widget _buildControlButton(IconData icon, Color color, VoidCallback? onPressed) {
+  Widget _buildControlButton(
+    IconData icon,
+    Color color,
+    VoidCallback? onPressed,
+  ) {
     return IconButton(
       icon: Icon(icon, color: color, size: 24.sp),
       onPressed: onPressed,
@@ -456,7 +470,9 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
       children: [
         // Previous Button
         GestureDetector(
-          onTap: selectedStep > 0 ? () => _onStepSelected(selectedStep - 1) : null,
+          onTap: selectedStep > 0
+              ? () => _onStepSelected(selectedStep - 1)
+              : null,
           child: _buildNavButton(Icons.chevron_left, false, selectedStep > 0),
         ),
 
@@ -466,7 +482,9 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
         ...List.generate(widget.skills.length, (index) {
           return Expanded(
             child: Padding(
-              padding: EdgeInsets.only(right: index != widget.skills.length - 1 ? 8.w : 0),
+              padding: EdgeInsets.only(
+                right: index != widget.skills.length - 1 ? 8.w : 0,
+              ),
               child: _buildStepButton(index),
             ),
           );
@@ -516,10 +534,7 @@ class _RecipeInstructionsScreenState extends State<RecipeInstructionsScreen> {
           color: isSelected ? Colors.black : Colors.white,
           border: isSelected
               ? null
-              : Border.all(
-                  color: const Color(0xFFE5E7EB),
-                  width: 2,
-                ),
+              : Border.all(color: const Color(0xFFE5E7EB), width: 2),
           borderRadius: BorderRadius.circular(8.r),
         ),
         child: Center(
@@ -623,11 +638,7 @@ class _FullScreenVideoPlayerState extends State<_FullScreenVideoPlayer> {
               child: CircleAvatar(
                 radius: 40.r,
                 backgroundColor: Colors.white.withOpacity(0.8),
-                child: Icon(
-                  Icons.play_arrow,
-                  color: Colors.black,
-                  size: 48.sp,
-                ),
+                child: Icon(Icons.play_arrow, color: Colors.black, size: 48.sp),
               ),
             ),
 
@@ -642,10 +653,7 @@ class _FullScreenVideoPlayerState extends State<_FullScreenVideoPlayer> {
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
-                  colors: [
-                    Colors.black.withOpacity(0.7),
-                    Colors.transparent,
-                  ],
+                  colors: [Colors.black.withOpacity(0.7), Colors.transparent],
                 ),
               ),
               child: Column(
@@ -696,7 +704,9 @@ class _FullScreenVideoPlayerState extends State<_FullScreenVideoPlayer> {
                       // Play/Pause button
                       IconButton(
                         icon: Icon(
-                          _isPlaying ? Icons.pause_circle_filled : Icons.play_circle_fill,
+                          _isPlaying
+                              ? Icons.pause_circle_filled
+                              : Icons.play_circle_fill,
                           color: Colors.white,
                           size: 40.sp,
                         ),
