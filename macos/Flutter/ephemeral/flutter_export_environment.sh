@@ -1,9 +1,7 @@
-
-export "FLUTTER_ROOT=/Users/jahidulislam/flutter"
-export "FLUTTER_APPLICATION_PATH=/Users/jahidulislam/Desktop/Flutter/freshbite"
-export "FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/Users/jahidulislam/Desktop/Flutter/freshbite/macos/Flutter/ephemeral/Packages/.packages/FlutterFramework"
-export "FLUTTER_ROOT=/opt/homebrew/share/flutter"
-export "FLUTTER_APPLICATION_PATH=/Volumes/external_disk/apps/freshbite"
+#!/bin/sh
+# This is a generated file; do not edit or check into version control.
+export "FLUTTER_ROOT=C:\flutter"
+export "FLUTTER_APPLICATION_PATH=C:\Alithim\freshbite"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"
