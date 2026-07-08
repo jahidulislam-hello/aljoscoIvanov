@@ -26,13 +26,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   StreamSubscription? _premiumListener;
 
-  final List<Map<String, dynamic>> plans = const [
-    {"title": "Guest / Free Account",   "price": 0.0,  "currency": "CHF"},
-    {"title": "Family subscription",    "price": 24.0, "currency": "CHF"},
-    {"title": "Premium subscription",   "price": 19.0, "currency": "CHF"},
-    {"title": "Premium trial (1 week)", "price": 0.0,  "currency": "CHF"},
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -54,11 +47,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final selectedIndex = subscriptionController.selectedPlan.value;
     if (selectedIndex == -1) return;
 
-    final plan = plans[selectedIndex];
-    final double price = plan['price'];
+    final subscriptions = subscriptionController.subscriptions;
+    if (selectedIndex >= subscriptions.length) return;
 
-    if (price <= 0) {
+    final sub = subscriptions[selectedIndex];
+
+    if (sub.price <= 0) {
+      // Free plans (guest / trial) -> just notify backend with empty token
       Get.offAllNamed(AppRoute.getBottomNavbar());
+      await subscriptionController.purchaseSubscription(
+        subscriptionId: sub.id,
+        purchaseToken: "",
+      );
       return;
     }
 
@@ -76,14 +76,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
       return;
     }
 
-    await iap.buyPlan(selectedIndex);
+    await iap.buyPlan(sub.plan);
   }
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
       final selectedIndex = subscriptionController.selectedPlan.value;
-      final plan = selectedIndex != -1 ? plans[selectedIndex] : null;
+      final subscriptions = subscriptionController.subscriptions;
+      final sub = selectedIndex != -1 && selectedIndex < subscriptions.length
+          ? subscriptions[selectedIndex]
+          : null;
 
       return Scaffold(
         backgroundColor: AppColors.background,
@@ -95,7 +98,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             const CustomAppBar(title: "Payment", height: kToolbarHeight),
           ),
         ),
-        body: plan == null
+        body: sub == null
             ? const Center(child: Text("No plan selected"))
             : Padding(
           padding: EdgeInsets.all(20.w),
@@ -124,9 +127,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(plan['title'], style: AppTextStyles.body),
+                        Expanded(
+                          child: Text(
+                            SubscriptionController.getTitleForPlan(sub.plan)
+                                .replaceAll('\n', ' '),
+                            style: AppTextStyles.body,
+                          ),
+                        ),
                         Text(
-                          "${plan['currency']} ${(plan['price'] as double).toStringAsFixed(2)}",
+                          "CHF ${sub.price.toStringAsFixed(2)}",
                           style: AppTextStyles.H4_Regular,
                         ),
                       ],
@@ -137,7 +146,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       children: [
                         Text("Total", style: AppTextStyles.H3_Regular),
                         Text(
-                          "${plan['currency']} ${(plan['price'] as double).toStringAsFixed(2)}",
+                          "CHF ${sub.price.toStringAsFixed(2)}",
                           style: AppTextStyles.H3_Regular
                               .copyWith(color: AppColors.buttonColor),
                         ),
@@ -173,8 +182,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
 
               // Store unavailable warning
-              if (!iap.isAvailable.value &&
-                  (plan['price'] as double) > 0)
+              if (!iap.isAvailable.value && sub.price > 0)
                 Container(
                   padding: EdgeInsets.all(12.w),
                   decoration: BoxDecoration(
@@ -199,10 +207,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
               const Spacer(),
 
               // Pay button
-              iap.isLoading.value
+              subscriptionController.isLoading.value
+                  ? const Center(child: CircularProgressIndicator())
+                  : iap.isLoading.value
                   ? const Center(child: CircularProgressIndicator())
                   : CustomTextButton(
-                text: (plan['price'] as double) > 0
+                text: sub.price > 0
                     ? "CONFIRM AND PAY"
                     : "ACTIVATE PLAN",
                 onTap: _handlePayment,

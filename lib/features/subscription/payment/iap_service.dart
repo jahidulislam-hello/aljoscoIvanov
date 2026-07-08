@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_wrappers.dart';
+import 'package:freshbite/features/subscription/subscription_controller/subscription_controller.dart';
 
 class IAPService extends GetxService {
   static IAPService get to => Get.find();
@@ -21,6 +22,13 @@ class IAPService extends GetxService {
   };
 
   final RxList<ProductDetails> products = <ProductDetails>[].obs;
+
+  /// Reverse map: productId -> plan key
+  static const Map<String, String> planForProductId = {
+    'com.freshbite.family_monthly': 'family',
+    'com.freshbite.premium_monthly': 'premium',
+    'com.freshbite.premium_trial': 'trial',
+  };
   final RxBool isAvailable = false.obs;
   final RxBool isPremium = false.obs;
   final RxBool isLoading = false.obs;
@@ -66,8 +74,8 @@ class IAPService extends GetxService {
     isLoading.value = false;
   }
 
-  /// Call this with plan index from SubscriptionController
-  Future<void> buyPlan(int planIndex) async {
+  /// Call this with the plan key (e.g. 'premium', 'family', 'trial')
+  Future<void> buyPlan(String planKey) async {
     if (!isAvailable.value) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Get.snackbar(
@@ -80,10 +88,9 @@ class IAPService extends GetxService {
       return;
     }
 
-    final String? key = {1: 'family', 2: 'premium', 3: 'trial'}[planIndex];
-    if (key == null) return;
+    final String? productId = productIds[planKey];
+    if (productId == null) return;
 
-    final String? productId = productIds[key];
     final ProductDetails? product =
     products.firstWhereOrNull((p) => p.id == productId);
 
@@ -127,7 +134,10 @@ class IAPService extends GetxService {
         case PurchaseStatus.restored:
           isLoading.value = false;
           final valid = _verifyPurchase(purchase);
-          if (valid) _unlockPlan(purchase.productID);
+          if (valid) {
+            _unlockPlan(purchase.productID);
+            await _notifyBackend(purchase);
+          }
           if (purchase.pendingCompletePurchase) {
             await _iap.completePurchase(purchase);
           }
@@ -167,6 +177,26 @@ class IAPService extends GetxService {
       backgroundColor: Colors.green,
       colorText: Colors.white,
     );
+  }
+
+  /// Notify backend with subscriptionId + purchaseToken (google / appstore)
+  Future<void> _notifyBackend(PurchaseDetails purchase) async {
+    try {
+      final planKey = planForProductId[purchase.productID];
+      if (planKey == null) return;
+
+      final controller = Get.find<SubscriptionController>();
+      final sub = controller.subscriptions
+          .firstWhereOrNull((s) => s.plan == planKey);
+      if (sub == null) return;
+
+      await controller.purchaseSubscription(
+        subscriptionId: sub.id,
+        purchaseToken: purchase.verificationData.serverVerificationData,
+      );
+    } catch (e) {
+      debugPrint('[IAP] Backend notify error: $e');
+    }
   }
 
   @override

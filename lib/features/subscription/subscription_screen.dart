@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freshbite/core/appbar/custom_appbar.dart';
+import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/app_images.dart';
 import 'package:freshbite/core/widgets/custom_text_button.dart';
 import 'package:freshbite/features/subscription/subscription_controller/subscription_controller.dart';
 import 'package:freshbite/features/subscription/payment/payment.dart';
-import 'package:freshbite/routes/routes.dart';
 import 'package:get/get.dart';
-import '../../core/themes/app_colors.dart';
 import '../../core/themes/text_styles.dart';
 
+class SubscriptionScreen extends StatelessWidget {
+  final String currentPlanType;
+  final String currentSubscriptionStatus;
 
-class SubscriptionScreen extends StatelessWidget{
-  SubscriptionScreen({super.key});
+  SubscriptionScreen({
+    super.key,
+    this.currentPlanType = '',
+    this.currentSubscriptionStatus = '',
+  }) {
+    controller.setCurrentSubscription(
+      planType: currentPlanType,
+      status: currentSubscriptionStatus,
+    );
+  }
 
   final SubscriptionController controller = Get.put(SubscriptionController());
 
@@ -30,92 +40,88 @@ class SubscriptionScreen extends StatelessWidget{
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          children: [
-            /// ---------- GRID: 2 BOXES IN EACH ROW ----------
-            GridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 16.h,
-              crossAxisSpacing: 16.w,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 0.58,
-              children: [
-                _card(
-                  index: 0,
-                  icon: AppImages.crown_icon,
-                  title: "Guest /\n Free Account",
-                  items: const [
-                    "Free, single user",
-                    "Access to 5 recipes",
-                    "New recipes locked",
-                    "Plan 1 day",
-                    "Create up to 3 recipes",
-                  ],
-                  price: "CHF 00.00",
-                  unit: "/month",
-                ),
-                _card(
-                  index: 1,
-                  icon: AppImages.family_icon,
-                  title: "Family\n subscription",
-                  items: const [
-                    "Full access to all recipes",
-                    "Invite 4 users",
-                    "Synced meal planner",
-                    "Shared notes",
-                    "All users can create",
-                  ],
-                  price: "CHF 24.00",
-                  unit: "/month",
-                ),
-                _card(
-                  index: 2,
-                  icon: AppImages.pepper_icon,
-                  title: "Premium subscription",
-                  items: const [
-                    "Full access to all recipes",
-                    "Unlimited planner",
-                    "Save unlimited recipes",
-                    "Kitchen skills library",
-                    "Single user only",
-                  ],
-                  price: "CHF 19.00",
-                  unit: "/month",
-                ),
-                _card(
-                  index: 3,
-                  icon: AppImages.handshake_icon,
-                  title: "Premium trial (1 week)",
-                  items: const [
-                    "Free, single user",
-                    "Full access",
-                    "Limited to 1 week",
-                  ],
-                  price: "CHF 00.00",
-                  unit: "/1 week",
-                ),
-              ],
-            ),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-            30.verticalSpace,
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(16.w),
+          child: Column(
+            children: [
+              /// ---------- GRID: 2 BOXES IN EACH ROW (FROM API) ----------
+              GridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16.h,
+                crossAxisSpacing: 16.w,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                childAspectRatio: 0.58,
+                children: List.generate(controller.subscriptions.length, (index) {
+                  final sub = controller.subscriptions[index];
+                  return _card(
+                    index: index,
+                    icon: SubscriptionController.getIconForPlan(sub.plan),
+                    title: SubscriptionController.getTitleForPlan(sub.plan),
+                    items: sub.features,
+                    price: "CHF ${sub.price.toStringAsFixed(2)}",
+                    unit: SubscriptionController.getUnitForDuration(sub.duration),
+                  );
+                }),
+              ),
 
-            /// ---------- PAY BUTTON ----------
-            CustomTextButton(
-              text: "PAY NOW",
-              onTap: () {
-                if (controller.selectedPlan.value == -1) {
-                  Get.snackbar("Alert", "Please select a plan first");
-                } else {
-                  Get.to(()=>PaymentScreen());
-                }
-              },
-            ),
-          ],
-        ),
-      ),
+              30.verticalSpace,
+
+              /// ---------- ALREADY SUBSCRIBED BANNER ----------
+              if (controller.hasActiveSubscription)
+                Container(
+                  margin: EdgeInsets.only(bottom: 16.h),
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade50,
+                    borderRadius: BorderRadius.circular(10.r),
+                    border: Border.all(color: Colors.green),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.check_circle, color: Colors.green),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Text(
+                          "You already have an active subscription",
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: Colors.green,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              /// ---------- PAY BUTTON ----------
+              CustomTextButton(
+                text: controller.hasActiveSubscription
+                    ? "ALREADY SUBSCRIBED"
+                    : "PAY NOW",
+                onTap: () {
+                  if (controller.hasActiveSubscription) {
+                    Get.snackbar(
+                      "Info",
+                      "You already have an active subscription",
+                    );
+                    return;
+                  }
+                  if (controller.selectedPlan.value == -1) {
+                    Get.snackbar("Alert", "Please select a plan first");
+                  } else {
+                    Get.to(() => PaymentScreen());
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 
@@ -171,6 +177,8 @@ class SubscriptionScreen extends StatelessWidget{
                     icon,
                     width: 28.w,
                     height: 28.h,
+                    color: index == 3 ? AppColors.buttonColor : Colors.white,
+                    colorBlendMode: BlendMode.srcIn,
                   ),
                 ),
               ),
@@ -191,45 +199,44 @@ class SubscriptionScreen extends StatelessWidget{
               10.verticalSpace,
 
               /// FEATURE LIST
-              SizedBox(
-                height: 80.h,
-                child: ListView.builder(
-                  padding: EdgeInsets.zero,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: items.length,
-                  itemBuilder: (_, i) {
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: 4.h),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Image.asset(
-                            index == 3
-                                ? AppImages.white_thikki_icon
-                                : AppImages.thikki_icon,
-                            width: 12.w,
-                            height: 12.h,
-                          ),
+              ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: items.length,
+                itemBuilder: (_, i) {
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: 4.h),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Image.asset(
+                          index == 3
+                              ? AppImages.white_thikki_icon
+                              : AppImages.thikki_icon,
+                          width: 12.w,
+                          height: 12.h,
+                        ),
 
-                          6.horizontalSpace,
+                        6.horizontalSpace,
 
-                          Expanded(
-                            child: Text(
-                              items[i],
-                              style: AppTextStyles.bodySmall.copyWith(
-                                fontSize: 10.sp,
-                                color: subTextColor, // white for last card
-                              ),
+                        Expanded(
+                          child: Text(
+                            items[i],
+                            style: AppTextStyles.bodySmall.copyWith(
+                              fontSize: 10.sp,
+                              color: subTextColor, // white for last card
                             ),
                           ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
 
-              12.verticalSpace,
+              /// PUSH PRICE TO BOTTOM BORDER
+              const Spacer(),
 
               /// PRICE
               Text(
