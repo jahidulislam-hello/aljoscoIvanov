@@ -1,5 +1,5 @@
 class Urls {
-  static const String baseUrl = 'https://dgpjqg8r-6000.inc1.devtunnels.ms/api/v1';
+  static const String baseUrl = 'https://server.freshbite.ch/api/v1';
   // static const String baseUrl = 'https://ibrahim8000.sobhoy.com/api/v1';
   static const String imageBaseUrl = "https://rakib6590.sobhoy.com";
   static const String pictureUrl = 'https://argentoba.s3.us-east-2.amazonaws.com';
@@ -25,4 +25,18 @@ class Urls {
   // Skill endpoints
   static const String getAllSkills = '$baseUrl/skill/get-all-skill';
   static String getSkillById(String id) => '$baseUrl/skill/get-skill/$id';
+
+
+  //subscription
+  static const String getAllSubcription = '$baseUrl/subscription';
+  static const String purchaseSubscription = '$baseUrl/user/purchase-subscription';
+
+
+
+
+
+
+
+
+
 }
