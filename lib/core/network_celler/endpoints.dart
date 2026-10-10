@@ -25,4 +25,18 @@ class Urls {
   // Skill endpoints
   static const String getAllSkills = '$baseUrl/skill/get-all-skill';
   static String getSkillById(String id) => '$baseUrl/skill/get-skill/$id';
+
+
+  //subscription
+  static const String getAllSubcription = '$baseUrl/subscription';
+  static const String purchaseSubscription = '$baseUrl/user/purchase-subscription';
+
+
+
+
+
+
+
+
+
 }

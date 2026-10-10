@@ -6,6 +6,7 @@ import 'package:freshbite/core/themes/app_colors.dart';
 import 'package:freshbite/core/themes/text_styles.dart';
 import 'package:freshbite/features/profile/profile/model/profile_recipe_model.dart';
 import 'package:freshbite/features/profile/profile/profile_controller/profile_controller.dart';
+import 'package:freshbite/features/subscription/subscription_screen.dart';
 import 'package:get/get.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -148,39 +149,45 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 12.h),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-            decoration: BoxDecoration(
-              border: Border.all(color: AppColors.lightGrey, width: 1.5.w),
-              borderRadius: BorderRadius.circular(10.r),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  user.isGuestUser
-                      ? Icons.person_outline
-                      : Icons.workspace_premium,
-                  size: 16.sp,
-                  color: user.isTrialUser
-                      ? Colors.orange
-                      : user.isGuestUser
-                          ? AppColors.grey
-                          : AppColors.black,
-                ),
-                SizedBox(width: 6.w),
-                Text(
-                  user.getPlanDisplayName(),
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    fontWeight: FontWeight.w500,
+          GestureDetector(
+            onTap: () => Get.to(() => SubscriptionScreen(
+              currentPlanType: user.planType,
+              currentSubscriptionStatus: user.subscriptionStatus,
+            )),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.lightGrey, width: 1.5.w),
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    user.isGuestUser
+                        ? Icons.person_outline
+                        : Icons.workspace_premium,
+                    size: 16.sp,
                     color: user.isTrialUser
                         ? Colors.orange
                         : user.isGuestUser
                             ? AppColors.grey
                             : AppColors.black,
                   ),
-                ),
-              ],
+                  SizedBox(width: 6.w),
+                  Text(
+                    user.getPlanDisplayName(),
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: user.isTrialUser
+                          ? Colors.orange
+                          : user.isGuestUser
+                              ? AppColors.grey
+                              : AppColors.black,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
